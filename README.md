@@ -90,8 +90,9 @@ Compatibility is pinned to the package, APKM file type, version **20.0**, versio
 for all ABIs, `minSdk` **24**, and the official signing-certificate SHA-256.
 
 Those pins identify and validate the input; they do not control which website Manager's built-in
-“help me find an APK” flow opens. If it opens a different host, use the exact README link above and
-select the downloaded APKM manually.
+“help me find an APK” flow opens.
+
+> **Uptodown note:** If Morphe’s “help me find an APK” flow opens Uptodown and downloads the 1DM 20.0 XAPK, that file has also been tested successfully. Select it in Morphe Manager instead of installing it. For x86/x86_64 devices, or if the Uptodown result is not exactly 20.0, use the APKMirror universal APKM above.
 
 ## Usage (Morphe Manager)
 
