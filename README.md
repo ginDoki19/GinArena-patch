@@ -17,8 +17,22 @@ github.com/sagarkhansau19-svg/GinArena-patch
 ## 🩹 Patches list
 
 <!-- PATCHES_START EXPANDED -->
+> **[v2.0.0-dev.1](https://github.com/sagarkhansau19-svg/GinArena-patch/releases/tag/v2.0.0-dev.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;1 patches total
+<details open>
+<summary>📦 1DM&nbsp;&nbsp;•&nbsp;&nbsp;1 patch</summary>
+<br>
 
-#### A list of patches will automatically be shown here after a release is created.
+**🎯 Supported versions:**
+
+| 20.0 |
+| :---: |
+| Official universal APKM for 1DM 20.0 (30257), Android 7.0+ / 160-640 dpi. Download: https://www.apkmirror.com/apk/Vicky%20Bonick/idm-download-video-movie-music-anime-torrent/1dm-browser-video-download-20-0-release/1dm-browser-video-download-20-0-2-android-apk-download/ Do not use the separate 20257 variant. |
+
+| 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
+|----------|----------------|-----------|
+| [GinArena Patch](#ginarena-patch) | Removes visible banner/full-screen ads and 1DM+ promotions from free 1DM 20.0 (30257), including the downloads-home VPN promo bar and sponsored browser start-page tiles. User shortcuts remain available. Stock APKM: https://www.apkmirror.com/apk/Vicky%20Bonick/idm-download-video-movie-music-anime-torrent/1dm-browser-video-download-20-0-release/1dm-browser-video-download-20-0-2-android-apk-download/ |  |
+
+</details>
 
 <!-- PATCHES_END -->
 
