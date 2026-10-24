@@ -4,10 +4,10 @@ patches {
     about {
         name = "GinArena Patch"
         description = "Removes visible ads and promotions from free 1DM 20.0 (30257), including the downloads-home VPN promo bar and sponsored browser start-page tiles."
-        source = "https://github.com/sagarkhansau19-svg/GinArena-patch"
-        author = "sagarkhansau19-svg"
-        contact = "https://github.com/sagarkhansau19-svg/GinArena-patch/issues"
-        website = "https://github.com/sagarkhansau19-svg/GinArena-patch"
+        source = "https://github.com/ginDoki19/GinArena-patch"
+        author = "ginDoki19"
+        contact = "https://github.com/ginDoki19/GinArena-patch/issues"
+        website = "https://github.com/ginDoki19/GinArena-patch"
         license = "GPLv3"
     }
 }
