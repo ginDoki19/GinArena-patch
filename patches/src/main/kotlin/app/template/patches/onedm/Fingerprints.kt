@@ -14,6 +14,9 @@ internal const val BROWSER_ACTIVITY = "Lacr/browser/lightning/activity/BrowserAc
 internal const val BANNER_MANAGER = "Lacr/browser/lightning/view/BannerManager;"
 internal const val ACR_BANNER_VIEW = "Lacr/browser/lightning/view/BannerView;"
 internal const val MAIN_ACTIVITY = "Lidm/internet/download/manager/MainActivity;"
+internal const val MAIN_ACTIVITY_FRAGMENT = "Lidm/internet/download/manager/MainActivity\$a;"
+internal const val LEGACY_START_PAGE = "Lacr/browser/lightning/constant/StartPage2;"
+internal const val SPONSORED_SHORTCUT = "Li/fc;"
 internal const val TORRENT_DETAILS = "Lidm/internet/download/manager/TorrentDetails;"
 internal const val APPODEAL_BANNER_VIEW = "Lidm/internet/download/manager/AppodealBannerView;"
 internal const val IDM_BANNER_VIEW = "Lidm/internet/download/manager/BannerView;"
@@ -363,6 +366,66 @@ object MaxHeightOnMeasureFingerprint : Fingerprint(
     name = "onMeasure",
     returnType = "V",
     parameters = listOf("I", "I")
+)
+
+// endregion
+
+// region v2.0.0 device-test follow-ups: downloads-home promo bar and browser sponsored tiles
+
+/**
+ * The obfuscated updater for the `offer_vpnLL` strip in the downloads fragment. Its boolean
+ * argument is the app's own force-hide switch; with false it can display the VPN offer or the
+ * other promotional messages identified by the string resources below.
+ */
+object MainActivityPromoBarFingerprint : Fingerprint(
+    definingClass = MAIN_ACTIVITY_FRAGMENT,
+    returnType = "V",
+    parameters = listOf("Z"),
+    filters = listOf(
+        resourceLiteral(ResourceType.STRING, "install_shoppers_search_desc"),
+        resourceLiteral(ResourceType.STRING, "info_help_telegram"),
+        resourceLiteral(ResourceType.STRING, "vpn_offer_x")
+    )
+)
+
+/**
+ * Modern browser start page: `StartPage.getHomepage()` includes a database BannerInfo entry
+ * as a sponsored shortcut tile only when this returns true (adType == 1). User-created tiles
+ * are stored separately by StartPageShortcutStore and rendered by homepage.js.
+ */
+object BannerInfoIsTileAdFingerprint : Fingerprint(
+    definingClass = BANNER_INFO,
+    name = "isTileAd",
+    returnType = "Z",
+    parameters = emptyList()
+)
+
+/**
+ * Legacy/simple browser start page. The two getIconCss calls receive the first and second
+ * remotely configured sponsored-shortcut objects immediately before the HTML is assembled;
+ * both the CSS helper and the later link rendering explicitly handle null objects.
+ */
+object LegacyStartPageHomepageFingerprint : Fingerprint(
+    definingClass = LEGACY_START_PAGE,
+    name = "getHomepage",
+    returnType = "Ljava/lang/String;",
+    parameters = emptyList(),
+    filters = listOf(
+        methodCall(
+            definingClass = LEGACY_START_PAGE,
+            name = "getIconCss",
+            parameters = listOf(SPONSORED_SHORTCUT),
+            returnType = "Ljava/lang/String;",
+            opcode = Opcode.INVOKE_STATIC
+        ),
+        methodCall(
+            definingClass = LEGACY_START_PAGE,
+            name = "getIconCss",
+            parameters = listOf(SPONSORED_SHORTCUT),
+            returnType = "Ljava/lang/String;",
+            opcode = Opcode.INVOKE_STATIC
+        )
+    )
 )
 
 // endregion

@@ -1,17 +1,17 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "1.0.0",
+  "version": "2.0.0-dev.1",
   "patches": [
     {
       "name": "GinArena Patch",
-      "description": "Removes visible banner/full-screen ads and 1DM+ promotions from free 1DM 20.0 (30257).",
+      "description": "Removes visible banner/full-screen ads and 1DM+ promotions from free 1DM 20.0 (30257), including the downloads-home VPN promo bar and sponsored browser start-page tiles. User shortcuts remain available. Stock APKM: https://www.apkmirror.com/apk/Vicky%20Bonick/idm-download-video-movie-music-anime-torrent/1dm-browser-video-download-20-0-release/1dm-browser-video-download-20-0-2-android-apk-download/",
       "default": true,
       "category": null,
       "compatiblePackages": [
         {
           "packageName": "idm.internet.download.manager",
           "name": "1DM",
-          "description": null,
+          "description": "1DM: Browser & Video Download (free). Use the official 1DM 20.0 (30257) universal APKM (Android 7.0+, 160-640 dpi). Stock APKM: https://www.apkmirror.com/apk/Vicky%20Bonick/idm-download-video-movie-music-anime-torrent/1dm-browser-video-download-20-0-release/1dm-browser-video-download-20-0-2-android-apk-download/",
           "apkFileType": "APKM",
           "appIconColor": "#43A047",
           "signatures": [
@@ -29,7 +29,7 @@
               },
               "isExperimental": false,
               "minSdk": 24,
-              "description": null
+              "description": "Official universal APKM for 1DM 20.0 (30257), Android 7.0+ / 160-640 dpi. Download: https://www.apkmirror.com/apk/Vicky%20Bonick/idm-download-video-movie-music-anime-torrent/1dm-browser-video-download-20-0-release/1dm-browser-video-download-20-0-2-android-apk-download/ Do not use the separate 20257 variant."
             }
           ]
         }

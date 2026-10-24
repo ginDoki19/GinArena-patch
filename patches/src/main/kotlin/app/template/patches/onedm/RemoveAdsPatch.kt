@@ -13,12 +13,18 @@ import app.morphe.patcher.util.returnEarly
 import app.template.patches.shared.Constants.COMPATIBILITY_ONEDM
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.Method
+import com.android.tools.smali.dexlib2.iface.instruction.FiveRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.TwoRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 
 private fun FieldReference.toSmali() = "$definingClass->$name:$type"
+
+private fun nullRegisterInstruction(register: Int): String {
+    val opcode = if (register < 16) "const/4" else "const/16"
+    return "$opcode v$register, 0x0"
+}
 
 private fun Method.firstFieldReference(
     opcode: Opcode,
@@ -104,7 +110,7 @@ private fun MutableMethod.runRunnableAndReturn(registerName: String, invokeKindA
 @Suppress("unused")
 val removeAdsPatch = bytecodePatch(
     name = "GinArena Patch",
-    description = "Removes visible banner/full-screen ads and 1DM+ promotions from free 1DM 20.0 (30257).",
+    description = "Removes visible banner/full-screen ads and 1DM+ promotions from free 1DM 20.0 (30257), including the downloads-home VPN promo bar and sponsored browser start-page tiles. User shortcuts remain available. Stock APKM: https://www.apkmirror.com/apk/Vicky%20Bonick/idm-download-video-movie-music-anime-torrent/1dm-browser-video-download-20-0-release/1dm-browser-video-download-20-0-2-android-apk-download/",
     default = true
 ) {
     compatibleWith(COMPATIBILITY_ONEDM)
@@ -292,6 +298,40 @@ val removeAdsPatch = bytecodePatch(
                 const/4 p2, 0x0
                 invoke-virtual {p0, p1, p2}, Landroid/view/View;->setMeasuredDimension(II)V
                 return-void
+            """
+        )
+
+        // Downloads-home promotional strip (`offer_vpnLL`): p1 is this updater's own
+        // force-hide flag. Forcing it true reuses the app's existing path that tags the
+        // container "0", sets it GONE and returns, so neither the ProtonVPN offer nor the
+        // strip's other promo variants can be shown. VPN settings/functionality elsewhere
+        // in the app are not touched.
+        MainActivityPromoBarFingerprint.matchAll(1..1).first().method.addInstructions(
+            0,
+            "const/4 p1, 0x1"
+        )
+
+        // Modern browser start page: BannerInfo entries are emitted as sponsored shortcut
+        // tiles only if isTileAd() (adType == 1) returns true. Returning false removes those
+        // database-backed promo tiles even if they were cached before patching. Custom
+        // StartPageShortcutStore tiles and the Add Shortcut tile use a separate path.
+        BannerInfoIsTileAdFingerprint.method.returnEarly(false)
+
+        // Legacy/simple start page: null its two remotely configured sponsored shortcuts
+        // just before their icon CSS is read. getIconCss() accepts null, and the HTML link
+        // branches below only render a sponsored button when an object is non-null.
+        val legacyStartPageMatch = LegacyStartPageHomepageFingerprint.matchAll(1..1).first()
+        val firstSponsoredShortcutMatch = legacyStartPageMatch.instructionMatches[0]
+        val secondSponsoredShortcutMatch = legacyStartPageMatch.instructionMatches[1]
+        val firstSponsoredShortcutRegister =
+            firstSponsoredShortcutMatch.getInstruction<FiveRegisterInstruction>().registerC
+        val secondSponsoredShortcutRegister =
+            secondSponsoredShortcutMatch.getInstruction<FiveRegisterInstruction>().registerC
+        legacyStartPageMatch.method.addInstructionsAtControlFlowLabel(
+            firstSponsoredShortcutMatch.index,
+            """
+                ${nullRegisterInstruction(firstSponsoredShortcutRegister)}
+                ${nullRegisterInstruction(secondSponsoredShortcutRegister)}
             """
         )
     }
