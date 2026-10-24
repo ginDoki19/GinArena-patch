@@ -17,21 +17,8 @@ github.com/sagarkhansau19-svg/GinArena-patch
 ## 🩹 Patches list
 
 <!-- PATCHES_START EXPANDED -->
-> **[v1.0.0](https://github.com/sagarkhansau19-svg/GinArena-patch/releases/tag/v1.0.0)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;1 patches total
-<details open>
-<summary>📦 1DM&nbsp;&nbsp;•&nbsp;&nbsp;1 patch</summary>
-<br>
 
-**🎯 Supported versions:**
-
-| 20.0 |
-| :---: |
-
-| 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
-|----------|----------------|-----------|
-| [GinArena Patch](#ginarena-patch) | Removes visible banner/full-screen ads and 1DM+ promotions from free 1DM 20.0 (30257). |  |
-
-</details>
+#### A list of patches will automatically be shown here after a release is created.
 
 <!-- PATCHES_END -->
 
@@ -47,6 +34,17 @@ flow intact:
 - The navigation drawer **“Upgrade to 1DM+”** item is hidden.
 - The **“1DM+ on sale”** toolbar subtitle is disabled (the legitimate *Update app* subtitle is kept).
 - The empty banner container (`MaxHeightLinearLayout`) is collapsed to 0×0 so no blank strip remains.
+
+- The downloads-home promo strip (`offer_vpnLL`) is forced onto the app's own hide path, so the
+  ProtonVPN installation offer—and the other promo messages rotated through that same strip—are not
+  shown. This does not alter 1DM's actual VPN settings or functionality.
+- Sponsored browser start-page tiles are removed:
+  - the modern start page no longer selects database `BannerInfo` tile ads (`isTileAd()` now
+    returns false), including previously cached *Play Quiz / Play Games* promotions;
+  - the legacy/simple start page's two remotely configured sponsored shortcuts are nulled before
+    its HTML is built.
+
+User-created browser shortcuts and the **Add Shortcut** tile use a separate path and remain available.
 
 GinArena Patch does **not** unlock any 1DM+ paid features (scheduler, higher part/concurrency
 caps, paid DNS entries, …), and it contains no 1DM+ code or resources.
@@ -71,10 +69,10 @@ names differ between builds, so the fingerprints must be re-audited per version.
 ### Stock download note
 
 Morphe patch metadata does not have a dedicated “stock app download URL” field, and Morphe Manager
-does not read a download destination from a patch bundle. The exact APKMirror URL therefore stays
-in this README. Compatibility is pinned to the package, APKM file type, version **20.0**,
-versionCode **30257** for all ABIs, `minSdk` **24**, and the official signing-certificate SHA-256
-so Manager and compatible helpers can recognize and validate the correct input.
+does not read a download destination from a patch bundle. In this release the exact APKMirror URL
+is included in this README and in the patch/compatibility target descriptions. Compatibility is
+also pinned to the package, APKM file type, version **20.0**, versionCode **30257** for all ABIs,
+`minSdk` **24**, and the official signing-certificate SHA-256.
 
 ## Usage (Morphe Manager)
 

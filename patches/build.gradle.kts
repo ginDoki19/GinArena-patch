@@ -3,7 +3,7 @@ group = "app.GinArena.onedm"
 patches {
     about {
         name = "GinArena Patch"
-        description = "Removes visible ads and promotions from free 1DM 20.0 (30257)."
+        description = "Removes visible ads and promotions from free 1DM 20.0 (30257), including the downloads-home VPN promo bar and sponsored browser start-page tiles. Stock APKM: https://www.apkmirror.com/apk/Vicky%20Bonick/idm-download-video-movie-music-anime-torrent/1dm-browser-video-download-20-0-release/1dm-browser-video-download-20-0-2-android-apk-download/"
         source = "https://github.com/sagarkhansau19-svg/GinArena-patch"
         author = "sagarkhansau19-svg"
         contact = "https://github.com/sagarkhansau19-svg/GinArena-patch/issues"
