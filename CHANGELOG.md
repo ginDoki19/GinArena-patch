@@ -1,3 +1,9 @@
+## [2.0.1-dev.1](https://github.com/sagarkhansau19-svg/GinArena-patch/compare/v2.0.0...v2.0.1-dev.1) (2026-10-24)
+
+### 🐛 Bug Fixes
+
+* clean up Manager version-card metadata ([e65053a](https://github.com/sagarkhansau19-svg/GinArena-patch/commit/e65053a28c0b133bb6573b1f569cb8056650661d))
+
 ## [2.0.0](https://github.com/sagarkhansau19-svg/GinArena-patch/compare/v1.0.0...v2.0.0) (2026-10-24)
 
 ### ⚠ BREAKING CHANGES
