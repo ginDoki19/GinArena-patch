@@ -17,22 +17,8 @@ github.com/sagarkhansau19-svg/GinArena-patch
 ## 🩹 Patches list
 
 <!-- PATCHES_START EXPANDED -->
-> **[v2.0.0](https://github.com/sagarkhansau19-svg/GinArena-patch/releases/tag/v2.0.0)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;1 patches total
-<details open>
-<summary>📦 1DM&nbsp;&nbsp;•&nbsp;&nbsp;1 patch</summary>
-<br>
 
-**🎯 Supported versions:**
-
-| 20.0 |
-| :---: |
-| Official universal APKM for 1DM 20.0 (30257), Android 7.0+ / 160-640 dpi. Download: https://www.apkmirror.com/apk/Vicky%20Bonick/idm-download-video-movie-music-anime-torrent/1dm-browser-video-download-20-0-release/1dm-browser-video-download-20-0-2-android-apk-download/ Do not use the separate 20257 variant. |
-
-| 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
-|----------|----------------|-----------|
-| [GinArena Patch](#ginarena-patch) | Removes visible banner/full-screen ads and 1DM+ promotions from free 1DM 20.0 (30257), including the downloads-home VPN promo bar and sponsored browser start-page tiles. User shortcuts remain available. Stock APKM: https://www.apkmirror.com/apk/Vicky%20Bonick/idm-download-video-movie-music-anime-torrent/1dm-browser-video-download-20-0-release/1dm-browser-video-download-20-0-2-android-apk-download/ |  |
-
-</details>
+#### A list of patches will automatically be shown here after a release is created.
 
 <!-- PATCHES_END -->
 
@@ -83,10 +69,15 @@ names differ between builds, so the fingerprints must be re-audited per version.
 ### Stock download note
 
 Morphe patch metadata does not have a dedicated “stock app download URL” field, and Morphe Manager
-does not read a download destination from a patch bundle. In this release the exact APKMirror URL
-is included in this README and in the patch/compatibility target descriptions. Compatibility is
-also pinned to the package, APKM file type, version **20.0**, versionCode **30257** for all ABIs,
-`minSdk` **24**, and the official signing-certificate SHA-256.
+does not read a download destination from a patch bundle. The exact APKMirror URL therefore stays
+in this README, where it is clickable. The in-Manager version target carries only the short label
+**“Universal APKM (160-640 dpi, Android 7.0+), build 30257”**, so the version card stays clean.
+Compatibility is pinned to the package, APKM file type, version **20.0**, versionCode **30257**
+for all ABIs, `minSdk` **24**, and the official signing-certificate SHA-256.
+
+Those pins identify and validate the input; they do not control which website Manager's built-in
+“help me find an APK” flow opens. If it opens a different host, use the exact README link above and
+select the downloaded APKM manually.
 
 ## Usage (Morphe Manager)
 
