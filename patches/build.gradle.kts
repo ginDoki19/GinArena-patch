@@ -1,14 +1,13 @@
-group = "app.template"
+group = "app.GinArena.onedm"
 
 patches {
-    // TODO: Update this section with your project details.
     about {
-        name = "UserXYZ Patches"
-        description = "Patches for apps I like"
-        source = "git@github.com:UserXYZ/morphe-patches.git"
-        author = "Awesome dev"
-        contact = "na"
-        website = "na"
+        name = "GinArena Patch"
+        description = "Removes visible ads and promotions from free 1DM 20.0 (30257)."
+        source = "https://github.com/sagarkhansau19-svg/GinArena-patch"
+        author = "sagarkhansau19-svg"
+        contact = "https://github.com/sagarkhansau19-svg/GinArena-patch/issues"
+        website = "https://github.com/sagarkhansau19-svg/GinArena-patch"
         license = "GPLv3"
     }
 }
