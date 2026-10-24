@@ -110,7 +110,7 @@ private fun MutableMethod.runRunnableAndReturn(registerName: String, invokeKindA
 @Suppress("unused")
 val removeAdsPatch = bytecodePatch(
     name = "GinArena Patch",
-    description = "Removes visible banner/full-screen ads and 1DM+ promotions from free 1DM 20.0 (30257), including the downloads-home VPN promo bar and sponsored browser start-page tiles. User shortcuts remain available. Stock APKM: https://www.apkmirror.com/apk/Vicky%20Bonick/idm-download-video-movie-music-anime-torrent/1dm-browser-video-download-20-0-release/1dm-browser-video-download-20-0-2-android-apk-download/",
+    description = "Removes visible banner/full-screen ads and 1DM+ promotions from free 1DM 20.0 (30257), including the downloads-home VPN promo bar and sponsored browser start-page tiles. User shortcuts remain available.",
     default = true
 ) {
     compatibleWith(COMPATIBILITY_ONEDM)
