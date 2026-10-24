@@ -6,18 +6,18 @@ Android app (`idm.internet.download.manager`). It contains one default-on patch,
 
 ### How to use these patches
 
-Click here to add these patches to Morphe: https://morphe.software/add-source?github=sagarkhansau19-svg/GinArena-patch
+Click here to add these patches to Morphe: https://morphe.software/add-source?github=ginDoki19/GinArena-patch
 
 Or manually add this repository as a remote source in Morphe Manager:
 
 ```text
-github.com/sagarkhansau19-svg/GinArena-patch
+github.com/ginDoki19/GinArena-patch
 ```
 
 ## 🩹 Patches list
 
 <!-- PATCHES_START EXPANDED -->
-> **[v2.0.1](https://github.com/sagarkhansau19-svg/GinArena-patch/releases/tag/v2.0.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;1 patches total
+> **[v2.0.1](https://github.com/ginDoki19/GinArena-patch/releases/tag/v2.0.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;1 patches total
 <details open>
 <summary>📦 1DM&nbsp;&nbsp;•&nbsp;&nbsp;1 patch</summary>
 <br>
