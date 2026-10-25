@@ -3,7 +3,7 @@ group = "app.GinArena.onedm"
 patches {
     about {
         name = "GinArena Patch"
-        description = "Privacy, ad-removal, and quality-of-life patches for free 1DM 20.0 (30257) and CRICFy TV 7.3 (53)."
+        description = "Privacy, ad-removal, and quality-of-life patches for free 1DM 20.0 (30257), CRICFy TV 7.3 (53), and CricZ TV 7.3 (10)."
         source = "https://github.com/ginDoki19/GinArena-patch"
         author = "ginDoki19"
         contact = "https://github.com/ginDoki19/GinArena-patch/issues"
@@ -25,7 +25,7 @@ tasks {
     register<JavaExec>("generatePatchesList") {
         description = "Build patch with patch list"
 
-        dependsOn(build)
+        dependsOn(build, "buildAndroid")
 
         classpath = sourceSets["main"].runtimeClasspath + patchListGeneratorClasspath
         mainClass.set("util.PatchListGeneratorKt")

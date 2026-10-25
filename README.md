@@ -1,9 +1,9 @@
 # <img src="assets/icon.png" width="36" alt=""> GinArena Patch
 
 **GinArena Patch** is a [Morphe](https://morphe.software/) patch bundle for free **1DM**
-(`idm.internet.download.manager`) and **CRICFy TV** (`com.cricfytv.sports`). Morphe Manager
-automatically filters patches per app, so selecting 1DM shows only 1DM patches and selecting
-CRICFy TV shows only CRICFy TV patches.
+(`idm.internet.download.manager`), **CRICFy TV** (`com.cricfytv.sports`), and **CricZ TV**
+(`com.pro.cricztv`). Morphe Manager automatically filters patches per app, so selecting an app
+shows only the patches compatible with that app.
 
 ### How to use these patches
 
@@ -18,7 +18,7 @@ github.com/ginDoki19/GinArena-patch
 ## 🩹 Patches list
 
 <!-- PATCHES_START EXPANDED -->
-> **[v2.2.1](https://github.com/ginDoki19/GinArena-patch/releases/tag/v2.2.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;4 patches total
+> **[v2.3.0-dev.2](https://github.com/ginDoki19/GinArena-patch/releases/tag/v2.3.0-dev.2)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;5 patches total
 <details open>
 <summary>📦 1DM&nbsp;&nbsp;•&nbsp;&nbsp;3 patches</summary>
 <br>
@@ -50,6 +50,22 @@ github.com/ginDoki19/GinArena-patch
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
 | [Remove ads, proxy & restrictions](#remove-ads-proxy-restrictions) | Removes CashRaven background bandwidth sharing, all ads and sponsor/unlock gates, external browser redirects, the startup Telegram join dialog, promo marquee banners, forced-update lockouts, and promo push notifications. Optional clone/sniffer-check bypass and native-library stripping are off by default. | • Hide promo marquee ticker<br>• Bypass update & force-update screen<br>• Block promotional push notifications<br>• Bypass clone, work-profile & sniffer checks<br>• Strip proxy & ad native libraries |
+
+</details>
+
+<details open>
+<summary>📦 CricZ TV&nbsp;&nbsp;•&nbsp;&nbsp;1 patch</summary>
+<br>
+
+**🎯 Supported versions:**
+
+| 7.3 |
+| :---: |
+| Universal APK (arm64-v8a / armeabi-v7a / x86 / x86_64, Android 6.0+), build 10 |
+
+| 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
+|----------|----------------|-----------|
+| [Remove ads, telemetry & restrictions](#remove-ads-telemetry-restrictions) | Replaces native signature-locked config decryption in pure Java, removes all banner/popunder/timer ads and the local NanoHTTPD ad server, suppresses the startup Telegram popup and player watermarks, strips Firebase telemetry and push notifications, and bypasses update lockouts. Optional root/sniffer bypass and native/telemetry stripping are off by default. | • Hide promo announcement bar<br>• Remove push notifications<br>• Bypass update & force-update screen<br>• Bypass root & sniffer checks<br>• Strip native & telemetry bloat |
 
 </details>
 
@@ -188,6 +204,68 @@ privacy-respecting experience on **CRICFy TV 7.3** across phones, tablets, and A
 
 ---
 
+## 📦 CricZ TV (7.3, build 10)
+
+### What it does
+
+The **Remove ads, telemetry & restrictions** patch (enabled by default) provides a clean, fast,
+server-compatible experience on **CricZ TV 7.3** across phones, tablets, and Android TV:
+
+- **Pure-Java signature-independent decryption (`DataHelper.MyApp`):** Replaces native
+  `libnative-lib.so` decryption in pure Java (`Base64` → byte-pair swap → reverse → `Base64` →
+  AES-128-CBC with the stock certificate-derived key) while preserving graceful fallback to Tier-2
+  AES decryption (`c6.f0.j`), so live RemoteConfig (`api_url`) and all encrypted channel/event
+  feeds keep working after Morphe re-signs the APK, without the stock app's signing-certificate
+  check blocking decryption.
+- **Complete ad, popunder, timer-gate & local ad-server removal:** Sanitizes parsed `app.txt`
+  ad flags, disables external Chrome / CustomTabs popunder redirects (`vc.b.A`), removes the
+  10-second `SupportActivity` sponsor countdown gate (`kc.k.T`), and disables `"adpro*"` match-feed
+  banner injection (`hc.h.g`) so the local `NanoHTTPD` port `1120` ad server (`qc.k`) and its
+  debuggable ad `WebView` never start.
+- **No startup Telegram popup or video watermarks:** Suppresses the startup `dialog_telegram`
+  modal on `MainActivity` launch (while keeping voluntary Settings links functional) and clears
+  `player_text` / `@id/playerTxt` overlays across Portrait, Landscape, PiP, and Floating Player.
+- **Preserves Firebase RemoteConfig:** The minimal `RemoteConfigRegistrar` +
+  `FirebaseInstallationsRegistrar` + `AbtRegistrar` graph required to resolve live backend
+  domain rotations is always kept intact. The opt-in *Strip native & telemetry bloat* option
+  below (off by default) can additionally remove Analytics, Crashlytics, Sessions,
+  DataTransport, AdServices, and `ProfileInstaller`.
+- **Configurable quality-of-life options (on by default unless noted):**
+  - **Hide promo announcement bar** (`hidePromoMarquee`) — collapses the scrolling `message_card`
+    promo banner on both the Events home screen and the Player screen.
+  - **Remove push notifications** (`removePushNotifications`) — disables `PushService` and Firebase
+    Cloud Messaging, skips Android 13+ `POST_NOTIFICATIONS` prompts across `SplashActivity`,
+    `MainActivity`, and `TvActivity`, and strips FCM receivers/permissions from `AndroidManifest.xml`.
+  - **Bypass update & force-update screen** (`bypassUpdateGate`) — skips forced and optional update
+    lockouts on Splash startup (`SplashActivity.z`) and Player deeplink exit (`PlayerActivity.v`),
+    and removes `REQUEST_INSTALL_PACKAGES`.
+  - **Bypass root & sniffer checks** (`bypassEnvironmentChecks`, **off by default**) — neutralizes
+    RootBeer + `su`/`magisk` shell lockouts (`b8.h.r`), Frida/sniffer package scans (`rc.b` /
+    `p4.v.O`), and proxy-certificate SubjectDN lockouts (`qc.b`). Not needed on ordinary
+    phones/TVs. The six `MainActivity` startup tamper crash-bombs are always neutralized
+    separately so patched builds start reliably.
+  - **Strip native & telemetry bloat** (`stripNativeAndTelemetryBloat`, **off by default**) —
+    removes `libnative-lib.so` across all four ABIs (and `libtoolChecker.so` only when the root
+    bypass above is enabled, because `RootBeerNative` loads it), keeping Media3's
+    `libffmpegJNI.so` and `libdav1dJNI.so`, plus telemetry manifest services/receivers. Purely a
+    size saving: with this off, the libraries stay in the APK but are never loaded.
+
+### Target app (CricZ TV)
+
+| Field | Value |
+| --- | --- |
+| Package | `com.pro.cricztv` |
+| Version | **7.3** (versionCode 10), universal APK (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`) |
+| Stock download | Official developer Telegram channel: [t.me/cricztvapp](https://t.me/cricztvapp) — verify the APK SHA-256 below after downloading |
+| Signing certificate SHA-256 | `9ff349c0c047abd68e169980484b43926b6ff2d251a430fe44e3ae3e2930e1d2` |
+| APK SHA-256 | `74a8a13da7ab1865dc9e3bbb511fe82bb0f8c093fcf2404ac4a59ecdce44fb82` |
+
+> **Version safety:** only **7.3 (10)** is supported. Every fingerprint is validated before writing
+> anything, and future CricZ TV versions are refused by design until they receive a fresh audit —
+> do not force-patch other versions in Expert Mode.
+
+---
+
 ### Stock download note
 
 Morphe patch metadata does not have a dedicated “stock app download URL” field, and Morphe Manager
@@ -199,7 +277,8 @@ short readable build labels and validate the package name, file type, version, `
 ## Usage (Morphe Manager)
 
 1. Add this repository as a remote patch source using the link at the top of this README.
-2. Download the official stock **1DM 20.0 APKM** or **CRICFy TV 7.3 APK** above onto your device.
+2. Download the official stock **1DM 20.0 APKM**, **CRICFy TV 7.3 APK**, or **CricZ TV 7.3 APK**
+   above onto your device.
 3. Uninstall the stock app first if it is already installed (re-signing changes the APK signature).
 4. In Morphe Manager, choose **Select from storage**, pick the downloaded stock `.apkm` / `.apk`
    file (rather than an already-patched installed app), configure options if desired, then patch
@@ -213,10 +292,13 @@ short readable build labels and validate the package name, file type, version, `
 > patch your saved/patched APK again. Re-download the exact stock file from the links above and
 > patch it from the beginning.
 >
-> **New in v2.2.1 (CRICFy TV):** safer defaults — *Bypass clone, work-profile & sniffer checks*
-> and *Strip proxy & ad native libraries* are now **off** unless you turn them on. Ad removal and
-> CashRaven bandwidth-sharing removal are unchanged. If your CRICFy TV patched with v2.2.0 works
-> fine, you don't need to do anything.
+> **New in v2.3.0:** adds **CricZ TV 7.3** support — ads, popunder redirects, the 10-second
+> sponsor gate, the startup Telegram popup, player watermarks, and push notifications are
+> removed, while live config decryption keeps working on the re-signed build. As with CRICFy TV
+> since v2.2.1, the environment-check bypass (root / cloner / sniffer) and native-library
+> stripping options are **off by default** — turn them on only if you actually use root, app
+> cloners, work profiles, or HTTPS-filtering tools. If your current patched 1DM or CRICFy TV
+> works fine, you don't need to do anything.
 
 ## Building from source
 
