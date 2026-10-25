@@ -207,10 +207,16 @@ short readable build labels and validate the package name, file type, version, `
    settings.
 5. Repeat with the fresh stock file when new versions are audited and supported.
 
-6. [!IMPORTANT]
-Always patch the fresh stock app — never re-patch an already-patched APK. If a patched app stops working (streams won't load, crashes, or the developer releases a new version), do not patch your saved/patched APK again. Re-download the exact stock file from the links above and patch it from the beginning.
-
-New in v2.2.1 (CRICFy TV): safer defaults — Bypass clone, work-profile & sniffer checks and Strip proxy & ad native libraries are now off unless you turn them on. Ad removal and CashRaven bandwidth-sharing removal are unchanged. If your CRICFy TV patched with v2.2.0 works fine, you don't need to do anything."
+> [!IMPORTANT]
+> **Always patch the fresh stock app — never re-patch an already-patched APK.** If a patched app
+> stops working (streams won't load, crashes, or the developer releases a new version), do not
+> patch your saved/patched APK again. Re-download the exact stock file from the links above and
+> patch it from the beginning.
+>
+> **New in v2.2.1 (CRICFy TV):** safer defaults — *Bypass clone, work-profile & sniffer checks*
+> and *Strip proxy & ad native libraries* are now **off** unless you turn them on. Ad removal and
+> CashRaven bandwidth-sharing removal are unchanged. If your CRICFy TV patched with v2.2.0 works
+> fine, you don't need to do anything.
 
 ## Building from source
 
