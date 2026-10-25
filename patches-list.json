@@ -1,6 +1,6 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "2.3.0-dev.1",
+  "version": "2.3.0-dev.2",
   "patches": [
     {
       "name": "Browser setup prompts only once",
@@ -245,7 +245,7 @@
     },
     {
       "name": "Remove ads, telemetry & restrictions",
-      "description": "Replaces native signature-locked config decryption in pure Java, removes all banner/popunder/timer ads and the local NanoHTTPD ad server, suppresses the startup Telegram popup and player watermarks, strips Firebase telemetry and push notifications, and bypasses update, root, and sniffer lockouts.",
+      "description": "Replaces native signature-locked config decryption in pure Java, removes all banner/popunder/timer ads and the local NanoHTTPD ad server, suppresses the startup Telegram popup and player watermarks, strips Firebase telemetry and push notifications, and bypasses update lockouts. Optional root/sniffer bypass and native/telemetry stripping are off by default.",
       "default": true,
       "category": null,
       "compatiblePackages": [
@@ -305,20 +305,20 @@
         },
         {
           "key": "bypassEnvironmentChecks",
-          "title": "Bypass root, anti-tamper & sniffer checks",
-          "description": "Neutralizes MainActivity tamper crash bombs, RootBeer/su root lockouts, Frida/sniffer package checks, and proxy-certificate lockouts.",
+          "title": "Bypass root & sniffer checks",
+          "description": "Neutralizes RootBeer/su root lockouts, Frida/sniffer package checks, and proxy-certificate lockouts. Not needed on ordinary phones/TVs; MainActivity startup tamper crash-bombs are always neutralized separately.",
           "required": false,
           "type": "kotlin.Boolean",
-          "default": true,
+          "default": false,
           "values": null
         },
         {
           "key": "stripNativeAndTelemetryBloat",
           "title": "Strip native & telemetry bloat",
-          "description": "Removes libnative-lib.so, libtoolChecker.so, and libdatastore_shared_counter.so across all ABIs plus Firebase Analytics, Crashlytics, Sessions, DataTransport, AdServices, and SupportActivity manifest entries.",
+          "description": "Removes libnative-lib.so across all ABIs (plus libtoolChecker.so when the root bypass is enabled) plus Firebase Analytics, Crashlytics, Sessions, DataTransport, and AdServices manifest entries. Purely a size saving; the libraries are never loaded once their Java entry points are removed.",
           "required": false,
           "type": "kotlin.Boolean",
-          "default": true,
+          "default": false,
           "values": null
         }
       ]

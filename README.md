@@ -18,7 +18,7 @@ github.com/ginDoki19/GinArena-patch
 ## 🩹 Patches list
 
 <!-- PATCHES_START EXPANDED -->
-> **[v2.3.0-dev.1](https://github.com/ginDoki19/GinArena-patch/releases/tag/v2.3.0-dev.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;5 patches total
+> **[v2.3.0-dev.2](https://github.com/ginDoki19/GinArena-patch/releases/tag/v2.3.0-dev.2)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;5 patches total
 <details open>
 <summary>📦 1DM&nbsp;&nbsp;•&nbsp;&nbsp;3 patches</summary>
 <br>
@@ -65,7 +65,7 @@ github.com/ginDoki19/GinArena-patch
 
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
-| [Remove ads, telemetry & restrictions](#remove-ads-telemetry-restrictions) | Replaces native signature-locked config decryption in pure Java, removes all banner/popunder/timer ads and the local NanoHTTPD ad server, suppresses the startup Telegram popup and player watermarks, strips Firebase telemetry and push notifications, and bypasses update, root, and sniffer lockouts. | • Hide promo announcement bar<br>• Remove push notifications<br>• Bypass update & force-update screen<br>• Bypass root, anti-tamper & sniffer checks<br>• Strip native & telemetry bloat |
+| [Remove ads, telemetry & restrictions](#remove-ads-telemetry-restrictions) | Replaces native signature-locked config decryption in pure Java, removes all banner/popunder/timer ads and the local NanoHTTPD ad server, suppresses the startup Telegram popup and player watermarks, strips Firebase telemetry and push notifications, and bypasses update lockouts. Optional root/sniffer bypass and native/telemetry stripping are off by default. | • Hide promo announcement bar<br>• Remove push notifications<br>• Bypass update & force-update screen<br>• Bypass root & sniffer checks<br>• Strip native & telemetry bloat |
 
 </details>
 
