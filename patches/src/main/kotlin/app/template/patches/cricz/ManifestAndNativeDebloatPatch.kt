@@ -31,19 +31,21 @@ internal val bypassUpdateGateOption = booleanOption(
 
 internal val bypassEnvironmentChecksOption = booleanOption(
     key = "bypassEnvironmentChecks",
-    default = true,
-    title = "Bypass root, anti-tamper & sniffer checks",
-    description = "Neutralizes MainActivity tamper crash bombs, RootBeer/su root lockouts, " +
-        "Frida/sniffer package checks, and proxy-certificate lockouts.",
+    default = false,
+    title = "Bypass root & sniffer checks",
+    description = "Neutralizes RootBeer/su root lockouts, Frida/sniffer package checks, and " +
+        "proxy-certificate lockouts. Not needed on ordinary phones/TVs; MainActivity startup " +
+        "tamper crash-bombs are always neutralized separately.",
 )
 
 internal val stripNativeAndTelemetryBloatOption = booleanOption(
     key = "stripNativeAndTelemetryBloat",
-    default = true,
+    default = false,
     title = "Strip native & telemetry bloat",
-    description = "Removes libnative-lib.so, libtoolChecker.so, and libdatastore_shared_counter.so " +
-        "across all ABIs plus Firebase Analytics, Crashlytics, Sessions, DataTransport, AdServices, " +
-        "and SupportActivity manifest entries.",
+    description = "Removes libnative-lib.so across all ABIs (plus libtoolChecker.so when the root " +
+        "bypass is enabled) plus Firebase Analytics, Crashlytics, Sessions, DataTransport, and " +
+        "AdServices manifest entries. Purely a size saving; the libraries are never loaded once " +
+        "their Java entry points are removed.",
 )
 
 /**
@@ -52,12 +54,14 @@ internal val stripNativeAndTelemetryBloatOption = booleanOption(
  *    while preserving `RemoteConfigRegistrar`, `FirebaseInstallationsRegistrar`, `AbtRegistrar`,
  *    `FirebaseCommonKtxRegistrar`, `FirebaseInitProvider`, `versionCode=10`, `minSdk=23`, and `targetSdk=36`.
  * 2. Collapses `@id/playerTxt` watermarks (and `@id/message_card` promo bars when enabled) in layout XMLs.
- * 3. Deletes `libnative-lib.so`, `libtoolChecker.so`, and `libdatastore_shared_counter.so` across all ABIs,
- *    leaving only Media3's `libffmpegJNI.so` and `libdav1dJNI.so`.
+ * 3. Deletes `libnative-lib.so` across all ABIs (and `libtoolChecker.so` only when the root bypass
+ *    is enabled, since `RootBeerNative.<clinit>` loads it), leaving Media3's `libffmpegJNI.so`
+ *    and `libdav1dJNI.so` untouched. `libdatastore_shared_counter.so` is kept (unused by app code).
  */
 internal val manifestAndNativeDebloatPatch = resourcePatch {
     execute {
         val removePush = removePushNotificationsOption.value == true
+        val bypassEnv = bypassEnvironmentChecksOption.value == true
         val bypassUpdate = bypassUpdateGateOption.value == true
         val hideMarquee = hidePromoMarqueeOption.value == true
         val stripBloat = stripNativeAndTelemetryBloatOption.value == true
@@ -78,8 +82,10 @@ internal val manifestAndNativeDebloatPatch = resourcePatch {
                 }
             }
 
+            // `SupportActivity` deliberately stays declared: the 10-second sponsor gate is
+            // bypassed in bytecode, and removing the activity could crash any other menu or
+            // deeplink entry that still starts it.
             val removableComponents = buildSet {
-                add("com.pro.cricztv.activities.SupportActivity")
                 if (removePush) {
                     add("com.pro.cricztv.firebase.PushService")
                     add("com.google.firebase.iid.FirebaseInstanceIdReceiver")
@@ -155,11 +161,10 @@ internal val manifestAndNativeDebloatPatch = resourcePatch {
         // 3. Delete unneeded native `.so` binaries across all ABIs (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`),
         // keeping only Media3's `libffmpegJNI.so` and `libdav1dJNI.so`.
         if (stripBloat) {
-            val removableNativeLibs = listOf(
-                "/libnative-lib.so",
-                "/libtoolChecker.so",
-                "/libdatastore_shared_counter.so",
-            )
+            val removableNativeLibs = buildList {
+                add("/libnative-lib.so")
+                if (bypassEnv) add("/libtoolChecker.so")
+            }
             for (entry in listApkEntries("lib/")) {
                 if (removableNativeLibs.any(entry::endsWith)) {
                     delete(entry)

@@ -228,7 +228,7 @@ server-compatible experience on **CricZ TV 7.3** across phones, tablets, and And
   `RemoteConfigRegistrar` + `FirebaseInstallationsRegistrar` + `AbtRegistrar` graph required to
   resolve live backend domain rotations while removing Analytics, Crashlytics, Sessions,
   DataTransport, AdServices, and `ProfileInstaller`.
-- **Configurable quality-of-life options (all on by default):**
+- **Configurable quality-of-life options (on by default unless noted):**
   - **Hide promo announcement bar** (`hidePromoMarquee`) — collapses the scrolling `message_card`
     promo banner on both the Events home screen and the Player screen.
   - **Remove push notifications** (`removePushNotifications`) — disables `PushService` and Firebase
@@ -237,12 +237,16 @@ server-compatible experience on **CricZ TV 7.3** across phones, tablets, and And
   - **Bypass update & force-update screen** (`bypassUpdateGate`) — skips forced and optional update
     lockouts on Splash startup (`SplashActivity.z`) and Player deeplink exit (`PlayerActivity.v`),
     and removes `REQUEST_INSTALL_PACKAGES`.
-  - **Bypass root, anti-tamper & sniffer checks** (`bypassEnvironmentChecks`) — neutralizes all six
-    `MainActivity` tamper crash bombs, RootBeer + `su`/`magisk` shell lockouts (`b8.h.r`),
-    Frida/sniffer package scans (`rc.b` / `p4.v.O`), and proxy-certificate SubjectDN lockouts (`qc.b`).
-  - **Strip native & telemetry bloat** (`stripNativeAndTelemetryBloat`) — removes `libnative-lib.so`,
-    `libtoolChecker.so`, and `libdatastore_shared_counter.so` across all four ABIs (keeping only
-    Media3's `libffmpegJNI.so` and `libdav1dJNI.so`) plus telemetry manifest services/receivers.
+  - **Bypass root & sniffer checks** (`bypassEnvironmentChecks`, **off by default**) — neutralizes
+    RootBeer + `su`/`magisk` shell lockouts (`b8.h.r`), Frida/sniffer package scans (`rc.b` /
+    `p4.v.O`), and proxy-certificate SubjectDN lockouts (`qc.b`). Not needed on ordinary
+    phones/TVs. The six `MainActivity` startup tamper crash-bombs are always neutralized
+    separately so patched builds start reliably.
+  - **Strip native & telemetry bloat** (`stripNativeAndTelemetryBloat`, **off by default**) —
+    removes `libnative-lib.so` across all four ABIs (and `libtoolChecker.so` only when the root
+    bypass above is enabled, because `RootBeerNative` loads it), keeping Media3's
+    `libffmpegJNI.so` and `libdav1dJNI.so`, plus telemetry manifest services/receivers. Purely a
+    size saving: with this off, the libraries stay in the APK but are never loaded.
 
 ### Target app (CricZ TV)
 

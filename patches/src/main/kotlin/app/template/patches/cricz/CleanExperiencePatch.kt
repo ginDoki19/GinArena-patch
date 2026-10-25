@@ -31,7 +31,7 @@ val removeAdsTelemetryAndRestrictionsPatch = bytecodePatch(
     description = "Replaces native signature-locked config decryption in pure Java, removes all " +
         "banner/popunder/timer ads and the local NanoHTTPD ad server, suppresses the startup Telegram " +
         "popup and player watermarks, strips Firebase telemetry and push notifications, and bypasses " +
-        "update, root, and sniffer lockouts.",
+        "update lockouts. Optional root/sniffer bypass and native/telemetry stripping are off by default.",
     default = true,
 ) {
     compatibleWith(COMPATIBILITY_CRICZ_TV)
@@ -288,16 +288,16 @@ val removeAdsTelemetryAndRestrictionsPatch = bytecodePatch(
             val tgTarget = (insns[tgSkipBranchIdx] as BuilderOffsetInstruction).target
             mainOnCreate.replaceInstruction(tgSkipBranchIdx, BuilderInstruction30t(Opcode.GOTO_32, tgTarget))
 
-            // 3b. Neutralize all 6 Java anti-tamper crash bombs (`versionCode != 10`, `minSdk`/`targetSdk`,
-            // `getFilesDir()` dot-count, `res/raw/{live,load}` JSON check, `R.raw` field-count reflection,
-            // and `rc.b.a & rc.b.b`) by turning `if-eqz isTv` into `nop` so execution always takes the
-            // stock `goto/16` directly to normal `MainActivity` initialization.
-            if (bypassEnvironmentChecks == true) {
-                check(insns[antiTamperIfEqzIdx + 1].opcode == Opcode.GOTO_16) {
-                    "Unexpected instruction after is_tv check in MainActivity.onCreate."
-                }
-                mainOnCreate.replaceInstruction(antiTamperIfEqzIdx, BuilderInstruction10x(Opcode.NOP))
+            // 3b. Always neutralize all 6 Java anti-tamper crash bombs (`versionCode != 10`,
+            // `minSdk`/`targetSdk`, `getFilesDir()` dot-count, `res/raw/{live,load}` JSON check,
+            // `R.raw` field-count reflection, and `rc.b.a & rc.b.b`) by turning `if-eqz isTv` into
+            // `nop` so execution always takes the stock `goto/16` directly to normal `MainActivity`
+            // initialization. Kept unconditional (like the pure-Java decryption above) so patched
+            // builds always start; the optional root/sniffer bypasses in section 7 stay opt-in.
+            check(insns[antiTamperIfEqzIdx + 1].opcode == Opcode.GOTO_16) {
+                "Unexpected instruction after is_tv check in MainActivity.onCreate."
             }
+            mainOnCreate.replaceInstruction(antiTamperIfEqzIdx, BuilderInstruction10x(Opcode.NOP))
 
             // 3c. Skip Android 13+ `POST_NOTIFICATIONS` runtime permission prompt in `MainActivity.onCreate`.
             if (removePushNotifications == true) {
