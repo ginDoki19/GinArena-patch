@@ -18,7 +18,7 @@ github.com/ginDoki19/GinArena-patch
 ## 🩹 Patches list
 
 <!-- PATCHES_START EXPANDED -->
-> **[v2.1.0](https://github.com/ginDoki19/GinArena-patch/releases/tag/v2.1.0)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;3 patches total
+> **[v2.2.0](https://github.com/ginDoki19/GinArena-patch/releases/tag/v2.2.0)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;4 patches total
 <details open>
 <summary>📦 1DM&nbsp;&nbsp;•&nbsp;&nbsp;3 patches</summary>
 <br>
@@ -34,6 +34,22 @@ github.com/ginDoki19/GinArena-patch
 | [Browser setup prompts only once](#browser-setup-prompts-only-once) | Shows the browser accessibility and shortcut-menu-strip setup prompts once, then records each as shown as soon as it appears so closing the browser before dismissing it cannot make it repeat. |  |
 | [Preset browser settings](#preset-browser-settings) | Sets fresh-install browser fallbacks for normal and incognito modes: Brave search, matching suggestions, and Google search by image by default. Saved or imported choices are preserved and can be changed later in 1DM. | • Search engine<br>• Search suggestions<br>• Search by image |
 | [Remove ads and promotions](#remove-ads-and-promotions) | Removes visible banner/full-screen ads and 1DM+ promotions from free 1DM 20.0 (30257), including the downloads-home VPN promo bar and sponsored browser start-page tiles. User shortcuts remain available. |  |
+
+</details>
+
+<details open>
+<summary>📦 CRICFy TV&nbsp;&nbsp;•&nbsp;&nbsp;1 patch</summary>
+<br>
+
+**🎯 Supported versions:**
+
+| 7.3 |
+| :---: |
+| Universal APK (arm64-v8a / armeabi-v7a / x86 / x86_64, Android 7.0+), build 53 |
+
+| 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
+|----------|----------------|-----------|
+| [Remove ads, proxy & restrictions](#remove-ads-proxy-restrictions) | Removes CashRaven background bandwidth sharing, all ads and sponsor/unlock gates, external browser redirects, the startup Telegram join dialog, promo marquee banners, forced-update lockouts, promo push notifications, and clone/sniffer checks. | • Hide promo marquee ticker<br>• Bypass update & force-update screen<br>• Block promotional push notifications<br>• Bypass clone, work-profile & sniffer checks<br>• Strip proxy & ad native libraries |
 
 </details>
 

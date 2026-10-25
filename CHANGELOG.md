@@ -1,3 +1,9 @@
+## [2.2.0](https://github.com/ginDoki19/GinArena-patch/compare/v2.1.0...v2.2.0) (2026-10-25)
+
+### ✨ New Features
+
+* add CRICFy TV 7.3 patch ([0070991](https://github.com/ginDoki19/GinArena-patch/commit/0070991cc06cd600594a969abb1836f6a6f14e5d))
+
 ## [2.1.0](https://github.com/ginDoki19/GinArena-patch/compare/v2.0.1...v2.1.0) (2026-10-25)
 
 ### ✨ New Features
