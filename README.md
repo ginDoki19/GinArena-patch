@@ -174,7 +174,7 @@ privacy-respecting experience on **CRICFy TV 7.3** across phones, tablets, and A
 | --- | --- |
 | Package | `com.cricfytv.sports` |
 | Version | **7.3** (versionCode 53), universal APK (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`) |
-| Stock download | [Official CRICFy TV v7.3 APK](https://cricfyapk.io/downloads/CRICFy_v7.3.apk) (identical to official Telegram & Pixeldrain mirrors) |
+| Stock download | Official [cricfyapk.io/download/](https://cricfyapk.io/download/) page or the developer's official Telegram channel |
 | Signing certificate SHA-256 | `f2cd86fcbc92461a3300cec47b6f74d20f0c89dd7162ecc333b3dd2c16e79841` |
 | APK SHA-256 | `d5b7a8cf16a9966a58d25841b1a108b7dba445fcd409ee932933b98f81d2de0d` |
 
@@ -199,12 +199,6 @@ short readable build labels and validate the package name, file type, version, `
    settings.
 5. Repeat with the fresh stock file when new versions are audited and supported.
 
-### Bundle icon
-
-The Gintama logo is included as `patches-bundle.png` for the remote patch-source icon and as
-`assets/icon.png` for this README. A Morphe `.mpp` file does not embed the bundle PNG by itself;
-Manager picks it up from beside the remote bundle metadata.
-
 ## Building from source
 
 Requirements: JDK 21 and a GitHub token with `read:packages` for Morphe's GitHub Packages
@@ -224,6 +218,11 @@ bash gradlew :patches:buildAndroid
 - Do not manually edit generated files such as `patches-list.json`, `patches-bundle.json`, or
   `CHANGELOG.md`; the release workflow updates them.
 - New app versions require a fresh fingerprint audit before compatibility is declared.
+
+## Credits
+
+- [callMeBeyonder/morphe-patches](https://github.com/callMeBeyonder/morphe-patches) — inspiration and initial CRICFy TV patch idea.
+- [Morphe](https://morphe.software/) — Morphe Patcher and Morphe Manager.
 
 ## Notes
 
