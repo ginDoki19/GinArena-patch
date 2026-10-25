@@ -17,6 +17,9 @@ object Constants {
     /** SHA-256 of the official signing certificate used by CRICFy TV 7.3 (53). */
     private const val CRICFY_SIGNER_SHA256 = "f2cd86fcbc92461a3300cec47b6f74d20f0c89dd7162ecc333b3dd2c16e79841"
 
+    /** SHA-256 of the official signing certificate used by CricZ TV 7.3 (10). */
+    private const val CRICZ_SIGNER_SHA256 = "9ff349c0c047abd68e169980484b43926b6ff2d251a430fe44e3ae3e2930e1d2"
+
     val COMPATIBILITY_ONEDM = Compatibility(
         name = "1DM",
         packageName = "idm.internet.download.manager",
@@ -45,6 +48,22 @@ object Constants {
                 versionCode = 53,
                 minSdk = 24,
                 description = "Universal APK (arm64-v8a / armeabi-v7a / x86 / x86_64, Android 7.0+), build 53"
+            )
+        )
+    )
+
+    val COMPATIBILITY_CRICZ_TV = Compatibility(
+        name = "CricZ TV",
+        packageName = "com.pro.cricztv",
+        apkFileType = ApkFileType.APK,
+        appIconColor = 0x08C7D6,
+        signatures = setOf(CRICZ_SIGNER_SHA256),
+        targets = listOf(
+            AppTarget(
+                version = "7.3",
+                versionCode = 10,
+                minSdk = 23,
+                description = "Universal APK (arm64-v8a / armeabi-v7a / x86 / x86_64, Android 6.0+), build 10"
             )
         )
     )
