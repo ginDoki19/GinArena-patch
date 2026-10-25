@@ -23,7 +23,8 @@ val removeAdsProxyAndRestrictionsPatch = bytecodePatch(
     name = "Remove ads, proxy & restrictions",
     description = "Removes CashRaven background bandwidth sharing, all ads and sponsor/unlock gates, " +
         "external browser redirects, the startup Telegram join dialog, promo marquee banners, " +
-        "forced-update lockouts, promo push notifications, and clone/sniffer checks.",
+        "forced-update lockouts, and promo push notifications. Optional clone/sniffer-check " +
+        "bypass and native-library stripping are off by default.",
     default = true,
 ) {
     compatibleWith(COMPATIBILITY_CRICFY_TV)
@@ -54,7 +55,7 @@ val removeAdsProxyAndRestrictionsPatch = bytecodePatch(
 
     val bypassEnvironmentChecks by booleanOption(
         key = "bypassEnvironmentChecks",
-        default = true,
+        default = false,
         title = "Bypass clone, work-profile & sniffer checks",
         description = "Allows running inside work profiles, app cloners, or alongside HTTP debugging tools.",
     )
