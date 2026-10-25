@@ -1,3 +1,9 @@
+## [2.1.0](https://github.com/ginDoki19/GinArena-patch/compare/v2.0.1...v2.1.0) (2026-10-25)
+
+### ✨ New Features
+
+* add browser presets and one-time setup prompts ([4d35ea7](https://github.com/ginDoki19/GinArena-patch/commit/4d35ea7328f1e9e31178e993f05058f849c44f92))
+
 ## [2.0.1](https://github.com/sagarkhansau19-svg/GinArena-patch/compare/v2.0.0...v2.0.1) (2026-10-24)
 
 ### 🐛 Bug Fixes
