@@ -6,14 +6,16 @@ import app.morphe.patcher.patch.Compatibility
 
 object Constants {
     /**
-     * Morphe patch metadata has no dedicated stock-app download field. The exact APKMirror
-     * link intentionally lives in the project README instead of user-facing descriptions, so
-     * Manager's version card stays readable. The target description below only identifies the
-     * required APKM variant.
+     * Morphe patch metadata has no dedicated stock-app download field. Exact stock download
+     * links and file hashes intentionally live in the project README instead of user-facing
+     * descriptions, so Manager's version cards stay readable.
      */
 
     /** SHA-256 of the official Vicky Bonick signing certificate used by 1DM 20.0 (30257). */
     private const val ONEDM_SIGNER_SHA256 = "9f48b6b2741fe7e4f78ea7375f469e99086c07f45a6c7f38407f0483d2451ce7"
+
+    /** SHA-256 of the official signing certificate used by CRICFy TV 7.3 (53). */
+    private const val CRICFY_SIGNER_SHA256 = "f2cd86fcbc92461a3300cec47b6f74d20f0c89dd7162ecc333b3dd2c16e79841"
 
     val COMPATIBILITY_ONEDM = Compatibility(
         name = "1DM",
@@ -27,6 +29,22 @@ object Constants {
                 versionCode = 30257,
                 minSdk = 24,
                 description = "Universal APKM (160-640 dpi, Android 7.0+), build 30257"
+            )
+        )
+    )
+
+    val COMPATIBILITY_CRICFY_TV = Compatibility(
+        name = "CRICFy TV",
+        packageName = "com.cricfytv.sports",
+        apkFileType = ApkFileType.APK,
+        appIconColor = 0xEE4326,
+        signatures = setOf(CRICFY_SIGNER_SHA256),
+        targets = listOf(
+            AppTarget(
+                version = "7.3",
+                versionCode = 53,
+                minSdk = 24,
+                description = "Universal APK (arm64-v8a / armeabi-v7a / x86 / x86_64, Android 7.0+), build 53"
             )
         )
     )

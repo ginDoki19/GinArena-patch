@@ -3,7 +3,7 @@ group = "app.GinArena.onedm"
 patches {
     about {
         name = "GinArena Patch"
-        description = "Removes visible ads and promotions from free 1DM 20.0 (30257), including the downloads-home VPN promo bar and sponsored browser start-page tiles."
+        description = "Privacy, ad-removal, and quality-of-life patches for free 1DM 20.0 (30257) and CRICFy TV 7.3 (53)."
         source = "https://github.com/ginDoki19/GinArena-patch"
         author = "ginDoki19"
         contact = "https://github.com/ginDoki19/GinArena-patch/issues"

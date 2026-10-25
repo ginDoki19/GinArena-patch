@@ -1,8 +1,9 @@
 # <img src="assets/icon.png" width="36" alt=""> GinArena Patch
 
-**GinArena Patch** is a [Morphe](https://morphe.software/) patch bundle for the free **1DM**
-Android app (`idm.internet.download.manager`). It contains one default-on patch, also named
-**GinArena Patch**, implemented entirely as bytecode changes.
+**GinArena Patch** is a [Morphe](https://morphe.software/) patch bundle for free **1DM**
+(`idm.internet.download.manager`) and **CRICFy TV** (`com.cricfytv.sports`). Morphe Manager
+automatically filters patches per app, so selecting 1DM shows only 1DM patches and selecting
+CRICFy TV shows only CRICFy TV patches.
 
 ### How to use these patches
 
@@ -38,7 +39,11 @@ github.com/ginDoki19/GinArena-patch
 
 <!-- PATCHES_END -->
 
-## What it does
+---
+
+## 📦 1DM (20.0, build 30257)
+
+### What it does
 
 It removes visible advertising and promotion UI from the free app while keeping the app's own
 flow intact:
@@ -50,7 +55,6 @@ flow intact:
 - The navigation drawer **“Upgrade to 1DM+”** item is hidden.
 - The **“1DM+ on sale”** toolbar subtitle is disabled (the legitimate *Update app* subtitle is kept).
 - The empty banner container (`MaxHeightLinearLayout`) is collapsed to 0×0 so no blank strip remains.
-
 - The downloads-home promo strip (`offer_vpnLL`) is forced onto the app's own hide path, so the
   ProtonVPN installation offer—and the other promo messages rotated through that same strip—are not
   shown. This does not alter 1DM's actual VPN settings or functionality.
@@ -62,7 +66,7 @@ flow intact:
 
 User-created browser shortcuts and the **Add Shortcut** tile use a separate path and remain available.
 
-### Browser setup prompts only once (opt-in)
+#### Browser setup prompts only once (opt-in)
 
 This separate patch is **off by default**. The stock browser can show its
 **Accessibility settings** and **shortcut menu strip** setup
@@ -71,7 +75,7 @@ prompts again if the browser activity/process ends before their dismiss callback
 same in-memory and persisted shown-flag write immediately after `show()`. Closing the browser
 before dismissing either dialog therefore cannot make that same setup prompt keep returning.
 
-### Preset browser settings (opt-in)
+#### Preset browser settings (opt-in)
 
 This separate patch is **off by default**, so it is not selected accidentally. When a user
 enables it, it changes only the fresh-install/missing-key fallbacks for normal and incognito
@@ -91,7 +95,7 @@ later inside 1DM's General Settings.
 GinArena Patch does **not** unlock any 1DM+ paid features (scheduler, higher part/concurrency
 caps, paid DNS entries, …), and it contains no 1DM+ code or resources.
 
-## Target app
+### Target app (1DM)
 
 | Field | Value |
 | --- | --- |
@@ -105,32 +109,79 @@ caps, paid DNS entries, …), and it contains no 1DM+ code or resources.
 
 Do **not** use the separate **20257** variant for this patch.
 
-Other versions (including 20.1 beta) are **not** declared compatible: obfuscated class/method
-names differ between builds, so the fingerprints must be re-audited per version.
+> **Uptodown note:** If Morphe’s “help me find an APK” flow opens Uptodown and downloads the 1DM 20.0 XAPK, that file has also been tested successfully. Select it in Morphe Manager instead of installing it. For x86/x86_64 devices, or if the Uptodown result is not exactly 20.0, use the APKMirror universal APKM above.
+
+---
+
+## 📦 CRICFy TV (7.3, build 53)
+
+### What it does
+
+The **Remove ads, proxy & restrictions** patch (enabled by default) delivers a clean, safe,
+privacy-respecting experience on **CRICFy TV 7.3** across phones, tablets, and Android TV:
+
+- **Removes CashRaven background residential proxy:** Strips `CashRaven.createManaged` / forced
+  `CashRaven.optIn()` from `App.onCreate`, disables `CashRavenService`, `AppExitGuardService`, and
+  `CrBootReceiver`, and removes the dead **Bandwidth Sharing** drawer item so tapping it can never
+  crash the app.
+- **Native signature-tamper bypass (`ResourceMode.RAW`):** Dynamically parses ELF32/ELF64 `.dynsym`
+  and `PT_LOAD` headers across all four ABIs (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`) in
+  `libnative-lib.so` and patches `AntiTamper::isTampered` to return `false`, allowing `Baker.merge`
+  to decrypt live server configurations after Morphe re-signs the APK without touching CRICFy's
+  anti-tamper `resources.arsc`.
+- **Anti-decompiler DEX payload sanitizer:** Repairs deliberately corrupted dead-code
+  `array-payload` (`0x0300`) instructions before `dexlib2` rewrites touched classes.
+- **Complete ad, sponsor-gate & redirect removal:** Disables Unity Ads startup initialization,
+  `AlertNew` countdown gates, sponsor banners, startup full-screen custom ads
+  (`CustomAdFullBinding`), external browser / `WebActivity` redirects, and all three pre-playback
+  channel lock/sponsor gates (`UnlockDilaogBinding`, countdown WebView, and browser redirect) so
+  channels open immediately.
+- **No startup Telegram join popup:** Suppresses the startup `DialogTgJoinBinding` (`dialog_alert`)
+  prompt on `MainActivity` launch while leaving voluntary social links in the side drawer intact.
+- **Configurable quality-of-life options (all on by default):**
+  - **Hide promo marquee ticker** (`hidePromoMarquee`) — hides the scrolling announcement/redirect
+    marquee bar on Home, Player, and Floating Player screens.
+  - **Bypass update & force-update screen** (`bypassUpdateGate`) — skips optional and forced
+    `FragmentUpdate` lockouts on Splash startup.
+  - **Block promotional push notifications** (`blockPromoPushNotifications`) — suppresses
+    promotional/redirect FCM notifications and skips the Android 13+ notification permission prompt
+    while keeping silent RemoteConfig (`type == 3`) stream API refreshes working.
+  - **Bypass clone, work-profile & sniffer checks** (`bypassEnvironmentChecks`) — allows running
+    inside work profiles (`userId 999`), app cloners, or alongside HTTP debugging tools.
+  - **Strip proxy & ad native libraries** (`stripNativeBloat`) — removes ~7.7 MB of unused
+    `libcr_android.so`, `libjnidispatch.so`, `libunitycoherencenative.so`, legacy `armeabi`/`mips`
+    folders, and `assets/ad-viewer/`.
+
+### Target app (CRICFy TV)
+
+| Field | Value |
+| --- | --- |
+| Package | `com.cricfytv.sports` |
+| Version | **7.3** (versionCode 53), universal APK (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`) |
+| Stock download | [Official CRICFy TV v7.3 APK](https://cricfyapk.io/downloads/CRICFy_v7.3.apk) (identical to official Telegram & Pixeldrain mirrors) |
+| Signing certificate SHA-256 | `f2cd86fcbc92461a3300cec47b6f74d20f0c89dd7162ecc333b3dd2c16e79841` |
+| APK SHA-256 | `d5b7a8cf16a9966a58d25841b1a108b7dba445fcd409ee932933b98f81d2de0d` |
+
+---
 
 ### Stock download note
 
 Morphe patch metadata does not have a dedicated “stock app download URL” field, and Morphe Manager
-does not read a download destination from a patch bundle. The exact APKMirror URL therefore stays
-in this README, where it is clickable. The in-Manager version target carries only the short label
-**“Universal APKM (160-640 dpi, Android 7.0+), build 30257”**, so the version card stays clean.
-Compatibility is pinned to the package, APKM file type, version **20.0**, versionCode **30257**
-for all ABIs, `minSdk` **24**, and the official signing-certificate SHA-256.
-
-Those pins identify and validate the input; they do not control which website Manager's built-in
-“help me find an APK” flow opens.
-
-> **Uptodown note:** If Morphe’s “help me find an APK” flow opens Uptodown and downloads the 1DM 20.0 XAPK, that file has also been tested successfully. Select it in Morphe Manager instead of installing it. For x86/x86_64 devices, or if the Uptodown result is not exactly 20.0, use the APKMirror universal APKM above.
+does not read a download destination from a patch bundle. Exact download URLs and SHA-256 hashes
+therefore stay in this README, where they are clickable, while the in-Manager version cards carry
+short readable build labels and validate the package name, file type, version, `versionCode`,
+`minSdk`, and official signing-certificate SHA-256.
 
 ## Usage (Morphe Manager)
 
-1. Add this repository as a remote patch source using the link above.
-2. Download the exact official 20.0 universal APKM above and verify the hash if you can.
-3. Back up 1DM data if you already use it — patching re-signs the app, so you must **uninstall
-   the official 1DM first** (signature mismatch), which clears its private settings.
-4. In Morphe Manager, select the 1DM 20.0 APKM, enable **GinArena Patch**, then patch and install.
-   If a third-party source or patch is not visible, enable Expert Mode in Morphe settings.
-5. Patched builds cannot update from the Play Store; repeat the process for future versions.
+1. Add this repository as a remote patch source using the link at the top of this README.
+2. Download the official stock **1DM 20.0 APKM** or **CRICFy TV 7.3 APK** above onto your device.
+3. Uninstall the stock app first if it is already installed (re-signing changes the APK signature).
+4. In Morphe Manager, choose **Select from storage**, pick the downloaded stock `.apkm` / `.apk`
+   file (rather than an already-patched installed app), configure options if desired, then patch
+   and install. If a third-party source or patch is not visible, enable Expert Mode in Morphe
+   settings.
+5. Repeat with the fresh stock file when new versions are audited and supported.
 
 ### Bundle icon
 
@@ -151,19 +202,17 @@ bash gradlew :patches:buildAndroid
 
 ## Development
 
-- Make changes on the `dev` branch.
-- Use semantic commit messages (`feat:`, `fix:`, `chore:`). `dev` creates pre-releases; merging
-  `dev` into `main` (merge commit, not squash) creates stable releases.
+- Use semantic commit messages (`feat:`, `fix:`, `chore:`). Pushing to `dev` creates pre-releases;
+  merging `dev` into `main` (merge commit, not squash) or pushing `feat:`/`fix:` to `main` creates
+  stable releases and back-merges automatically.
 - Do not manually edit generated files such as `patches-list.json`, `patches-bundle.json`, or
   `CHANGELOG.md`; the release workflow updates them.
-- A new 1DM version requires a fresh fingerprint audit before compatibility is declared.
+- New app versions require a fresh fingerprint audit before compatibility is declared.
 
 ## Notes
 
-- This patch is for an app you legitimately obtained; it only patches files on your device.
-  Support the 1DM developer by buying 1DM+ if you want the paid features.
-- Ad SDK classes remain in the APK; their entry points are simply never reached. Removing classes
-  would risk breaking reflective references, while dead code is harmless.
+- These patches only modify app files locally on your device. Support app developers by purchasing
+  official paid editions such as 1DM+ if you want paid features.
 
 ## License
 
