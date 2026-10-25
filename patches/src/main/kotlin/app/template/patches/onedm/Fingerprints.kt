@@ -26,6 +26,9 @@ internal const val BANNER_INFO = "Lcom/aspsine/multithreaddownload/core/BannerIn
 internal const val PP0 = "Li/pp0;"
 internal const val D82 = "Li/d82;"
 internal const val X90 = "Li/x90;"
+internal const val CONTEXT = "Landroid/content/Context;"
+internal const val DIALOG_INTERFACE = "Landroid/content/DialogInterface;"
+internal const val DISMISS_LISTENER = "Lacr/browser/lightning/view/DismissListener;"
 
 // region App-level ad initialization and banner gates (non-obfuscated app classes)
 
@@ -426,6 +429,87 @@ object LegacyStartPageHomepageFingerprint : Fingerprint(
             opcode = Opcode.INVOKE_STATIC
         )
     )
+)
+
+// endregion
+
+// region Browser preset settings and one-time setup prompts
+
+private val BROWSER_SETTINGS_LOADER_STRINGS = listOf(
+    "search",
+    "search_inc",
+    "suggestions_choice",
+    "suggestions_choice_inc",
+    "rv_img_srch",
+    "rv_img_srch_inc",
+    "SUGGESTION_GOOGLE"
+)
+
+/**
+ * The obfuscated 1DM settings loader used when the settings singleton is created or
+ * reloaded. It is matched by its descriptor and persisted keys, not by its obfuscated
+ * class or method name.
+ *
+ * In the audited 20.0 base this is the `(Landroid/content/Context;)V` loader in the
+ * settings class. The preset patch extracts the integer fallback fields from its
+ * `getInt(key, currentField)` sequences.
+ */
+object BrowserSettingsLoaderFingerprint : Fingerprint(
+    isStatic = false,
+    returnType = "V",
+    parameters = listOf(CONTEXT),
+    strings = BROWSER_SETTINGS_LOADER_STRINGS
+)
+
+/**
+ * The parallel settings loader used for import/reload. In 20.0 it receives the already
+ * decoded settings-map wrapper as its second argument and applies the same fallback
+ * rules as [BrowserSettingsLoaderFingerprint].
+ */
+object BrowserSettingsImportLoaderFingerprint : Fingerprint(
+    isStatic = false,
+    returnType = "V",
+    parameters = listOf(CONTEXT, "L"),
+    strings = BROWSER_SETTINGS_LOADER_STRINGS
+)
+
+/**
+ * BrowserActivity's setup-prompt chain. The two string-resource literals identify the
+ * accessibility-settings prompt and the shortcut-menu-strip prompt in `onCreate`.
+ */
+object BrowserActivityOnCreateSetupPromptsFingerprint : Fingerprint(
+    definingClass = BROWSER_ACTIVITY,
+    name = "onCreate",
+    returnType = "V",
+    parameters = listOf("Landroid/os/Bundle;"),
+    filters = listOf(
+        resourceLiteral(ResourceType.STRING, "info_checkout_accessibility_settings"),
+        resourceLiteral(ResourceType.STRING, "setup_shortcut_menu_strip_browser")
+    )
+)
+
+/**
+ * Dismiss listener for the "Checkout Accessibility settings..." prompt.
+ * Its persisted shown key is `cas_shown`.
+ */
+object AccessibilityPromptDismissFingerprint : Fingerprint(
+    superclass = DISMISS_LISTENER,
+    name = "onDialogDismiss",
+    returnType = "V",
+    parameters = listOf(DIALOG_INTERFACE),
+    strings = listOf("cas_shown")
+)
+
+/**
+ * Dismiss listener for the "Setup shortcut menu strip..." prompt.
+ * Its persisted shown key is `csmss_shown`.
+ */
+object ShortcutMenuStripPromptDismissFingerprint : Fingerprint(
+    superclass = DISMISS_LISTENER,
+    name = "onDialogDismiss",
+    returnType = "V",
+    parameters = listOf(DIALOG_INTERFACE),
+    strings = listOf("csmss_shown")
 )
 
 // endregion

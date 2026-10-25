@@ -109,7 +109,7 @@ private fun MutableMethod.runRunnableAndReturn(registerName: String, invokeKindA
 
 @Suppress("unused")
 val removeAdsPatch = bytecodePatch(
-    name = "GinArena Patch",
+    name = "Remove ads and promotions",
     description = "Removes visible banner/full-screen ads and 1DM+ promotions from free 1DM 20.0 (30257), including the downloads-home VPN promo bar and sponsored browser start-page tiles. User shortcuts remain available.",
     default = true
 ) {

@@ -60,6 +60,32 @@ flow intact:
 
 User-created browser shortcuts and the **Add Shortcut** tile use a separate path and remain available.
 
+### Browser setup prompts only once (opt-in)
+
+This separate patch is **off by default**. The stock browser can show its
+**Accessibility settings** and **shortcut menu strip** setup
+prompts again if the browser activity/process ends before their dismiss callbacks save the
+“shown” flags. This patch lets each prompt appear normally the first time, then performs the
+same in-memory and persisted shown-flag write immediately after `show()`. Closing the browser
+before dismissing either dialog therefore cannot make that same setup prompt keep returning.
+
+### Preset browser settings (opt-in)
+
+This separate patch is **off by default**, so it is not selected accidentally. When a user
+enables it, it changes only the fresh-install/missing-key fallbacks for normal and incognito
+browsing:
+
+- **Search engine:** Brave by default, with Google, DuckDuckGo/Lite, Bing, StartPage/Mobile,
+  Yahoo/Japan, Yandex/Russian, Baidu, and AOL available as patch options.
+- **Search suggestions:** matched to the selected search provider where 1DM supports it;
+  providers without a matching suggestion service use **None** instead of silently using
+  Google. A supported provider or None can also be chosen explicitly.
+- **Search by image:** Google by default, with Bing, Yandex, TinEye, SauceNAO, and Sogou
+  available. 1DM does not offer Brave or DuckDuckGo for reverse image search.
+
+Saved or imported 1DM choices are not overwritten, and every provider can still be changed
+later inside 1DM's General Settings.
+
 GinArena Patch does **not** unlock any 1DM+ paid features (scheduler, higher part/concurrency
 caps, paid DNS entries, …), and it contains no 1DM+ code or resources.
 
