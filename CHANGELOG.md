@@ -1,3 +1,9 @@
+## [2.2.1-dev.1](https://github.com/ginDoki19/GinArena-patch/compare/v2.2.0...v2.2.1-dev.1) (2026-10-25)
+
+### 🐛 Bug Fixes
+
+* make CRICFy patch safer by default ([db89a79](https://github.com/ginDoki19/GinArena-patch/commit/db89a79fda9a9d8f4e3025170a3c492940ad8ace))
+
 ## [2.2.0](https://github.com/ginDoki19/GinArena-patch/compare/v2.1.0...v2.2.0) (2026-10-25)
 
 ### ✨ New Features
