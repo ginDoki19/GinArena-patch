@@ -215,7 +215,8 @@ server-compatible experience on **CricZ TV 7.3** across phones, tablets, and And
   `libnative-lib.so` decryption in pure Java (`Base64` → byte-pair swap → reverse → `Base64` →
   AES-128-CBC with the stock certificate-derived key) while preserving graceful fallback to Tier-2
   AES decryption (`c6.f0.j`), so live RemoteConfig (`api_url`) and all encrypted channel/event
-  feeds continue working seamlessly after Morphe re-signs the APK without ever getting blocked.
+  feeds keep working after Morphe re-signs the APK, without the stock app's signing-certificate
+  check blocking decryption.
 - **Complete ad, popunder, timer-gate & local ad-server removal:** Sanitizes parsed `app.txt`
   ad flags, disables external Chrome / CustomTabs popunder redirects (`vc.b.A`), removes the
   10-second `SupportActivity` sponsor countdown gate (`kc.k.T`), and disables `"adpro*"` match-feed
@@ -224,9 +225,10 @@ server-compatible experience on **CricZ TV 7.3** across phones, tablets, and And
 - **No startup Telegram popup or video watermarks:** Suppresses the startup `dialog_telegram`
   modal on `MainActivity` launch (while keeping voluntary Settings links functional) and clears
   `player_text` / `@id/playerTxt` overlays across Portrait, Landscape, PiP, and Floating Player.
-- **Preserves Firebase RemoteConfig while stripping telemetry:** Keeps the minimal closed
-  `RemoteConfigRegistrar` + `FirebaseInstallationsRegistrar` + `AbtRegistrar` graph required to
-  resolve live backend domain rotations while removing Analytics, Crashlytics, Sessions,
+- **Preserves Firebase RemoteConfig:** The minimal `RemoteConfigRegistrar` +
+  `FirebaseInstallationsRegistrar` + `AbtRegistrar` graph required to resolve live backend
+  domain rotations is always kept intact. The opt-in *Strip native & telemetry bloat* option
+  below (off by default) can additionally remove Analytics, Crashlytics, Sessions,
   DataTransport, AdServices, and `ProfileInstaller`.
 - **Configurable quality-of-life options (on by default unless noted):**
   - **Hide promo announcement bar** (`hidePromoMarquee`) — collapses the scrolling `message_card`
@@ -254,7 +256,7 @@ server-compatible experience on **CricZ TV 7.3** across phones, tablets, and And
 | --- | --- |
 | Package | `com.pro.cricztv` |
 | Version | **7.3** (versionCode 10), universal APK (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`) |
-| Stock download | Official developer Telegram channel |
+| Stock download | Official developer Telegram channel: [t.me/cricztvapp](https://t.me/cricztvapp) — verify the APK SHA-256 below after downloading |
 | Signing certificate SHA-256 | `9ff349c0c047abd68e169980484b43926b6ff2d251a430fe44e3ae3e2930e1d2` |
 | APK SHA-256 | `74a8a13da7ab1865dc9e3bbb511fe82bb0f8c093fcf2404ac4a59ecdce44fb82` |
 
@@ -290,10 +292,13 @@ short readable build labels and validate the package name, file type, version, `
 > patch your saved/patched APK again. Re-download the exact stock file from the links above and
 > patch it from the beginning.
 >
-> **New in v2.2.1 (CRICFy TV):** safer defaults — *Bypass clone, work-profile & sniffer checks*
-> and *Strip proxy & ad native libraries* are now **off** unless you turn them on. Ad removal and
-> CashRaven bandwidth-sharing removal are unchanged. If your CRICFy TV patched with v2.2.0 works
-> fine, you don't need to do anything.
+> **New in v2.3.0:** adds **CricZ TV 7.3** support — ads, popunder redirects, the 10-second
+> sponsor gate, the startup Telegram popup, player watermarks, and push notifications are
+> removed, while live config decryption keeps working on the re-signed build. As with CRICFy TV
+> since v2.2.1, the environment-check bypass (root / cloner / sniffer) and native-library
+> stripping options are **off by default** — turn them on only if you actually use root, app
+> cloners, work profiles, or HTTPS-filtering tools. If your current patched 1DM or CRICFy TV
+> works fine, you don't need to do anything.
 
 ## Building from source
 
