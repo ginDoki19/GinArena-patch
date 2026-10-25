@@ -1,3 +1,9 @@
+## [2.3.0-dev.1](https://github.com/ginDoki19/GinArena-patch/compare/v2.2.1...v2.3.0-dev.1) (2026-10-25)
+
+### ✨ New Features
+
+* **cricz:** add Remove ads, telemetry & restrictions patch for CricZ TV 7.3 ([a26de87](https://github.com/ginDoki19/GinArena-patch/commit/a26de877deaacba93bf576c0e1c8e320ce417c16))
+
 ## [2.2.1](https://github.com/ginDoki19/GinArena-patch/compare/v2.2.0...v2.2.1) (2026-10-25)
 
 ### 🐛 Bug Fixes
