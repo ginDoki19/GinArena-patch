@@ -154,7 +154,7 @@ privacy-respecting experience on **CRICFy TV 7.3** across phones, tablets, and A
   channels open immediately.
 - **No startup Telegram join popup:** Suppresses the startup `DialogTgJoinBinding` (`dialog_alert`)
   prompt on `MainActivity` launch while leaving voluntary social links in the side drawer intact.
-- **Configurable quality-of-life options (all on by default):**
+- **Configurable quality-of-life options (on by default unless noted):**
   - **Hide promo marquee ticker** (`hidePromoMarquee`) — hides the scrolling announcement/redirect
     marquee bar on Home, Player, and Floating Player screens.
   - **Bypass update & force-update screen** (`bypassUpdateGate`) — skips optional and forced
@@ -162,11 +162,14 @@ privacy-respecting experience on **CRICFy TV 7.3** across phones, tablets, and A
   - **Block promotional push notifications** (`blockPromoPushNotifications`) — suppresses
     promotional/redirect FCM notifications and skips the Android 13+ notification permission prompt
     while keeping silent RemoteConfig (`type == 3`) stream API refreshes working.
-  - **Bypass clone, work-profile & sniffer checks** (`bypassEnvironmentChecks`) — allows running
-    inside work profiles (`userId 999`), app cloners, or alongside HTTP debugging tools.
-  - **Strip proxy & ad native libraries** (`stripNativeBloat`) — removes ~7.7 MB of unused
-    `libcr_android.so`, `libjnidispatch.so`, `libunitycoherencenative.so`, legacy `armeabi`/`mips`
-    folders, and `assets/ad-viewer/`.
+  - **Bypass clone, work-profile & sniffer checks** (`bypassEnvironmentChecks`, **off by
+    default**) — allows running inside work profiles (`userId 999`), app cloners, or alongside
+    HTTP debugging tools. Not needed for ad/proxy removal; enable only if you use such tools.
+  - **Strip proxy & ad native libraries** (`stripNativeBloat`, **off by default**) — removes
+    ~7.7 MB of unused `libcr_android.so`, `libjnidispatch.so`, `libunitycoherencenative.so`,
+    legacy `armeabi`/`mips` folders, and `assets/ad-viewer/`. Purely a size saving: with this
+    off, the libraries stay in the APK but are never loaded, because their Java entry points
+    are already removed above.
 
 ### Target app (CRICFy TV)
 
@@ -177,6 +180,11 @@ privacy-respecting experience on **CRICFy TV 7.3** across phones, tablets, and A
 | Stock download | Official [cricfyapk.io/download/](https://cricfyapk.io/download/) page or the developer's official Telegram channel |
 | Signing certificate SHA-256 | `f2cd86fcbc92461a3300cec47b6f74d20f0c89dd7162ecc333b3dd2c16e79841` |
 | APK SHA-256 | `d5b7a8cf16a9966a58d25841b1a108b7dba445fcd409ee932933b98f81d2de0d` |
+
+> **Version safety:** only **7.3 (53)** is supported. The patch validates every fingerprint and
+> the native `AntiTamper` symbol before writing anything, and **aborts with an error instead of
+> producing a broken APK** if the app internals have changed. Future CRICFy versions are refused
+> by design until they receive a fresh audit — do not force-patch other versions in Expert Mode.
 
 ---
 
