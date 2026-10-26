@@ -3,7 +3,7 @@ group = "app.GinArena.onedm"
 patches {
     about {
         name = "GinArena Patch"
-        description = "Privacy, ad-removal, and quality-of-life patches for free 1DM 20.0 (30257), CRICFy TV 7.3 (53), and CricZ TV 7.3 (10)."
+        description = "Privacy, ad-removal, and quality-of-life patches for free 1DM 20.0 (30257), CRICFy TV 7.3 (53), CricZ TV 7.3 (10), and MX Player 3.4.1 / 3.4.0 / 3.3.1."
         source = "https://github.com/ginDoki19/GinArena-patch"
         author = "ginDoki19"
         contact = "https://github.com/ginDoki19/GinArena-patch/issues"
