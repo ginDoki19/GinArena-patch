@@ -1,3 +1,9 @@
+## [2.4.1-dev.1](https://github.com/ginDoki19/GinArena-patch/compare/v2.4.0...v2.4.1-dev.1) (2026-10-27)
+
+### 🐛 Bug Fixes
+
+* **mxplayer:** order supported versions oldest first so indexes show 3.4.1 ([0d4ba30](https://github.com/ginDoki19/GinArena-patch/commit/0d4ba301bf1bc12f140b4036920bb7e158ca80e5))
+
 ## [2.4.0](https://github.com/ginDoki19/GinArena-patch/compare/v2.3.0...v2.4.0) (2026-10-27)
 
 ### 🐛 Bug Fixes

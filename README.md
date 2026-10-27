@@ -18,7 +18,7 @@ github.com/ginDoki19/GinArena-patch
 ## 🩹 Patches list
 
 <!-- PATCHES_START EXPANDED -->
-> **[v2.4.0](https://github.com/ginDoki19/GinArena-patch/releases/tag/v2.4.0)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;10 patches total
+> **[v2.4.1-dev.1](https://github.com/ginDoki19/GinArena-patch/releases/tag/v2.4.1-dev.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;10 patches total
 <details open>
 <summary>📦 1DM&nbsp;&nbsp;•&nbsp;&nbsp;3 patches</summary>
 <br>
@@ -43,9 +43,9 @@ github.com/ginDoki19/GinArena-patch
 
 **🎯 Supported versions:**
 
-| 3.4.1 | 3.4.0 | 3.3.1 |
+| 3.3.1 | 3.4.0 | 3.4.1 |
 | :---: | :---: | :---: |
-| Standalone APK (arm64-v8a / armeabi-v7a, Android 7.0+), build 2001003551 | Standalone APK (arm64-v8a / armeabi-v7a, Android 7.0+), build 2001003550 | Standalone APK (arm64-v8a / armeabi-v7a, nodpi, Android 7.0+), build 2001003541 |
+| Standalone APK (arm64-v8a / armeabi-v7a, nodpi, Android 7.0+), build 2001003541 | Standalone APK (arm64-v8a / armeabi-v7a, Android 7.0+), build 2001003550 | Standalone APK (arm64-v8a / armeabi-v7a, Android 7.0+), build 2001003551 |
 
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
