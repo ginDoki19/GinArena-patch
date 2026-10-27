@@ -1,3 +1,9 @@
+## [2.4.0-dev.2](https://github.com/ginDoki19/GinArena-patch/compare/v2.4.0-dev.1...v2.4.0-dev.2) (2026-10-27)
+
+### 🐛 Bug Fixes
+
+* **mxplayer:** fix 1-tap Classic Themes and remove redundant Clean App Theme patch ([8024e90](https://github.com/ginDoki19/GinArena-patch/commit/8024e903b4630f009a4eb09343fa7806ccaff2d6))
+
 ## [2.4.0-dev.1](https://github.com/ginDoki19/GinArena-patch/compare/v2.3.0...v2.4.0-dev.1) (2026-10-26)
 
 ### ✨ New Features
