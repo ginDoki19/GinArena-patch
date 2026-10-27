@@ -2,7 +2,7 @@
 
 **GinArena Patch** is a [Morphe](https://morphe.software/) patch bundle for free **1DM**
 (`idm.internet.download.manager`), **CRICFy TV** (`com.cricfytv.sports`), **CricZ TV**
-(`com.pro.cricztv`), and **MX Player** (`com.mxtech.videoplayer.ad`). Morphe Manager automatically
+(`com.pro.cricztv`), **PlayZ TV** (`com.playz.tv`), and **MX Player** (`com.mxtech.videoplayer.ad`). Morphe Manager automatically
 filters patches per app, so selecting an app shows only the patches compatible with that app.
 
 ### How to use these patches
@@ -285,6 +285,45 @@ server-compatible experience on **CricZ TV 7.3** across phones, tablets, and And
 
 ---
 
+## 📦 PlayZ TV (2.3.1, build 8)
+
+### What it does
+
+The **Remove ads, popups & restrictions** patch (enabled by default) provides a clean, fast,
+server-compatible experience on **PlayZ TV 2.3.1** across phones, tablets, and Android TV:
+
+- **Pure-Java signature-independent decryption (`Px.app`):** Replaces native `libnative-lib.so`
+  decryption in pure Java (`Base64` → byte-pair swap → reverse → `Base64` → AES-128-CBC with the
+  stock certificate-derived key), so encrypted channel/event feeds keep working after Morphe
+  re-signs the APK. The native signer-certificate self-test (`Px.check`, which aborts a
+  re-signed build on startup) is neutralized, and any decode failure returns an empty result
+  so the app's own Java AES fallbacks (`q4.a0.j`) still apply — the app never crashes on a
+  bad payload.
+- **Complete ad & popunder removal:** Sanitizes the parsed `app.txt` config at the single
+  choke point (`wc.d.u`): banner/start/support ad flags off and external-ad preferences
+  cleared, and disables the timed Support / Custom Browser popunder (`wc.d.y`).
+- **No automatic Telegram popup:** Suppresses the automatic `dialog_telegram` promo
+  (`lc.n.a`), while manual Telegram links elsewhere remain untouched.
+- **Stability first:** TLS setup (`rc.b.a`), streaming, and update behavior are untouched; no
+  permissions are changed and no native libraries are stripped (the stock library stays in
+  the APK but is never loaded by the patched `Px` bridge).
+
+### Target app (PlayZ TV)
+
+| Field | Value |
+| --- | --- |
+| Package | `com.playz.tv` |
+| Version | **2.3.1** (versionCode 8), universal APK (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`) |
+| Stock download | Use the exact stock **2.3.1** APK and verify the APK SHA-256 below before patching |
+| Signing certificate SHA-256 | `05ecca660d7656ce2c65a878c9e49a169558c2a44976f26c369393eccf9dc44b` |
+| APK SHA-256 | `003c8b6e9afe4a3f17ab45112a99ad8d2bf715f1981a521c61dab5f453a1d827` |
+
+> **Version safety:** only **2.3.1 (8)** is supported. Every fingerprint is validated before writing
+> anything, and future PlayZ TV versions are refused by design until they receive a fresh audit —
+> do not force-patch other versions in Expert Mode.
+
+---
+
 ## 📦 MX Player (3.4.1 / 3.4.0 / 3.3.1)
 
 ### What it does
@@ -363,7 +402,8 @@ short readable build labels and validate the package name, file type, version, `
 ## Usage (Morphe Manager)
 
 1. Add this repository as a remote patch source using the link at the top of this README.
-2. Download the official stock **1DM 20.0 APKM**, **CRICFy TV 7.3 APK**, **CricZ TV 7.3 APK**, or
+2. Download the official stock **1DM 20.0 APKM**, **CRICFy TV 7.3 APK**, **CricZ TV 7.3 APK**,
+   **PlayZ TV 2.3.1 APK**, or
    **MX Player 3.4.1 / 3.4.0 / 3.3.1 standalone APK** above onto your device.
 3. Uninstall the stock app first if it is already installed (re-signing changes the APK signature).
 4. In Morphe Manager, choose **Select from storage**, pick the downloaded stock `.apkm` / `.apk`
@@ -383,7 +423,9 @@ short readable build labels and validate the package name, file type, version, `
 > into a clean, ad-free local video and music player with 1-tap offline & online **Classic Themes**
 > (16 Light + 16 Dark Slate swatches) and a tidier **Me** tab, plus optional patches to hide the
 > bottom navigation bar and bundle the **v3.1.0 Custom Codec** (`aio-v3.1.0_r1.zip`) directly into
-> the APK for Dolby / DTS audio. On CRICFy TV and CricZ TV, environment-check bypass and
+> the APK for Dolby / DTS audio. It also adds **PlayZ TV (`2.3.1`)** support — ad-free with
+> working encrypted channel/event feeds (pure-Java replacement of the signature-locked native
+> decryption, like CricZ TV). On CRICFy TV and CricZ TV, environment-check bypass and
 > native-library stripping remain **off by default** — if your current patched 1DM, CRICFy TV, or
 > CricZ TV works fine, you don't need to re-patch it.
 
