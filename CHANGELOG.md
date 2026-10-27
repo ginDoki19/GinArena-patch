@@ -1,3 +1,9 @@
+## [2.4.0-dev.3](https://github.com/ginDoki19/GinArena-patch/compare/v2.4.0-dev.2...v2.4.0-dev.3) (2026-10-27)
+
+### ✨ New Features
+
+* **playz:** add PlayZ TV 2.3.1 clean experience patch ([21a0a00](https://github.com/ginDoki19/GinArena-patch/commit/21a0a0045bda3f3685d15653c72e7c8fbd17476d))
+
 ## [2.4.0-dev.2](https://github.com/ginDoki19/GinArena-patch/compare/v2.4.0-dev.1...v2.4.0-dev.2) (2026-10-27)
 
 ### 🐛 Bug Fixes

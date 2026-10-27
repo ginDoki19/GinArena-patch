@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-10-27T02:01:24",
-  "description": "## [2.4.0-dev.2](https://github.com/ginDoki19/GinArena-patch/compare/v2.4.0-dev.1...v2.4.0-dev.2) (2026-10-27)\n\n### 🐛 Bug Fixes\n\n* **mxplayer:** fix 1-tap Classic Themes and remove redundant Clean App Theme patch ([8024e90](https://github.com/ginDoki19/GinArena-patch/commit/8024e903b4630f009a4eb09343fa7806ccaff2d6))",
-  "download_url": "https://github.com/ginDoki19/GinArena-patch/releases/download/v2.4.0-dev.2/patches-2.4.0-dev.2.mpp",
+  "created_at": "2026-10-27T02:15:39",
+  "description": "## [2.4.0-dev.3](https://github.com/ginDoki19/GinArena-patch/compare/v2.4.0-dev.2...v2.4.0-dev.3) (2026-10-27)\n\n### ✨ New Features\n\n* **playz:** add PlayZ TV 2.3.1 clean experience patch ([21a0a00](https://github.com/ginDoki19/GinArena-patch/commit/21a0a0045bda3f3685d15653c72e7c8fbd17476d))",
+  "download_url": "https://github.com/ginDoki19/GinArena-patch/releases/download/v2.4.0-dev.3/patches-2.4.0-dev.3.mpp",
   "signature_download_url": "",
-  "version": "2.4.0-dev.2"
+  "version": "2.4.0-dev.3"
 }

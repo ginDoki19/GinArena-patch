@@ -1,6 +1,6 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "2.4.0-dev.2",
+  "version": "2.4.0-dev.3",
   "patches": [
     {
       "name": "Browser setup prompts only once",
@@ -341,6 +341,40 @@
               "isExperimental": false,
               "minSdk": 24,
               "description": "Universal APKM (160-640 dpi, Android 7.0+), build 30257"
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "Remove ads, popups & restrictions",
+      "description": "Replaces the native signature-locked decryption in pure Java so encrypted channel and event feeds keep loading after Morphe re-signs the APK, and removes start/player/support/external ads plus the automatic Telegram promo dialog.",
+      "default": true,
+      "category": null,
+      "compatiblePackages": [
+        {
+          "packageName": "com.playz.tv",
+          "name": "PlayZ TV",
+          "description": null,
+          "apkFileType": "APK",
+          "appIconColor": "#00A6A6",
+          "signatures": [
+            "05ecca660d7656ce2c65a878c9e49a169558c2a44976f26c369393eccf9dc44b"
+          ],
+          "formFactor": "MOBILE",
+          "targets": [
+            {
+              "version": "2.3.1",
+              "versionCodes": {
+                "ARM64_V8A": 8,
+                "ARMEABI_V7A": 8,
+                "X86_64": 8,
+                "X86": 8
+              },
+              "isExperimental": false,
+              "minSdk": 23,
+              "description": "Universal APK (arm64-v8a / armeabi-v7a / x86 / x86_64, Android 6.0+), build 8"
             }
           ]
         }
