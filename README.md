@@ -18,7 +18,7 @@ github.com/ginDoki19/GinArena-patch
 ## 🩹 Patches list
 
 <!-- PATCHES_START EXPANDED -->
-> **[v2.4.0-dev.1](https://github.com/ginDoki19/GinArena-patch/releases/tag/v2.4.0-dev.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;10 patches total
+> **[v2.4.0-dev.1](https://github.com/ginDoki19/GinArena-patch/releases/tag/v2.4.0-dev.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;9 patches total
 <details open>
 <summary>📦 1DM&nbsp;&nbsp;•&nbsp;&nbsp;3 patches</summary>
 <br>
@@ -38,7 +38,7 @@ github.com/ginDoki19/GinArena-patch
 </details>
 
 <details open>
-<summary>📦 MX Player&nbsp;&nbsp;•&nbsp;&nbsp;5 patches</summary>
+<summary>📦 MX Player&nbsp;&nbsp;•&nbsp;&nbsp;4 patches</summary>
 <br>
 
 **🎯 Supported versions:**
@@ -49,10 +49,9 @@ github.com/ginDoki19/GinArena-patch
 
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
-| [Clean App Theme](#clean-app-theme) | Removes online Other Themes (such as Zodiac) from the App Theme screen while keeping Adaptive / Light / Dark modes and all 31 Classic Themes color swatches available offline and online. |  |
 | [Clean Me page](#clean-me-page) | Removes the Status Saver, Legal, and Help sections from the Me page while keeping the 8-item local tools grid, App Theme, Settings, and Custom Pop-up Play. |  |
 | [Custom codec](#custom-codec) | Bundles an MX Player v3.1.0 custom codec (aio-v3.1.0_r1.zip, architecture ZIP, or libffmpeg.mx.so*) directly into the app for out-of-the-box E-AC-3, TrueHD, MLP, DTS, and AC-3 software audio decoding. | • Custom codec file |
-| [Remove ads & bloat](#remove-ads-bloat) | Removes banner, folder, player, interstitial, rewarded, app-open, exit, and Me-page ads, removes the Home horizontal shortcut strip, and disables Live TV, mxplay OTT streaming, MX Tube, Shorts, and Games while keeping Local Music, All-Files-Access setup, and Classic Themes intact. |  |
+| [Remove ads & bloat](#remove-ads-bloat) | Removes banner, folder, player, interstitial, rewarded, app-open, exit, and Me-page ads, removes the Home horizontal shortcut strip and online Zodiac App Themes, and disables Live TV, mxplay OTT streaming, MX Tube, Shorts, and Games while keeping Local Music, All-Files-Access setup, and 1-tap Classic Themes working offline and online. |  |
 | [Remove bottom navigation bar](#remove-bottom-navigation-bar) | Removes the bottom navigation bar from the UI and moves Me to the upper-right corner of the Home toolbar. Leave unchecked to keep the bottom navigation bar. |  |
 
 </details>
@@ -295,7 +294,7 @@ offline-friendly **local video and music player** with zero ads and optional bui
 audio decoding. Every patch automatically includes signature-protection handling under the hood so
 the re-signed app opens and plays videos smoothly without crashes.
 
-Two patches are **on by default**, and three extra customization patches are **optional
+Two patches are **on by default**, and two extra customization patches are **optional
 (off by default)** so you can pick the exact setup you prefer:
 
 <a id="remove-ads-bloat"></a>
@@ -303,10 +302,12 @@ Two patches are **on by default**, and three extra customization patches are **o
 
 *Enabled by default.* Removes all ads across the entire app (home-screen banners, folder-list ads,
 video-player ads, pause ads, pop-up ads, Me-page promos, and exit ads), removes the shortcut strip
-at the top of the Home (**Folders**) screen, and turns off online streaming clutter (**Live TV**,
-**OTT shows**, **MX Tube**, **Shorts**, and **Games**). Everyday local features — **Local Music**,
-**Continue Watching**, **Classic Themes**, and the **All-Files-Access** storage permission screen —
-keep working normally.
+at the top of the Home (**Folders**) screen, removes online ad-locked **Other Themes** (such as
+*Zodiac*), and turns off online streaming clutter (**Live TV**, **OTT shows**, **MX Tube**,
+**Shorts**, and **Games**). Everyday local features — **Local Music**, **Continue Watching**, the
+**All-Files-Access** storage permission screen, **Adaptive / Light / Dark** modes, and all **32
+Classic Themes** color swatches (16 Light + 16 Dark Slate, applying immediately in 1 tap both
+offline and online) — work cleanly out of the box.
 
 #### Clean Me page
 
@@ -322,12 +323,6 @@ keeping your **8 local tool shortcuts** (*Video Playlist*, *Private Folder*, *Fo
 bottom bar (**Folders**, **Music**, **Transfer**, **Me**). Turn it **on** to hide the bottom bar
 completely for a cleaner full-height folder list and move the **Me** icon to the top-right corner
 of the Home toolbar (*Music* and *File Transfer* remain easy to open inside *Me*).
-
-#### Clean App Theme
-
-*Optional — off by default.* Hides online **Other Themes** (such as *Zodiac*) from the **App
-Theme** page while keeping **Adaptive / Light / Dark** modes and all **31 Classic Themes** color
-swatches available both online and offline.
 
 #### Custom codec
 
@@ -385,10 +380,10 @@ short readable build labels and validate the package name, file type, version, `
 > patch it from the beginning.
 >
 > **New in v2.4.0:** adds **MX Player (`3.4.1` / `3.4.0` / `3.3.1`)** support — turns MX Player
-> into a clean, ad-free local video and music player with a tidier **Me** tab, plus optional
-> patches to hide the bottom navigation bar, remove online themes while keeping all 31 offline
-> Classic Themes, and bundle the **v3.1.0 Custom Codec** (`aio-v3.1.0_r1.zip`) directly into the
-> APK for Dolby / DTS audio. On CRICFy TV and CricZ TV, environment-check bypass and
+> into a clean, ad-free local video and music player with 1-tap offline & online **Classic Themes**
+> (16 Light + 16 Dark Slate swatches) and a tidier **Me** tab, plus optional patches to hide the
+> bottom navigation bar and bundle the **v3.1.0 Custom Codec** (`aio-v3.1.0_r1.zip`) directly into
+> the APK for Dolby / DTS audio. On CRICFy TV and CricZ TV, environment-check bypass and
 > native-library stripping remain **off by default** — if your current patched 1DM, CRICFy TV, or
 > CricZ TV works fine, you don't need to re-patch it.
 

@@ -285,18 +285,81 @@ internal object ClassicThemeObserverFingerprint : Fingerprint(
     ),
 )
 
-internal object ThemeLoadFromLocalFingerprint : Fingerprint(
+internal object AppThemeLoadFromLocalFingerprint : Fingerprint(
     definingClass = THEME_LOAD_LOCAL_CLASS,
     name = "invokeSuspend",
     returnType = "Ljava/lang/Object;",
     parameters = listOf("Ljava/lang/Object;"),
 )
 
-internal object ThemeLoadFromServerFingerprint : Fingerprint(
+internal object AppThemeLoadFromServerFingerprint : Fingerprint(
     definingClass = THEME_LOAD_SERVER_CLASS,
     name = "invokeSuspend",
     returnType = "Ljava/lang/Object;",
     parameters = listOf("Ljava/lang/Object;"),
+)
+
+internal object SkinManagerInitFingerprint : Fingerprint(
+    name = "<init>",
+    returnType = "V",
+    custom = { methodDef, classDef ->
+        classDef.sourceFile == "SkinManager.java" &&
+            !classDef.type.startsWith("Lcom/facebook/") &&
+            '$' !in classDef.type &&
+            methodDef.parameterTypes.size == 1
+    },
+)
+
+internal object ThemeLightStrategyFingerprint : Fingerprint(
+    returnType = "Z",
+    parameters = emptyList(),
+    custom = { _, classDef ->
+        classDef.sourceFile == "ThemeLight.java" && '$' !in classDef.type
+    },
+)
+
+internal object ThemeStrategyBaseFingerprint : Fingerprint(
+    name = "n",
+    returnType = "I",
+    parameters = listOf("Landroid/content/Context;", "I"),
+    custom = { _, classDef ->
+        classDef.sourceFile == "ThemeStrategyBase.java" && '$' !in classDef.type
+    },
+)
+
+internal object ResourcesSkinFingerprint : Fingerprint(
+    name = "<init>",
+    returnType = "V",
+    parameters = listOf("Landroid/content/res/Resources;"),
+    custom = { _, classDef ->
+        classDef.sourceFile == "ResourcesSkin.kt" && '$' !in classDef.type
+    },
+)
+
+internal object AppCompatUtilsColorFilterFingerprint : Fingerprint(
+    returnType = "Landroid/graphics/ColorFilter;",
+    parameters = listOf(
+        "Landroid/content/Context;",
+        "Landroid/graphics/drawable/Drawable;",
+        "Landroid/graphics/ColorFilter;",
+    ),
+    custom = { _, classDef ->
+        classDef.sourceFile == "AppCompatUtils.java" && '$' !in classDef.type
+    },
+)
+
+internal object ThemeListClickHandlerFingerprint : Fingerprint(
+    returnType = "V",
+    parameters = listOf(
+        "Lcom/mxtech/videoplayer/ad/online/model/bean/next/OnlineResource;",
+        "Lcom/mxtech/videoplayer/ad/online/model/bean/next/OnlineResource;",
+        "I",
+    ),
+    custom = { _, classDef ->
+        classDef.sourceFile == "ThemeListActivity.kt" &&
+            !classDef.type.startsWith("Lcom/mxtech/") &&
+            '$' !in classDef.type
+    },
 )
 
 internal object TabTypeClinitFingerprint : Fingerprint(

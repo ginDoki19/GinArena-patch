@@ -14,13 +14,16 @@ import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 val removeAdsAndBloatPatch = bytecodePatch(
     name = "Remove ads & bloat",
     description = "Removes banner, folder, player, interstitial, rewarded, app-open, exit, and Me-page ads, " +
-        "removes the Home horizontal shortcut strip, and disables Live TV, mxplay OTT streaming, MX Tube, " +
-        "Shorts, and Games while keeping Local Music, All-Files-Access setup, and Classic Themes intact.",
+        "removes the Home horizontal shortcut strip and online Zodiac App Themes, and disables Live TV, " +
+        "mxplay OTT streaming, MX Tube, Shorts, and Games while keeping Local Music, All-Files-Access setup, " +
+        "and 1-tap Classic Themes working offline and online.",
     default = true,
 ) {
     compatibleWith(COMPATIBILITY_MX_PLAYER_AD)
 
     dependsOn(mxIntegrityCorePatch)
+
+    extendWith("extensions/mxplayer.mpe")
 
     execute {
         // =========================================================================
@@ -364,8 +367,8 @@ val removeAdsAndBloatPatch = bytecodePatch(
             localMeClass.requireMethod("onConfigurationChanged", "V", listOf("Landroid/content/res/Configuration;"))
                 .appendHideBindingViews(bindingInfo, bindingInfo.promoAndAdFields)
 
-            // Ensure Classic Themes' 31 color swatches never vanish when online theme fetch is blocked/unavailable.
-            ensureClassicThemesAlwaysAvailable()
+            // Remove online Zodiac App Themes and wire in-memory 1-tap Classic Themes offline & online.
+            installCleanClassicThemeEngine()
         }
     }
 }

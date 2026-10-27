@@ -15,6 +15,7 @@ import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.builder.MutableMethodImplementation
 import com.android.tools.smali.dexlib2.iface.ClassDef
 import com.android.tools.smali.dexlib2.iface.Method
+import com.android.tools.smali.dexlib2.iface.instruction.FiveRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.NarrowLiteralInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
@@ -25,6 +26,8 @@ import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 import com.android.tools.smali.dexlib2.iface.reference.StringReference
 import com.android.tools.smali.dexlib2.iface.reference.TypeReference
 import com.android.tools.smali.dexlib2.immutable.ImmutableMethod
+
+internal const val CLASSIC_THEME_ENGINE_CLASS = "Lapp/template/extension/mxplayer/ClassicThemeEngine;"
 
 internal fun Method.parameterRegisterCount(): Int {
     val receiverRegs = if (AccessFlags.STATIC.isSet(accessFlags)) 0 else 1
@@ -64,6 +67,50 @@ internal fun MutableClass.replaceMethodBody(
     mutableCopy.addInstructionsWithLabels(0, smaliInstructions)
     methods.remove(method)
     methods.add(mutableCopy)
+}
+
+/**
+ * Moves [method]'s untouched original implementation into a `private` sibling `<name>$mxorig` on
+ * [this] class and installs a fresh wrapper body with [localRegisters] local registers.
+ */
+internal fun MutableClass.wrapWithPrivateOrig(
+    method: MutableMethod,
+    localRegisters: Int,
+    smaliBuilder: (origMethodName: String) -> String,
+) {
+    if (AccessFlags.ABSTRACT.isSet(method.accessFlags) || AccessFlags.NATIVE.isSet(method.accessFlags)) {
+        throw PatchException("Refusing to wrap abstract/native method ${type}->${method.name}")
+    }
+    val origPublicName = method.name
+    val origPrivateName = "${origPublicName}\$mxorig"
+    val origFlags = method.accessFlags
+    val origParams = method.parameters.toList()
+    val origReturnType = method.returnType
+    val origAnnotations = method.annotations.toSet()
+    val origHiddenApi = method.hiddenApiRestrictions.toSet()
+    val paramRegs = method.parameterRegisterCount()
+
+    val isStatic = AccessFlags.STATIC.isSet(origFlags)
+    val privateFlags = AccessFlags.PRIVATE.value or
+        (if (isStatic) AccessFlags.STATIC.value else AccessFlags.FINAL.value)
+
+    methods.remove(method)
+    method.setName(origPrivateName)
+    method.setAccessFlags(privateFlags)
+    methods.add(method)
+
+    val wrapper = ImmutableMethod(
+        type,
+        origPublicName,
+        origParams,
+        origReturnType,
+        origFlags,
+        origAnnotations,
+        origHiddenApi,
+        MutableMethodImplementation(paramRegs + localRegisters),
+    ).toMutable()
+    wrapper.addInstructionsWithLabels(0, smaliBuilder(origPrivateName).trimIndent())
+    methods.add(wrapper)
 }
 
 internal fun MutableClass.returnVoid(method: Method) {
@@ -121,16 +168,27 @@ internal fun MutableClass.requireMethod(
 )
 
 /**
- * Idempotently patches `ThemeListActivity` and its `"Local Classic Theme"` observer so:
- * 1. All 31 Classic Theme color swatches are always synthesized if absent from the loaded list,
- *    even when Wi-Fi / mobile data is connected (`isNetworkConnected(Context)Z -> false` inside
- *    the observer only).
- * 2. Neither the `NoNetworkTips` adapter item (`ArrayList.add(0, item)`) nor the `ThemeListActivity`
- *    offline overlay (`onCreate` network check -> `true`) is ever shown.
- *
- * Safe to invoke from both `Remove ads & bloat` and `Clean App Theme` in the same session.
+ * Installs the clean App Theme & Classic Themes engine across MX Player 3.3.1 / 3.4.0 / 3.4.1:
+ * 1. Suppresses online/ad-locked Zodiac theme fetches (`loadDataFromLocal$2`, `loadDataFromServer$2`).
+ * 2. Always populates Row 1 (`Adaptive | Light Theme | Dark Theme`) + all 32 `Classic Themes`
+ *    swatches (`16` solid Light + `16` split `#1c2939` Dark Slate) with deterministic skin IDs
+ *    and zero offline warning banners.
+ * 3. Wires `ClassicThemeEngine` into `SkinManager`, `ThemeLight`, `ThemeStrategyBase`,
+ *    `ResourcesSkin`, `AppCompatUtils`, and `ThemeListActivity`'s swatch click handler so every
+ *    swatch applies immediately in 1 tap and recolors MX Player across restarts.
  */
-internal fun BytecodePatchContext.ensureClassicThemesAlwaysAvailable() {
+internal fun BytecodePatchContext.installCleanClassicThemeEngine() {
+    // 1. Suppress cached/online "Other Themes" (Zodiac) payloads.
+    val loadLocalClass = AppThemeLoadFromLocalFingerprint.classDef
+    loadLocalClass.accessFlags = loadLocalClass.accessFlags or AccessFlags.PUBLIC.value
+    loadLocalClass.returnNull(AppThemeLoadFromLocalFingerprint.method)
+
+    val loadServerClass = AppThemeLoadFromServerFingerprint.classDef
+    loadServerClass.accessFlags = loadServerClass.accessFlags or AccessFlags.PUBLIC.value
+    loadServerClass.returnNull(AppThemeLoadFromServerFingerprint.method)
+
+    // 2. Always synthesize all 32 local Classic Theme swatches, assign deterministic IDs, and
+    //    suppress offline tips/overlays.
     val observerMethod = ClassicThemeObserverFingerprint.method
     val classicStrIdx = observerMethod.instructions.indexOfFirst { insn ->
         ((insn as? ReferenceInstruction)?.reference as? StringReference)?.string == "Local Classic Theme"
@@ -146,21 +204,13 @@ internal fun BytecodePatchContext.ensureClassicThemesAlwaysAvailable() {
         insn.opcode == Opcode.INVOKE_STATIC &&
             ref?.parameterTypes == listOf("Landroid/content/Context;") &&
             ref.returnType == "Z"
-    }
-    if (netCheckIdx != null) {
-        val destReg = (observerMethod.getInstruction(netCheckIdx + 1) as OneRegisterInstruction).registerA
-        observerMethod.replaceInstruction(netCheckIdx, "nop")
-        observerMethod.replaceInstruction(netCheckIdx + 1, "const/4 v$destReg, 0x0")
-    } else {
-        val alreadyPatched = (searchStart until classicStrIdx).any { idx ->
-            observerMethod.getInstruction(idx).opcode == Opcode.NOP
-        }
-        if (!alreadyPatched) {
-            throw PatchException("Network gate not found before Local Classic Theme in ${observerMethod.definingClass}")
-        }
-    }
+    } ?: throw PatchException("Network gate not found before Local Classic Theme in ${observerMethod.definingClass}")
 
-    val searchEnd = minOf(observerMethod.instructions.size, classicStrIdx + 150)
+    val netDestReg = (observerMethod.getInstruction(netCheckIdx + 1) as OneRegisterInstruction).registerA
+    observerMethod.replaceInstruction(netCheckIdx, "nop")
+    observerMethod.replaceInstruction(netCheckIdx + 1, "const/4 v$netDestReg, 0x0")
+
+    val searchEnd = minOf(observerMethod.instructions.size, classicStrIdx + 160)
     val prependTipIdx = ((classicStrIdx + 1) until searchEnd).firstOrNull { idx ->
         val insn = observerMethod.getInstruction(idx)
         val ref = (insn as? ReferenceInstruction)?.reference as? MethodReference
@@ -173,6 +223,22 @@ internal fun BytecodePatchContext.ensureClassicThemesAlwaysAvailable() {
         observerMethod.replaceInstruction(prependTipIdx, "nop")
     }
 
+    val setListEnd = minOf(observerMethod.instructions.size, classicStrIdx + 150)
+    val setResourceListIdx = ((classicStrIdx + 1) until setListEnd).firstOrNull { idx ->
+        val insn = observerMethod.getInstruction(idx)
+        val ref = (insn as? ReferenceInstruction)?.reference as? MethodReference
+        insn.opcode == Opcode.INVOKE_VIRTUAL &&
+            ref?.name == "setResourceList" &&
+            ref.parameterTypes == listOf("Ljava/util/List;")
+    } ?: throw PatchException("ResourceCollection->setResourceList(List) not found in ${observerMethod.definingClass}")
+
+    val setListInsn = observerMethod.getInstruction(setResourceListIdx) as FiveRegisterInstruction
+    val itemsListReg = setListInsn.registerD
+    observerMethod.addInstructions(
+        setResourceListIdx + 1,
+        "invoke-static {v$itemsListReg}, $CLASSIC_THEME_ENGINE_CLASS->assignLocalClassicIds(Ljava/util/List;)V",
+    )
+
     val onCreateMethod = ThemeListActivityOnCreateFingerprint.method
     val activityNetIdx = onCreateMethod.instructions.indexOfFirst { insn ->
         val ref = (insn as? ReferenceInstruction)?.reference as? MethodReference
@@ -184,6 +250,306 @@ internal fun BytecodePatchContext.ensureClassicThemesAlwaysAvailable() {
         val destReg = (onCreateMethod.getInstruction(activityNetIdx + 1) as OneRegisterInstruction).registerA
         onCreateMethod.replaceInstruction(activityNetIdx, "nop")
         onCreateMethod.replaceInstruction(activityNetIdx + 1, "const/4 v$destReg, 0x1")
+    }
+
+    // 3. Hook SkinManager (`SkinManager.java`: `o5i` / `k3i` / `vmi`).
+    val skinManagerClass = SkinManagerInitFingerprint.classDef
+    val appField = skinManagerClass.instanceFields.firstOrNull {
+        it.type == "Lcom/mxtech/videoplayer/e;"
+    } ?: throw PatchException("Application field not found on ${skinManagerClass.type}")
+    val skinNameField = skinManagerClass.instanceFields.firstOrNull {
+        it.type == "Ljava/lang/String;"
+    } ?: throw PatchException("skinName String field not found on ${skinManagerClass.type}")
+
+    SkinManagerInitFingerprint.method.appendBeforeReturnVoid(
+        """
+            iget-object v0, p0, $appField
+            iget-object v1, p0, $skinNameField
+            invoke-static {v0, v1}, $CLASSIC_THEME_ENGINE_CLASS->init(Ljava/lang/Object;Ljava/lang/String;)V
+        """.trimIndent(),
+    )
+
+    skinManagerClass.requireMethod("r", "V", listOf("Ljava/lang/String;")).appendBeforeReturnVoid(
+        """
+            iget-object v0, p0, $skinNameField
+            invoke-static {v0}, $CLASSIC_THEME_ENGINE_CLASS->syncSkinName(Ljava/lang/String;)V
+        """.trimIndent(),
+    )
+
+    skinManagerClass.requireMethod(
+        "onSharedPreferenceChanged",
+        "V",
+        listOf("Landroid/content/SharedPreferences;", "Ljava/lang/String;"),
+    ).appendBeforeReturnVoid(
+        """
+            iget-object v0, p0, $skinNameField
+            invoke-static {v0}, $CLASSIC_THEME_ENGINE_CLASS->syncSkinName(Ljava/lang/String;)V
+        """.trimIndent(),
+    )
+
+    val isDarkMethod = skinManagerClass.requireMethod("j", "Z", emptyList())
+    skinManagerClass.wrapWithPrivateOrig(isDarkMethod, localRegisters = 1) { origName ->
+        """
+            invoke-static {}, $CLASSIC_THEME_ENGINE_CLASS->isActive()Z
+            move-result v0
+            if-eqz v0, :delegate_orig
+            invoke-static {}, $CLASSIC_THEME_ENGINE_CLASS->isDark()Z
+            move-result v0
+            return v0
+            :delegate_orig
+            invoke-direct {p0}, ${skinManagerClass.type}->$origName()Z
+            move-result v0
+            return v0
+        """
+    }
+
+    val getStrategyMethod = skinManagerClass.methods.firstOrNull {
+        it.name == "d" && it.parameterTypes.isEmpty() && !AccessFlags.STATIC.isSet(it.accessFlags)
+    } ?: throw PatchException("SkinManager->d() strategy getter not found on ${skinManagerClass.type}")
+    val isExtCallIdx = getStrategyMethod.instructions.indexOfFirst { insn ->
+        val ref = (insn as? ReferenceInstruction)?.reference as? MethodReference
+        insn.opcode == Opcode.INVOKE_VIRTUAL &&
+            ref?.definingClass == skinManagerClass.type &&
+            ref.name == "m" &&
+            ref.parameterTypes.isEmpty() &&
+            ref.returnType == "Z"
+    }
+    if (isExtCallIdx < 0) {
+        throw PatchException("SkinManager->m() call not found inside ${skinManagerClass.type}->d()")
+    }
+    val isExtReg = (getStrategyMethod.getInstruction(isExtCallIdx + 1) as OneRegisterInstruction).registerA
+
+    val firstSkinKeyCallIdx = getStrategyMethod.instructions.indexOfFirst { insn ->
+        val ref = (insn as? ReferenceInstruction)?.reference as? MethodReference
+        insn.opcode == Opcode.INVOKE_VIRTUAL &&
+            ref?.definingClass == skinManagerClass.type &&
+            ref.name == "h" &&
+            ref.parameterTypes.isEmpty() &&
+            ref.returnType == "Ljava/lang/String;"
+    }
+    if (firstSkinKeyCallIdx < 0) {
+        throw PatchException("SkinManager->h() call not found inside ${skinManagerClass.type}->d()")
+    }
+    val skinKeyReg = (getStrategyMethod.getInstruction(firstSkinKeyCallIdx + 1) as OneRegisterInstruction).registerA
+
+    // Insert higher-index hook first so `firstSkinKeyCallIdx` stays unshifted.
+    getStrategyMethod.addInstructions(
+        isExtCallIdx + 2,
+        """
+            invoke-static {v$isExtReg}, $CLASSIC_THEME_ENGINE_CLASS->shouldLoadExternalSkinPack(Z)Z
+            move-result v$isExtReg
+        """.trimIndent(),
+    )
+    getStrategyMethod.addInstructions(
+        firstSkinKeyCallIdx + 2,
+        """
+            invoke-static {v$skinKeyReg}, $CLASSIC_THEME_ENGINE_CLASS->resolveBaseStrategyKey(Ljava/lang/String;)Ljava/lang/String;
+            move-result-object v$skinKeyReg
+        """.trimIndent(),
+    )
+
+    // 4. Hook ThemeLight (`ThemeLight.java`) so `SkinViewInflater.t(...)` inflates `mxSkin` views
+    //    when a Light Classic theme is active while staying fast-path `true` on stock Light Theme.
+    val themeLightClass = ThemeLightStrategyFingerprint.classDef
+    themeLightClass.replaceMethodBody(
+        method = ThemeLightStrategyFingerprint.method,
+        localRegisters = 1,
+        smaliInstructions = """
+            invoke-static {}, $CLASSIC_THEME_ENGINE_CLASS->isNotActive()Z
+            move-result v0
+            return v0
+        """.trimIndent(),
+    )
+
+    // 5. Hook ThemeStrategyBase (`ThemeStrategyBase.java`) color, ColorStateList & drawable resolvers.
+    val strategyBaseClass = ThemeStrategyBaseFingerprint.classDef
+    val strategyColorMethod = strategyBaseClass.methods.firstOrNull {
+        !AccessFlags.STATIC.isSet(it.accessFlags) &&
+            it.returnType == "I" &&
+            it.parameterTypes == listOf("Landroid/content/Context;", "I")
+    } ?: throw PatchException("ThemeStrategyBase->(Context, I)I not found on ${strategyBaseClass.type}")
+    strategyBaseClass.wrapWithPrivateOrig(strategyColorMethod, localRegisters = 1) { origName ->
+        """
+            invoke-direct {p0, p1, p2}, ${strategyBaseClass.type}->$origName(Landroid/content/Context;I)I
+            move-result v0
+            invoke-static {p1, p2, v0}, $CLASSIC_THEME_ENGINE_CLASS->overrideStrategyColor(Landroid/content/Context;II)I
+            move-result v0
+            return v0
+        """
+    }
+
+    val strategyCslMethod = strategyBaseClass.methods.firstOrNull {
+        !AccessFlags.STATIC.isSet(it.accessFlags) &&
+            it.returnType == "Landroid/content/res/ColorStateList;" &&
+            it.parameterTypes == listOf("Landroid/content/Context;", "I")
+    } ?: throw PatchException("ThemeStrategyBase->(Context, I)ColorStateList not found on ${strategyBaseClass.type}")
+    strategyBaseClass.wrapWithPrivateOrig(strategyCslMethod, localRegisters = 1) { origName ->
+        """
+            invoke-direct {p0, p1, p2}, ${strategyBaseClass.type}->$origName(Landroid/content/Context;I)Landroid/content/res/ColorStateList;
+            move-result-object v0
+            invoke-static {p1, p2, v0}, $CLASSIC_THEME_ENGINE_CLASS->overrideStrategyColorStateList(Landroid/content/Context;ILandroid/content/res/ColorStateList;)Landroid/content/res/ColorStateList;
+            move-result-object v0
+            return-object v0
+        """
+    }
+
+    val strategyDrawableMethod = strategyBaseClass.methods.firstOrNull {
+        !AccessFlags.STATIC.isSet(it.accessFlags) &&
+            it.returnType == "Landroid/graphics/drawable/Drawable;" &&
+            it.parameterTypes == listOf("Landroid/content/Context;", "I")
+    } ?: throw PatchException("ThemeStrategyBase->(Context, I)Drawable not found on ${strategyBaseClass.type}")
+    strategyBaseClass.wrapWithPrivateOrig(strategyDrawableMethod, localRegisters = 1) { origName ->
+        """
+            invoke-direct {p0, p1, p2}, ${strategyBaseClass.type}->$origName(Landroid/content/Context;I)Landroid/graphics/drawable/Drawable;
+            move-result-object v0
+            invoke-static {p1, p2, v0}, $CLASSIC_THEME_ENGINE_CLASS->overrideStrategyDrawable(Landroid/content/Context;ILandroid/graphics/drawable/Drawable;)Landroid/graphics/drawable/Drawable;
+            move-result-object v0
+            return-object v0
+        """
+    }
+
+    // 6. Hook ResourcesSkin (`ResourcesSkin.kt`) color, ColorStateList & drawable overloads.
+    val resSkinClass = ResourcesSkinFingerprint.classDef
+    val baseResField = resSkinClass.instanceFields.firstOrNull {
+        it.type == "Landroid/content/res/Resources;"
+    } ?: throw PatchException("Base Resources field not found on ${resSkinClass.type}")
+
+    resSkinClass.wrapWithPrivateOrig(
+        resSkinClass.requireMethod("getColor", "I", listOf("I")),
+        localRegisters = 2,
+    ) { origName ->
+        """
+            invoke-direct {p0, p1}, ${resSkinClass.type}->$origName(I)I
+            move-result v0
+            iget-object v1, p0, $baseResField
+            invoke-static {v1, p1, v0}, $CLASSIC_THEME_ENGINE_CLASS->overrideResColor(Landroid/content/res/Resources;II)I
+            move-result v0
+            return v0
+        """
+    }
+
+    resSkinClass.wrapWithPrivateOrig(
+        resSkinClass.requireMethod("getColor", "I", listOf("I", "Landroid/content/res/Resources\$Theme;")),
+        localRegisters = 2,
+    ) { origName ->
+        """
+            invoke-direct {p0, p1, p2}, ${resSkinClass.type}->$origName(ILandroid/content/res/Resources${'$'}Theme;)I
+            move-result v0
+            iget-object v1, p0, $baseResField
+            invoke-static {v1, p1, v0}, $CLASSIC_THEME_ENGINE_CLASS->overrideResColor(Landroid/content/res/Resources;II)I
+            move-result v0
+            return v0
+        """
+    }
+
+    resSkinClass.wrapWithPrivateOrig(
+        resSkinClass.requireMethod("getColorStateList", "Landroid/content/res/ColorStateList;", listOf("I")),
+        localRegisters = 2,
+    ) { origName ->
+        """
+            invoke-direct {p0, p1}, ${resSkinClass.type}->$origName(I)Landroid/content/res/ColorStateList;
+            move-result-object v0
+            iget-object v1, p0, $baseResField
+            invoke-static {v1, p1, v0}, $CLASSIC_THEME_ENGINE_CLASS->overrideResColorStateList(Landroid/content/res/Resources;ILandroid/content/res/ColorStateList;)Landroid/content/res/ColorStateList;
+            move-result-object v0
+            return-object v0
+        """
+    }
+
+    resSkinClass.wrapWithPrivateOrig(
+        resSkinClass.requireMethod(
+            "getColorStateList",
+            "Landroid/content/res/ColorStateList;",
+            listOf("I", "Landroid/content/res/Resources\$Theme;"),
+        ),
+        localRegisters = 2,
+    ) { origName ->
+        """
+            invoke-direct {p0, p1, p2}, ${resSkinClass.type}->$origName(ILandroid/content/res/Resources${'$'}Theme;)Landroid/content/res/ColorStateList;
+            move-result-object v0
+            iget-object v1, p0, $baseResField
+            invoke-static {v1, p1, v0}, $CLASSIC_THEME_ENGINE_CLASS->overrideResColorStateList(Landroid/content/res/Resources;ILandroid/content/res/ColorStateList;)Landroid/content/res/ColorStateList;
+            move-result-object v0
+            return-object v0
+        """
+    }
+
+    resSkinClass.wrapWithPrivateOrig(
+        resSkinClass.requireMethod("getDrawable", "Landroid/graphics/drawable/Drawable;", listOf("I")),
+        localRegisters = 2,
+    ) { origName ->
+        """
+            invoke-direct {p0, p1}, ${resSkinClass.type}->$origName(I)Landroid/graphics/drawable/Drawable;
+            move-result-object v0
+            iget-object v1, p0, $baseResField
+            invoke-static {v1, p1, v0}, $CLASSIC_THEME_ENGINE_CLASS->overrideResDrawable(Landroid/content/res/Resources;ILandroid/graphics/drawable/Drawable;)Landroid/graphics/drawable/Drawable;
+            move-result-object v0
+            return-object v0
+        """
+    }
+
+    resSkinClass.wrapWithPrivateOrig(
+        resSkinClass.requireMethod(
+            "getDrawable",
+            "Landroid/graphics/drawable/Drawable;",
+            listOf("I", "Landroid/content/res/Resources\$Theme;"),
+        ),
+        localRegisters = 2,
+    ) { origName ->
+        """
+            invoke-direct {p0, p1, p2}, ${resSkinClass.type}->$origName(ILandroid/content/res/Resources${'$'}Theme;)Landroid/graphics/drawable/Drawable;
+            move-result-object v0
+            iget-object v1, p0, $baseResField
+            invoke-static {v1, p1, v0}, $CLASSIC_THEME_ENGINE_CLASS->overrideResDrawable(Landroid/content/res/Resources;ILandroid/graphics/drawable/Drawable;)Landroid/graphics/drawable/Drawable;
+            move-result-object v0
+            return-object v0
+        """
+    }
+
+    // 7. Hook AppCompatUtils (`AppCompatUtils.java`) toolbar menu icon filter.
+    val appCompatUtilsClass = AppCompatUtilsColorFilterFingerprint.classDef
+    appCompatUtilsClass.wrapWithPrivateOrig(
+        AppCompatUtilsColorFilterFingerprint.method,
+        localRegisters = 1,
+    ) { origName ->
+        """
+            invoke-static {p0, p1, p2}, $CLASSIC_THEME_ENGINE_CLASS->overrideToolbarIconFilter(Landroid/content/Context;Landroid/graphics/drawable/Drawable;Landroid/graphics/ColorFilter;)Landroid/graphics/ColorFilter;
+            move-result-object v0
+            if-nez v0, :done
+            invoke-static {p0, p1, p2}, ${appCompatUtilsClass.type}->$origName(Landroid/content/Context;Landroid/graphics/drawable/Drawable;Landroid/graphics/ColorFilter;)Landroid/graphics/ColorFilter;
+            move-result-object v0
+            :done
+            return-object v0
+        """
+    }
+
+    // 8. Hook ThemeListActivity's swatch click handler (`xfj.B8` / `ycj.B8` / `i3k.E8`) so tapping
+    //    any Classic Theme swatch applies it immediately in 1 tap via `ThemeSwitchHelper.a(String)`.
+    val clickHandlerClass = ThemeListClickHandlerFingerprint.classDef
+    val clickHandlerMethod = ThemeListClickHandlerFingerprint.method
+    val themeSwitchRef = clickHandlerMethod.instructions
+        .filter { it.opcode == Opcode.INVOKE_STATIC }
+        .mapNotNull { (it as? ReferenceInstruction)?.reference as? MethodReference }
+        .firstOrNull {
+            it.name == "a" &&
+                it.parameterTypes == listOf("Ljava/lang/String;") &&
+                it.returnType == "V"
+        } ?: throw PatchException("ThemeSwitchHelper->a(String)V reference not found in ${clickHandlerClass.type}")
+
+    val themeSwitchClass = mutableClassDefBy(themeSwitchRef.definingClass)
+    themeSwitchClass.accessFlags = themeSwitchClass.accessFlags or AccessFlags.PUBLIC.value
+
+    clickHandlerClass.wrapWithPrivateOrig(clickHandlerMethod, localRegisters = 1) { origName ->
+        """
+            invoke-static {p2}, $CLASSIC_THEME_ENGINE_CLASS->consumeLocalClassicClick(Ljava/lang/Object;)Ljava/lang/String;
+            move-result-object v0
+            if-eqz v0, :delegate_orig
+            invoke-static {v0}, $themeSwitchRef
+            return-void
+            :delegate_orig
+            invoke-direct {p0, p1, p2, p3}, ${clickHandlerClass.type}->$origName(Lcom/mxtech/videoplayer/ad/online/model/bean/next/OnlineResource;Lcom/mxtech/videoplayer/ad/online/model/bean/next/OnlineResource;I)V
+            return-void
+        """
     }
 }
 
@@ -274,13 +640,6 @@ internal fun resolveLocalMeBinding(localMeClass: MutableClass): LocalMeBindingIn
 /**
  * Appends smali right before the final `return-void` of [this] method while preserving all
  * existing branch `Label`s that jump to `return-void`!
- *
- * CRITICAL DEXLIB2 INVARIANT:
- * Calling `addInstructions(returnIdx, ...)` alone leaves pre-existing branch labels (such as
- * early `if-eqz` jumps to `return-void`) attached to `return-void`, bypassing the inserted code.
- * Replacing `returnIdx` with `"nop"` FIRST keeps every branch label anchored to `"nop"`, so both
- * fallthrough paths and conditional branches execute [smaliBlock] before hitting the new
- * `return-void` appended at `returnIdx + 1`.
  */
 internal fun MutableMethod.appendBeforeReturnVoid(smaliBlock: String) {
     val returnIdx = instructions.indexOfLast { it.opcode == Opcode.RETURN_VOID }
@@ -341,12 +700,7 @@ internal fun MutableMethod.appendHideBindingViews(
 
 /**
  * Resolves `TabType.ME`'s `normalIcon` drawable resource ID directly at patch time from
- * `TabType.<init>` and `TabType.<clinit>` (`0x7f081293` in 3.3.1, `0x7f081252` in 3.4.1, etc.).
- *
- * CRITICAL: `TabType.normalIcon` is `private final int` (`accessFlags = 0x12`), so reading
- * `iget v1, v1, TabType;->normalIcon:I` from `LocalTabActivityMediaList` throws an immediate
- * `java.lang.IllegalAccessError` on Android ART at cold open. Resolving the integer resource ID
- * constant at patch time avoids any runtime field/method access on `TabType` altogether.
+ * `TabType.<init>` and `TabType.<clinit>`.
  */
 internal fun resolveMeNormalIconResId(tabTypeClass: ClassDef): Int {
     val ctor = tabTypeClass.methods.firstOrNull { it.name == "<init>" }
