@@ -1,3 +1,14 @@
+## [2.4.0](https://github.com/ginDoki19/GinArena-patch/compare/v2.3.0...v2.4.0) (2026-10-27)
+
+### 🐛 Bug Fixes
+
+* **mxplayer:** fix 1-tap Classic Themes and remove redundant Clean App Theme patch ([8024e90](https://github.com/ginDoki19/GinArena-patch/commit/8024e903b4630f009a4eb09343fa7806ccaff2d6))
+
+### ✨ New Features
+
+* **mxplayer:** add MX Player 3.4.1, 3.4.0, and 3.3.1 patches ([e9ab673](https://github.com/ginDoki19/GinArena-patch/commit/e9ab673314475e81b0a041464ac778401607766b))
+* **playz:** add PlayZ TV 2.3.1 clean experience patch ([21a0a00](https://github.com/ginDoki19/GinArena-patch/commit/21a0a0045bda3f3685d15653c72e7c8fbd17476d))
+
 ## [2.4.0-dev.3](https://github.com/ginDoki19/GinArena-patch/compare/v2.4.0-dev.2...v2.4.0-dev.3) (2026-10-27)
 
 ### ✨ New Features
