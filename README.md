@@ -110,6 +110,9 @@ github.com/ginDoki19/GinArena-patch
 
 ## 📦 1DM (20.0, build 30257)
 
+<details>
+<summary><b>📖 App details</b> — what it does, target version and notes (click to expand)</summary>
+
 ### What it does
 
 It removes visible advertising and promotion UI from the free app while keeping the app's own
@@ -178,9 +181,14 @@ Do **not** use the separate **20257** variant for this patch.
 
 > **Uptodown note:** If Morphe’s “help me find an APK” flow opens Uptodown and downloads the 1DM 20.0 XAPK, that file has also been tested successfully. Select it in Morphe Manager instead of installing it. For x86/x86_64 devices, or if the Uptodown result is not exactly 20.0, use the APKMirror universal APKM above.
 
+</details>
+
 ---
 
 ## 📦 CRICFy TV (7.3, build 53)
+
+<details>
+<summary><b>📖 App details</b> — what it does, target version and notes (click to expand)</summary>
 
 ### What it does
 
@@ -237,9 +245,14 @@ privacy-respecting experience on **CRICFy TV 7.3** across phones, tablets, and A
 > producing a broken APK** if the app internals have changed. Future CRICFy versions are refused
 > by design until they receive a fresh audit — do not force-patch other versions in Expert Mode.
 
+</details>
+
 ---
 
 ## 📦 CricZ TV (7.3, build 10)
+
+<details>
+<summary><b>📖 App details</b> — what it does, target version and notes (click to expand)</summary>
 
 ### What it does
 
@@ -299,9 +312,14 @@ server-compatible experience on **CricZ TV 7.3** across phones, tablets, and And
 > anything, and future CricZ TV versions are refused by design until they receive a fresh audit —
 > do not force-patch other versions in Expert Mode.
 
+</details>
+
 ---
 
 ## 📦 PlayZ TV (2.3.1, build 8)
+
+<details>
+<summary><b>📖 App details</b> — what it does, target version and notes (click to expand)</summary>
 
 ### What it does
 
@@ -338,9 +356,14 @@ server-compatible experience on **PlayZ TV 2.3.1** across phones, tablets, and A
 > anything, and future PlayZ TV versions are refused by design until they receive a fresh audit —
 > do not force-patch other versions in Expert Mode.
 
+</details>
+
 ---
 
 ## 📦 MX Player (3.4.1 / 3.4.0 / 3.3.1)
+
+<details>
+<summary><b>📖 App details</b> — what it does, target version and notes (click to expand)</summary>
 
 ### What it does
 
@@ -414,6 +437,8 @@ does not read a download destination from a patch bundle. Exact download URLs an
 therefore stay in this README, where they are clickable, while the in-Manager version cards carry
 short readable build labels and validate the package name, file type, version, `versionCode`,
 `minSdk`, and official signing-certificate SHA-256.
+
+</details>
 
 ## Usage (Morphe Manager)
 
