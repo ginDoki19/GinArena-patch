@@ -1,3 +1,9 @@
+## [2.5.0-dev.1](https://github.com/ginDoki19/GinArena-patch/compare/v2.4.2...v2.5.0-dev.1) (2026-10-28)
+
+### ✨ New Features
+
+* **onedm:** add 1DM 20.0 cold-start, battery, cloud adblocker & userscript suite ([0cdb0c9](https://github.com/ginDoki19/GinArena-patch/commit/0cdb0c9154b42218a2d2209032d980f707017e4f))
+
 ## [2.4.2](https://github.com/ginDoki19/GinArena-patch/compare/v2.4.1...v2.4.2) (2026-10-27)
 
 ### 🐛 Bug Fixes
