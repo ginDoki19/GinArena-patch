@@ -1,10 +1,10 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "2.5.0-dev.2",
+  "version": "2.5.0-dev.3",
   "patches": [
     {
       "name": "AdBlocker turbo & userscript bundle",
-      "description": "Syncs SHA-256-verified weekly pre-compiled AdBlocker binary engines (28 default lists including OISD, HaGeZi Pro, uBlock, EasyList, and AdGuard) from GitHub to eliminate 14-90s CPU compilation lag on low-end devices with automatic Local Turbo fallback, and optionally seeds and auto-updates the mobile-adapted Bypass All Shortlinks userscript.",
+      "description": "Syncs SHA-256-verified pre-compiled AdBlocker binary engines + per-list filter archives (28 default lists, ~1.22M active rules) automatically in the background with instant Hosts & filters hydration, accelerates on-device filter compilation via 64 KB write buffering + foreground thread scheduling, and optionally seeds and auto-updates the mobile-adapted Bypass All Shortlinks userscript.",
       "default": true,
       "category": null,
       "compatiblePackages": [
@@ -38,20 +38,20 @@
         {
           "key": "adblockerMode",
           "title": "AdBlocker engine mode",
-          "description": "Cloud Pre-Built downloads SHA-256-verified weekly pre-compiled binary filter engines from GitHub to skip heavy on-device compilation, falling back automatically to Local Turbo if you customize filter lists. Local Turbo keeps all compilation on-device with buffered I/O, background CPU priority, and 7-day auto-update.",
+          "description": "Cloud Pre-Built downloads SHA-256-verified pre-compiled binary filter engines and per-list archives from GitHub automatically in the background (zero on-device compilation lag and full Hosts & filters counts/sizes/dates), falling back automatically to Local Turbo if you customize filter lists. Local Turbo keeps all compilation on-device with 64 KB buffered I/O, foreground CPU scheduling, and 7-day auto-update.",
           "required": true,
           "type": "kotlin.String",
           "default": "cloud_sync",
           "values": {
-            "Cloud Pre-Built + Weekly Auto-Sync (Recommended)": "cloud_sync",
-            "Local Turbo Parser + Weekly Auto-Rebuild": "local_turbo",
+            "Cloud Pre-Built + Auto-Sync (Recommended)": "cloud_sync",
+            "Local Turbo Parser + Auto-Rebuild": "local_turbo",
             "Stock 1DM": "stock"
           }
         },
         {
           "key": "bundleBypassShortlinks",
           "title": "Bundle Bypass All Shortlinks userscript",
-          "description": "Seeds and weekly auto-updates the mobile-adapted Bypass All Shortlinks Debloated userscript (.1dmus with offline-cached MonkeyConfig, explicit @connect hosts, and zero warnings). Preserves your enabled/disabled state and never re-installs if deleted.",
+          "description": "Seeds and auto-updates the mobile-adapted Bypass All Shortlinks Debloated userscript (.1dmus with offline-cached MonkeyConfig, explicit @connect hosts, and zero warnings). Preserves your enabled/disabled state and never re-installs if deleted.",
           "required": true,
           "type": "kotlin.Boolean",
           "default": true,
@@ -173,7 +173,7 @@
     },
     {
       "name": "Optimize cold start and battery",
-      "description": "Eliminates cold-start Chromium WebView initialization in Download Manager and background services, defers Browser AdBlock filter parsing until Browser launch, defers the CheckAppVersion subprocess past startup, and pauses MainActivity's 1 Hz background wakeup loop when minimized.",
+      "description": "Eliminates cold-start Chromium WebView initialization in Download Manager and background services, defers Browser AdBlock filter parsing until Browser launch, defers the CheckAppVersion subprocess past startup, pauses MainActivity's 1 Hz background wakeup loop when minimized, and keeps 1DM alive in Android Recents on Back press without killing background downloads.",
       "default": true,
       "category": null,
       "compatiblePackages": [

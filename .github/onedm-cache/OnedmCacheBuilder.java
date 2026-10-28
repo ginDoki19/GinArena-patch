@@ -12,9 +12,7 @@ import java.io.InputStream;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.ByteBuffer;
@@ -34,20 +32,24 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
+import java.util.zip.CRC32;
 import java.util.zip.Deflater;
 import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+import org.json.JSONObject;
 
 /**
- * Weekly CI builder for 1DM 20.0 (30257) Cloud Pre-Built AdBlocker & Userscript packs.
+ * Weekly CI builder for 1DM 20.0 (30257) Cloud Pre-Built AdBlocker & Userscript packs (schema v2).
  *
- * Executes 1DM 20.0's exact compiled AdBlocker parser (i.j12, binary header version 20)
- * and Userscript serializer (i.yg7 + UserScript.toExportString(), usVersion = 2) on
- * headless JDK 21, verifies round-trip loading before emitting artifacts, and writes:
- *   1. onedm-v20-adblock-pack.zip (abnfp.bin, abnhp.bin, abcfp.bin)
+ * Executes 1DM 20.0's exact compiled AdBlocker parser (i.j12, binary header version 20, with full
+ * assets/adblocker/js_resources.txt scriptlet & redirect catalog) and Userscript serializer
+ * (i.yg7 + UserScript.toExportString(), usVersion = 2) on headless JDK 21, verifies round-trip
+ * loading before emitting artifacts, and writes:
+ *   1. onedm-v20-adblock-pack.zip (abnfp.bin, abnhp.bin, abcfp.bin, sources_meta.json,
+ *      plus STORED sources/UUID1..UUID34.zip for complete Hosts & filters UI/DB hydration)
  *   2. bypass-shortlinks-1dm.1dmus.gz (mobile-adapted, offline-self-contained .1dmus)
- *   3. manifest.json (SHA-256 digests + build metadata for atomic client auto-sync)
+ *   3. manifest.json (schema 2 SHA-256 digests + build metadata for atomic client auto-sync)
  */
 public final class OnedmCacheBuilder {
 
@@ -55,6 +57,7 @@ public final class OnedmCacheBuilder {
         "https://codeberg.org/gongchandang49/bypass-all-shortlinks-debloated/raw/branch/main/Bypass_All_Shortlinks.user.js";
     private static final String MONKEY_CONFIG_URL =
         "https://codeberg.org/gongchandang49/bypass-all-shortlinks-debloated/raw/branch/main/MonkeyConfig-Mod.js";
+    private static final int BUILTIN_MANUAL_FILTER_COUNT = 90;
 
     private static final class FilterSpec {
         final String uuid;
@@ -72,10 +75,20 @@ public final class OnedmCacheBuilder {
         }
     }
 
+    private static final class AdblockBuild {
+        final File zipFile;
+        final int totalActiveFilters;
+
+        AdblockBuild(File zipFile, int totalActiveFilters) {
+            this.zipFile = zipFile;
+            this.totalActiveFilters = totalActiveFilters;
+        }
+    }
+
     /**
      * Exact 28 default-enabled filter rows from 1DM 20.0 (30257) i.hv6 (lines 340..620),
      * including the exact 15 trusted = true flags from hv6's trusted-source table so
-     * +js / $urlskip / $removeparam / $redirect rules compile identically to an on-device build.
+     * +js / $urlskip / $redirect rules compile identically to an on-device build.
      */
     private static final List<FilterSpec> DEFAULT_ENABLED_FILTERS = Arrays.asList(
         new FilterSpec("UUID1", 1, "1DM filters", "https://www.apps2sd.info/idm/filters.txt", true),
@@ -120,22 +133,33 @@ public final class OnedmCacheBuilder {
         Context ctx = new Context(new File(workDir, "ctx"));
         configureOneDmGlobals(ctx);
 
+        // Verify 1DM's embedded adblocker/js_resources.txt asset is accessible so +js & $redirect rules compile
+        try (InputStream jsRes = ctx.getAssets().open("adblocker/js_resources.txt")) {
+            if (jsRes.read() == -1) {
+                throw new IllegalStateException("Empty assets/adblocker/js_resources.txt!");
+            }
+        }
+
+        long buildEpochMs = System.currentTimeMillis();
         System.out.println("[1/3] Downloading & compiling 28 default 1DM 20.0 AdBlocker lists...");
-        File adblockPack = buildAndVerifyAdblockPack(ctx, new File(workDir, "lists"), outDir);
+        AdblockBuild adblockBuild = buildAndVerifyAdblockPack(ctx, new File(workDir, "lists"), outDir, buildEpochMs);
+        File adblockPack = adblockBuild.zipFile;
 
         System.out.println("[2/3] Building & verifying mobile-adapted Bypass All Shortlinks .1dmus...");
         UserscriptBuild usBuild = buildAndVerifyUserscriptPack(ctx, outDir);
 
-        System.out.println("[3/3] Writing manifest.json...");
+        System.out.println("[3/3] Writing manifest.json (schema 2)...");
         String adblockSha = sha256Hex(Files.readAllBytes(adblockPack.toPath()));
         String usSha = sha256Hex(Files.readAllBytes(usBuild.gzFile.toPath()));
-        String builtAt = Instant.now().toString();
+        String builtAt = Instant.ofEpochMilli(buildEpochMs).toString();
 
         String manifestJson = "{\n"
-            + "  \"schema\": 1,\n"
+            + "  \"schema\": 2,\n"
             + "  \"appVersionCode\": 30257,\n"
             + "  \"adblockFormatVersion\": 20,\n"
             + "  \"builtAt\": \"" + builtAt + "\",\n"
+            + "  \"builtAtEpochMs\": " + buildEpochMs + ",\n"
+            + "  \"totalActiveFilters\": " + adblockBuild.totalActiveFilters + ",\n"
             + "  \"adblockAsset\": \"" + adblockPack.getName() + "\",\n"
             + "  \"adblockSha256\": \"" + adblockSha + "\",\n"
             + "  \"adblockSize\": " + adblockPack.length() + ",\n"
@@ -148,7 +172,7 @@ public final class OnedmCacheBuilder {
         Files.write(manifestFile.toPath(), manifestJson.getBytes(StandardCharsets.UTF_8));
 
         System.out.println("Done! Artifacts written to " + outDir.getAbsolutePath() + ":");
-        System.out.println("  - " + adblockPack.getName() + " (" + adblockPack.length() + " B, sha256=" + adblockSha + ")");
+        System.out.println("  - " + adblockPack.getName() + " (" + adblockPack.length() + " B, filters=" + adblockBuild.totalActiveFilters + ", sha256=" + adblockSha + ")");
         System.out.println("  - " + usBuild.gzFile.getName() + " (" + usBuild.gzFile.length() + " B, v=" + usBuild.version + ", sha256=" + usSha + ")");
         System.out.println("  - manifest.json");
     }
@@ -163,7 +187,7 @@ public final class OnedmCacheBuilder {
 
         Field webviewMajorField = oj7Class.getDeclaredField("\u06e6\u06df\u06e1");
         webviewMajorField.setAccessible(true);
-        webviewMajorField.set(null, Integer.valueOf(120));
+        webviewMajorField.set(null, Integer.valueOf(124));
 
         Field unsafeField = sun.misc.Unsafe.class.getDeclaredField("theUnsafe");
         unsafeField.setAccessible(true);
@@ -190,7 +214,12 @@ public final class OnedmCacheBuilder {
             .invoke(w53Instance);
     }
 
-    private static File buildAndVerifyAdblockPack(Context ctx, File listsDir, File outDir) throws Throwable {
+    private static AdblockBuild buildAndVerifyAdblockPack(
+        Context ctx,
+        File listsDir,
+        File outDir,
+        long buildEpochMs
+    ) throws Throwable {
         listsDir.mkdirs();
         Set<String> coreUuids = new LinkedHashSet<>(Arrays.asList("UUID2", "UUID3", "UUID4", "UUID5", "UUID9", "UUID10", "UUID26", "UUID32"));
         ExecutorService pool = Executors.newFixedThreadPool(8, r -> {
@@ -220,7 +249,11 @@ public final class OnedmCacheBuilder {
                         }
                         File zipFile = new File(listsDir, spec.uuid + ".zip");
                         try (ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(zipFile))) {
-                            ZipEntry ze = new ZipEntry(spec.uuid + ".txt");
+                            zos.setLevel(Deflater.BEST_COMPRESSION);
+                            // Match 1DM x73.m2844 entry naming ("s_<uuid>.txt") + ZipEntry comment = raw .txt byte length
+                            ZipEntry ze = new ZipEntry("s_" + spec.uuid + ".txt");
+                            ze.setTime(0L);
+                            ze.setComment(String.valueOf(rawTxt.length));
                             zos.putNextEntry(ze);
                             zos.write(rawTxt);
                             zos.closeEntry();
@@ -228,10 +261,10 @@ public final class OnedmCacheBuilder {
                         src.setLocalPath(zipFile.getAbsolutePath());
                         src.setLocalFileExists(true);
                         src.setLocalSize(zipFile.length());
-                        src.setLocalLastUpdated(System.currentTimeMillis());
+                        src.setSourceSize(rawTxt.length);
+                        src.setLocalLastUpdated(buildEpochMs);
                     } catch (Exception e) {
                         if ("UUID1".equals(spec.uuid)) {
-                            // Fall back to 1DM's embedded asset copy of UUID1 if apps2sd.info is unreachable.
                             System.err.println("  [WARN] UUID1 online fetch failed; falling back to embedded 1DM asset.");
                             return src;
                         }
@@ -319,9 +352,32 @@ public final class OnedmCacheBuilder {
             throw new IllegalStateException("Fresh j12 engine did not mark loaded=true after reload!");
         }
 
+        int listRulesTotal = 0;
+        JSONObject sourcesMetaObj = new JSONObject();
+        for (AdblockerListSource src : sources) {
+            int count = src.getTotalFilterCount();
+            listRulesTotal += count;
+            JSONObject item = new JSONObject();
+            item.put("count", count);
+            item.put("localSize", src.getLocalSize());
+            item.put("sourceSize", src.getSourceSize());
+            sourcesMetaObj.put(src.getUuid(), item);
+        }
+        int totalActiveFilters = listRulesTotal + BUILTIN_MANUAL_FILTER_COUNT;
+        if (totalActiveFilters < 1_000_000) {
+            throw new IllegalStateException("Compiled filter count unexpectedly low (" + totalActiveFilters + "); aborting!");
+        }
+
+        JSONObject metaRoot = new JSONObject();
+        metaRoot.put("schema", 2);
+        metaRoot.put("builtAtEpochMs", buildEpochMs);
+        metaRoot.put("totalActiveFilters", totalActiveFilters);
+        metaRoot.put("sources", sourcesMetaObj);
+        byte[] metaBytes = metaRoot.toString(2).getBytes(StandardCharsets.UTF_8);
+
         System.out.printf(
-            "  Compiled & verified in %.2fs: abnfp.bin=%,d B, abnhp.bin=%,d B, abcfp.bin=%,d B%n",
-            elapsedMs / 1000.0, nfp.length(), nhp.length(), cfp.length()
+            "  Compiled & verified in %.2fs: totalActiveFilters=%,d, abnfp.bin=%,d B, abnhp.bin=%,d B, abcfp.bin=%,d B%n",
+            elapsedMs / 1000.0, totalActiveFilters, nfp.length(), nhp.length(), cfp.length()
         );
 
         File zipOut = new File(outDir, "onedm-v20-adblock-pack.zip");
@@ -329,13 +385,42 @@ public final class OnedmCacheBuilder {
             zos.setLevel(Deflater.BEST_COMPRESSION);
             for (File bin : Arrays.asList(nfp, nhp, cfp)) {
                 ZipEntry ze = new ZipEntry(bin.getName());
+                ze.setMethod(ZipEntry.DEFLATED);
                 ze.setTime(0L);
                 zos.putNextEntry(ze);
                 Files.copy(bin.toPath(), zos);
                 zos.closeEntry();
             }
+
+            ZipEntry metaEntry = new ZipEntry("sources_meta.json");
+            metaEntry.setMethod(ZipEntry.DEFLATED);
+            metaEntry.setTime(0L);
+            zos.putNextEntry(metaEntry);
+            zos.write(metaBytes);
+            zos.closeEntry();
+
+            // Embed already-DEFLATED per-UUID .zip archives using ZipEntry.STORED (zero double-compression,
+            // zero decompression CPU on device — direct stream copy into .adblocker_1dm/<uuid>.zip).
+            for (AdblockerListSource src : sources) {
+                String lp = src.getLocalPath(false);
+                if (lp == null || lp.isEmpty()) continue;
+                File srcZip = new File(lp);
+                if (!srcZip.isFile()) continue;
+                byte[] zipBytes = Files.readAllBytes(srcZip.toPath());
+                CRC32 crc = new CRC32();
+                crc.update(zipBytes);
+                ZipEntry stored = new ZipEntry("sources/" + src.getUuid() + ".zip");
+                stored.setMethod(ZipEntry.STORED);
+                stored.setSize(zipBytes.length);
+                stored.setCompressedSize(zipBytes.length);
+                stored.setCrc(crc.getValue());
+                stored.setTime(0L);
+                zos.putNextEntry(stored);
+                zos.write(zipBytes);
+                zos.closeEntry();
+            }
         }
-        return zipOut;
+        return new AdblockBuild(zipOut, totalActiveFilters);
     }
 
     private static final class UserscriptBuild {
@@ -351,8 +436,10 @@ public final class OnedmCacheBuilder {
         String rawScript = new String(fetchBytesWithRetry(BYPASS_SCRIPT_URL, 3), StandardCharsets.UTF_8);
         String rawMonkeyCfg = new String(fetchBytesWithRetry(MONKEY_CONFIG_URL, 3), StandardCharsets.UTF_8);
 
-        // Mobile-adapt MonkeyConfig-Mod.js: responsive width, 18px touch checkboxes, no infinite GPU label marquee
+        // Mobile-adapt MonkeyConfig-Mod.js: responsive width, 18px touch checkboxes, no infinite GPU label marquee,
+        // and strip nested @require headers that 1DM does not recursively parse.
         String adaptedMonkeyCfg = rawMonkeyCfg
+            .replaceAll("(?m)^\\s*//\\s*@require\\b.*$", "// [1DM-adapted: nested @require stripped]")
             .replace("\"600px\"", "\"min(94vw, 600px)\"")
             .replace("'11px'", "'18px'")
             .replace("width: 11px !important; height: 11px !important;", "width: 18px !important; height: 18px !important;")
@@ -365,7 +452,7 @@ public final class OnedmCacheBuilder {
             + Base64.getEncoder().encodeToString(adaptedMonkeyCfg.getBytes(StandardCharsets.UTF_8));
 
         // Mobile-adapt Bypass_All_Shortlinks.user.js header for 1DM 20.0:
-        // 1. Mark GM_registerMenuCommand optional; pre-declare @connect hosts for silent XHR
+        // 1. Mark GM_registerMenuCommand optional; pre-declare @connect hosts + window.close grant
         // 2. Embed adapted MonkeyConfig-Mod.js via data: URI during yg7 parse so hashes + methodsUsed populate offline
         // 3. Omit @downloadURL / @updateURL so stock kh7 raw .user.js updater never overwrites mobile adaptations
         StringBuilder adapted = new StringBuilder(rawScript.length() + 512);
@@ -511,7 +598,7 @@ public final class OnedmCacheBuilder {
                     conn.setInstanceFollowRedirects(false);
                     conn.setConnectTimeout(20_000);
                     conn.setReadTimeout(60_000);
-                    conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 Chrome/120.0.0.0 Mobile Safari/537.36");
+                    conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 Chrome/124.0.0.0 Mobile Safari/537.36");
                     int code = conn.getResponseCode();
                     if (code == 301 || code == 302 || code == 303 || code == 307 || code == 308) {
                         String loc = conn.getHeaderField("Location");

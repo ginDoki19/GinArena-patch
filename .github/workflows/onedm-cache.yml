@@ -44,20 +44,20 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: Restore cached sliced 1DM runtime jars
+      - name: Restore cached sliced 1DM runtime jars & assets
         id: sdk-cache
         uses: actions/cache@v6
         with:
           path: /tmp/onedm-cache-sdk
-          key: onedm-v20-30257-sdk-v1-${{ hashFiles('.github/onedm-cache/SliceDex.java') }}
+          key: onedm-v20-30257-sdk-v2-${{ hashFiles('.github/onedm-cache/SliceDex.java') }}
 
-      - name: Prepare toolchain & slice 1DM 20.0 DEX (on cache miss)
+      - name: Prepare toolchain, assets & slice 1DM 20.0 DEX (on cache miss)
         if: steps.sdk-cache.outputs.cache-hit != 'true'
         env:
           INPUT_APK_URL: ${{ inputs.apk_url }}
         run: |
           set -euo pipefail
-          mkdir -p /tmp/onedm-cache-sdk/{deps,jars,slice_cls} /tmp/onedm-apk-tmp/{dex,sliced_dex}
+          mkdir -p /tmp/onedm-cache-sdk/{deps,jars,slice_cls,apk_root} /tmp/onedm-apk-tmp/{dex,sliced_dex}
 
           echo "::group::Downloading Maven & dex2jar dependencies"
           curl -fsSL "https://dl.google.com/android/maven2/com/android/tools/smali/smali-dexlib2/3.0.9/smali-dexlib2-3.0.9.jar" \
@@ -112,6 +112,8 @@ jobs:
             exit 1
           fi
           unzip -q "$BASE_APK" "classes*.dex" -d /tmp/onedm-apk-tmp/dex/
+          unzip -q -o "$BASE_APK" "assets/adblocker/*" "assets/PublicSuffixDatabase.list" \
+            -d /tmp/onedm-cache-sdk/apk_root/
           echo "::endgroup::"
 
           echo "::group::Slicing DEX & converting to headless JVM jars"
@@ -138,7 +140,9 @@ jobs:
           JSON_JAR="/tmp/onedm-cache-sdk/deps/json.jar"
           BUILD_CP="$JSON_JAR:$JARS_CP${ANDROID_JAR:+:$ANDROID_JAR}"
 
-          mkdir -p /tmp/onedm-build/{classes,work,dist}
+          mkdir -p /tmp/onedm-build/{classes,work/ctx,dist}
+          cp -r /tmp/onedm-cache-sdk/apk_root/assets /tmp/onedm-build/work/ctx/assets
+
           find .github/onedm-cache/shims -name "*.java" > /tmp/onedm-build/sources.txt
           echo ".github/onedm-cache/OnedmCacheBuilder.java" >> /tmp/onedm-build/sources.txt
 
@@ -158,15 +162,16 @@ jobs:
         run: |
           set -euo pipefail
           BUILT_AT=$(jq -r '.builtAt' /tmp/onedm-build/dist/manifest.json)
+          TOTAL_FILTERS=$(jq -r '.totalActiveFilters' /tmp/onedm-build/dist/manifest.json)
           US_VER=$(jq -r '.userscriptVersion' /tmp/onedm-build/dist/manifest.json)
           AB_SHA=$(jq -r '.adblockSha256' /tmp/onedm-build/dist/manifest.json)
           US_SHA=$(jq -r '.userscriptSha256' /tmp/onedm-build/dist/manifest.json)
 
           NOTES=$(cat <<EOF
-          Automated weekly pre-compiled cache for **1DM 20.0 (30257)** (\`GinArena-patch\`).
+          Automated weekly pre-compiled cache for **1DM 20.0 (30257)** (\`GinArena-patch\`, schema \`v2\`).
 
           - **Built at (UTC):** \`$BUILT_AT\`
-          - **AdBlocker Pack (\`onedm-v20-adblock-pack.zip\`):** 28 default filter lists pre-compiled with 1DM 20.0 binary format \`v20\` (\`saveRawFilterLines = false\`), SHA-256: \`$AB_SHA\`
+          - **AdBlocker Pack (\`onedm-v20-adblock-pack.zip\`):** 28 default filter lists (\`$TOTAL_FILTERS\` total active filters including \`+js\` scriptlets & \`$redirect\` resources) + \`sources_meta.json\` + \`STORED\` per-UUID \`.zip\` archives, binary format \`v20\`, SHA-256: \`$AB_SHA\`
           - **Userscript Pack (\`bypass-shortlinks-1dm.1dmus.gz\`):** \`Bypass All Shortlinks Debloated\` \`v$US_VER\` + bundled mobile-adapted \`MonkeyConfig-Mod.js\`, SHA-256: \`$US_SHA\`
           EOF
           )

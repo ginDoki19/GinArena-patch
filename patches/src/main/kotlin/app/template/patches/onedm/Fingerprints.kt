@@ -703,10 +703,28 @@ object AdblockerPromptDismissFingerprint : Fingerprint(
 
 // endregion
 
-// region AdBlocker Turbo, Cloud Pre-Built Sync & Userscript Bundle
+// region Cold-start, Recents persistence & AdBlocker / Userscript Cloud Sync
+
+/**
+ * `MainActivity.onBackPressed()` calls `m3524(false, false)` at the fallthrough exit path,
+ * which broadcasts `action_main_app_stopped` to `:DownloadService`, calls `finishAndRemoveTask()`
+ * (erasing 1DM from Android Recents), and executes `Process.killProcess(myPid())`.
+ */
+object MainActivityOnBackPressedFingerprint : Fingerprint(
+    definingClass = MAIN_ACTIVITY,
+    name = "onBackPressed",
+    returnType = "V",
+    parameters = emptyList()
+)
 
 internal const val ADBLOCKER_SETTINGS_INFO =
     "Lcom/aspsine/multithreaddownload/util/AdblockerSettingsInfo;"
+internal const val ADBLOCKER_LIST_SOURCE =
+    "Lcom/aspsine/multithreaddownload/util/AdblockerListSource;"
+internal const val ADBLOCKER_SOURCE_MGMT_ACTIVITY =
+    "Lacr/browser/lightning/activity/AdblockerSourceManagementActivity;"
+internal const val ADBLOCKER_SOURCE_MGMT_INIT_DATA =
+    "Lacr/browser/lightning/activity/AdblockerSourceManagementActivity\$InitData;"
 internal const val USER_SCRIPT =
     "Lidm/internet/download/manager/userscript/UserScript;"
 internal const val ATOMIC_REFERENCE =
@@ -722,6 +740,46 @@ object AdblockerSettingsInfoInitFingerprint : Fingerprint(
     name = "<init>",
     returnType = "V",
     parameters = emptyList()
+)
+
+/**
+ * Base UI activity `onCreate(Bundle)`, invoked strictly in the UI process right as
+ * `BrowserApp.initApp(Application, Context)` completes.
+ */
+object MyAppOnCreateFingerprint : Fingerprint(
+    definingClass = MYAPP,
+    name = "onCreate",
+    returnType = "V",
+    parameters = listOf("Landroid/os/Bundle;")
+)
+
+/**
+ * `Hosts & filters` (`AdblockerSourceManagementActivity`) background database loader.
+ */
+object AdblockerSourceManagementGetSourcesFingerprint : Fingerprint(
+    definingClass = ADBLOCKER_SOURCE_MGMT_ACTIVITY,
+    name = "getSourcesFromDataBase",
+    returnType = "Ljava/util/List;",
+    parameters = listOf(ATOMIC_INTEGER)
+)
+
+/**
+ * `AdblockerSourceManagementActivity$InitData.doInBackground` (`abau_shown` / `cabs_shown_n`),
+ * anchoring the `w53` cached flag and `uc1` Tray boolean setter.
+ */
+object AdblockerSourceManagementInitDataFingerprint : Fingerprint(
+    definingClass = ADBLOCKER_SOURCE_MGMT_INIT_DATA,
+    strings = listOf("abau_shown", "cabs_shown_n")
+)
+
+/**
+ * `Hosts & filters` Update Filters dialog entry point.
+ */
+object AdblockerSourceManagementShowUpdateDialogFingerprint : Fingerprint(
+    definingClass = ADBLOCKER_SOURCE_MGMT_ACTIVITY,
+    name = "showUpdateFiltersDialog",
+    returnType = "V",
+    parameters = listOf("Ljava/util/Collection;", "Z", "Z", "Z")
 )
 
 /**

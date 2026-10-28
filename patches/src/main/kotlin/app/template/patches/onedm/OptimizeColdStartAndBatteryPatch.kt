@@ -1,5 +1,6 @@
 package app.template.patches.onedm
 
+import app.morphe.patcher.extensions.InstructionExtensions.addInstruction
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructionsWithLabels
 import app.morphe.patcher.extensions.InstructionExtensions.getInstruction
@@ -39,7 +40,7 @@ private fun MethodReference.toSmali() =
 @Suppress("unused")
 val optimizeColdStartAndBatteryPatch = bytecodePatch(
     name = "Optimize cold start and battery",
-    description = "Eliminates cold-start Chromium WebView initialization in Download Manager and background services, defers Browser AdBlock filter parsing until Browser launch, defers the CheckAppVersion subprocess past startup, and pauses MainActivity's 1 Hz background wakeup loop when minimized.",
+    description = "Eliminates cold-start Chromium WebView initialization in Download Manager and background services, defers Browser AdBlock filter parsing until Browser launch, defers the CheckAppVersion subprocess past startup, pauses MainActivity's 1 Hz background wakeup loop when minimized, and keeps 1DM alive in Android Recents on Back press without killing background downloads.",
     default = true
 ) {
     compatibleWith(COMPATIBILITY_ONEDM)
@@ -288,6 +289,34 @@ val optimizeColdStartAndBatteryPatch = bytecodePatch(
                 return-void
             """,
             ExternalLabel("onedm_main_foreground", foregroundResumeInsn)
+        )
+
+        // 6. Keep 1DM alive in Android Recents & protect background downloads on Back press:
+        //    Stock `MainActivity.onBackPressed()` calls `m3524(false, false)` at its fallthrough
+        //    exit branch, which broadcasts `action_main_app_stopped` to `:DownloadService`,
+        //    invokes `finishAndRemoveTask()` (erasing 1DM from Recents), and runs
+        //    `Process.killProcess(Process.myPid())`. Replace that self-destruct exit call with
+        //    `moveTaskToBack(true)` so Back behaves like standard Android apps while preserving
+        //    explicit Drawer/Notification "Exit" untouched.
+        val onBackPressed = MainActivityOnBackPressedFingerprint.matchAll(1..1).first().method
+        val selfKillExitIdx = onBackPressed.instructions.indexOfLast { insn ->
+            if (insn.opcode != Opcode.INVOKE_VIRTUAL) return@indexOfLast false
+            val ref = insn.getReference<MethodReference>() ?: return@indexOfLast false
+            ref.definingClass == MAIN_ACTIVITY &&
+                ref.parameterTypes.map { it.toString() } == listOf("Z", "Z") &&
+                ref.returnType == "V"
+        }
+        if (selfKillExitIdx < 0) {
+            throw PatchException("Could not find self-terminating exit call in $onBackPressed")
+        }
+        val moveTaskFlagReg = if (onBackPressed.p0Register == 0) 1 else 0
+        onBackPressed.replaceInstruction(
+            selfKillExitIdx,
+            "const/4 v$moveTaskFlagReg, 0x1"
+        )
+        onBackPressed.addInstruction(
+            selfKillExitIdx + 1,
+            "invoke-virtual {p0, v$moveTaskFlagReg}, Landroid/app/Activity;->moveTaskToBack(Z)Z"
         )
     }
 }

@@ -1,7 +1,7 @@
 package android.content;
 
+import android.content.res.AssetManager;
 import java.io.File;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -10,14 +10,21 @@ public class Context {
     private final File rootDir;
     private final File filesDir;
     private final File cacheDir;
+    private final AssetManager assetManager;
     private final Map<String, SharedPreferences> prefsMap = new HashMap<>();
 
     public Context(File rootDir) {
         this.rootDir = rootDir;
         this.filesDir = new File(rootDir, "files");
         this.cacheDir = new File(rootDir, "cache");
+        File assetsDir = new File(rootDir, "assets");
         this.filesDir.mkdirs();
         this.cacheDir.mkdirs();
+        this.assetManager = new AssetManager(assetsDir);
+    }
+
+    public AssetManager getAssets() {
+        return assetManager;
     }
 
     public Context getApplicationContext() {
