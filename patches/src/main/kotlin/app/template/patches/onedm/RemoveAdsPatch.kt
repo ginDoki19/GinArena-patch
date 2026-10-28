@@ -1,6 +1,8 @@
 package app.template.patches.onedm
 
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
+import app.morphe.patcher.extensions.InstructionExtensions.addInstructionsWithLabels
+import app.morphe.patcher.extensions.InstructionExtensions.getInstruction
 import app.morphe.patcher.extensions.InstructionExtensions.instructions
 import app.morphe.patcher.patch.PatchException
 import app.morphe.patcher.patch.bytecodePatch
@@ -10,16 +12,26 @@ import app.morphe.patcher.util.getReference
 import app.morphe.patcher.util.p0Register
 import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod
 import app.morphe.patcher.util.returnEarly
+import app.morphe.patcher.util.smali.ExternalLabel
 import app.template.patches.shared.Constants.COMPATIBILITY_ONEDM
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.Method
 import com.android.tools.smali.dexlib2.iface.instruction.FiveRegisterInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.Instruction
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.TwoRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.reference.FieldReference
+import com.android.tools.smali.dexlib2.iface.reference.MethodReference
+import com.android.tools.smali.dexlib2.iface.reference.StringReference
+import com.android.tools.smali.dexlib2.iface.reference.TypeReference
 
 private fun FieldReference.toSmali() = "$definingClass->$name:$type"
+
+private fun Instruction.stringOrNull(): String? {
+    if (opcode != Opcode.CONST_STRING && opcode != Opcode.CONST_STRING_JUMBO) return null
+    return getReference<StringReference>()?.string
+}
 
 private fun nullRegisterInstruction(register: Int): String {
     val opcode = if (register < 16) "const/4" else "const/16"
@@ -44,8 +56,6 @@ private fun Method.firstFieldReference(
 }
 
 private fun MutableMethod.tempRegisterAt(index: Int, vararg exclude: Int): Int {
-    // v0 is a real local only when p0 is not v0. All of the view methods patched here have
-    // at least one local register; findFreeRegister is kept as a safety net for tight methods.
     return if (p0Register > 0) 0 else findFreeRegister(index, p0Register, *exclude)
 }
 
@@ -83,8 +93,6 @@ private fun MutableMethod.hideThisBeforeReturn() {
 }
 
 private fun MutableMethod.forceSuperVisibilityGoneAndReturn() {
-    // p1 is the visibility argument; overwriting it avoids needing a spare local register
-    // in AppodealBannerView.setVisibilitySuper(), which has no locals.
     addInstructions(
         0,
         """
@@ -110,25 +118,30 @@ private fun MutableMethod.runRunnableAndReturn(registerName: String, invokeKindA
 @Suppress("unused")
 val removeAdsPatch = bytecodePatch(
     name = "Remove ads and promotions",
-    description = "Removes visible banner/full-screen ads and 1DM+ promotions from free 1DM 20.0 (30257), including the downloads-home VPN promo bar and sponsored browser start-page tiles. User shortcuts remain available.",
+    description = "Removes banner, interstitial, fallback, and Amazon ads, 1DM+ sale/VPN/drawer/rate promotions, sponsored browser tiles, promo FCM topics, and 17 ad/telemetry SDK initializers and native/asset payloads from free 1DM 20.0 (30257).",
     default = true
 ) {
     compatibleWith(COMPATIBILITY_ONEDM)
+    dependsOn(manifestAndBloatPatch)
 
     execute {
-        // Banner/consent gates: force the app onto its no-ad paths.
+        // 1. Banner/consent/rate-nag boolean gates -> false.
         listOf(
+            MyAppIsShowBannerFingerprint,
             MyAppIsShowConsentAndInitializeAdsFingerprint,
             BrowserIsShowBannerFingerprint,
             BrowserIsShowConsentAndInitializeAdsFingerprint,
             MainIsShowBannerFingerprint,
-            TorrentDetailsIsShowBannerFingerprint
+            MainIsShowConsentAndInitializeAdsFingerprint,
+            TorrentDetailsIsShowBannerFingerprint,
+            RateMeMaybeShouldShowFingerprint,
+            AmazonServiceIsInitializedFingerprint,
+            AmazonServiceHasAdFingerprint,
         ).forEach { fingerprint ->
             fingerprint.method.returnEarly(false)
         }
 
-        // Consent/SDK init: preserve the original first-call and continuation semantics,
-        // but do not initialize Appodeal/Amazon/Smaato or request consent.
+        // 2. Consent/SDK init: preserve continuation callbacks without starting Appodeal/Amazon/Smaato.
         val currentActivityField = MyAppInitializeAdsAndRunFingerprint.originalMethod
             .firstFieldReference(Opcode.SGET_OBJECT, MYAPP)
             .toSmali()
@@ -182,6 +195,7 @@ val removeAdsPatch = bytecodePatch(
         )
 
         listOf(
+            MyAppLoadBannerAdFingerprint,
             MyAppStartBannerManagerFingerprint,
             MyAppShowBannerAdFingerprint,
             MyAppShowBannerAdIfNecessaryFingerprint,
@@ -189,27 +203,26 @@ val removeAdsPatch = bytecodePatch(
             BannerManagerResumeFingerprint,
             BannerManagerPostAdFingerprint,
             BannerManagerRepostAdFingerprint,
-            BannerManagerSetNetworkAdShowingAndNotifyFingerprint
+            BannerManagerSetNetworkAdShowingAndNotifyFingerprint,
+            AmazonServiceStartFingerprint,
+            AmazonServiceFetchFingerprint,
+            HouseBannerSyncFingerprint,
         ).forEach { fingerprint ->
             fingerprint.method.returnEarly()
         }
 
         BannerManagerGetCurrentAdFingerprint.method.returnEarly(null)
 
-        // House/network banner views: keep them gone if any state tries to bind/show them.
+        // 3. House/network banner views: keep collapsed if any layout inflates or binds them.
         AcrBannerViewSetupAdViewFingerprint.method.hideThisAndReturn()
         AcrBannerViewSetAdFingerprint.method.hideThisAndReturn()
         AcrBannerViewOnAdReceivedFingerprint.method.hideThisAndReturn()
-        IdmBannerViewOnFinishInflateFingerprint.method.hideThisAndReturn(
-            callSuperOnFinishInflate = true
-        )
-        NewBannerViewOnFinishInflateFingerprint.method.hideThisAndReturn(
-            callSuperOnFinishInflate = true
-        )
+        IdmBannerViewOnFinishInflateFingerprint.method.hideThisAndReturn(callSuperOnFinishInflate = true)
+        NewBannerViewOnFinishInflateFingerprint.method.hideThisAndReturn(callSuperOnFinishInflate = true)
         AppodealBannerViewSetVisibilityFingerprint.method.forceSuperVisibilityGoneAndReturn()
         AppodealBannerViewSetVisibilitySuperFingerprint.method.forceSuperVisibilityGoneAndReturn()
 
-        // Appodeal adapter (obfuscated): store the mediation manager, but do not init/cache/show ads.
+        // 4. Appodeal adapter (Li/om;) and SQLite FallbackNetwork adapter (Li/l82;).
         val omInitializeMatch = OmInitializeFingerprint.matchAll(1..1).first()
         val omManagerField = omInitializeMatch.originalMethod
             .firstFieldReference(Opcode.IPUT_OBJECT, PP0, definingClass = "Li/om;")
@@ -227,14 +240,26 @@ val removeAdsPatch = bytecodePatch(
             registerName = "p2",
             invokeKindAndTarget = "invoke-interface {p2}, Ljava/lang/Runnable;->run()V"
         )
-        OmCanShowFingerprint.matchAll(2..2).forEach { match ->
-            match.method.returnEarly(false)
-        }
-        OmShowWrappersFingerprint.matchAll(2..2).forEach { match ->
-            match.method.returnEarly(false)
+        OmCanShowFingerprint.matchAll(2..2).forEach { it.method.returnEarly(false) }
+        OmShowWrappersFingerprint.matchAll(2..2).forEach { it.method.returnEarly(false) }
+
+        val fallbackNetworkClass = FallbackNetworkTagFingerprint.matchAll(1..1).first().classDef
+        fallbackNetworkClass.methods.forEach { method ->
+            if (method.name == "<init>" || method.name == "getTag") return@forEach
+            val params = method.parameterTypes.map { it.toString() }
+            when {
+                params == listOf(MYAPP, "Ljava/lang/Runnable;") && method.returnType == "V" ->
+                    method.runRunnableAndReturn(
+                        registerName = "p2",
+                        invokeKindAndTarget = "invoke-interface {p2}, Ljava/lang/Runnable;->run()V"
+                    )
+                method.returnType == "V" -> method.returnEarly()
+                method.returnType == "Z" -> method.returnEarly(false)
+                method.returnType == "D" -> method.returnEarly(0.0)
+            }
         }
 
-        // Central mediation/full-screen helpers.
+        // 5. Central mediation/full-screen helpers & pp0 waterfall loops.
         val centralFullScreenMatch = CentralFullScreenHelperFingerprint.matchAll(1..1).first()
         val continuationType = centralFullScreenMatch.originalMethod.parameterTypes[2].toString()
         centralFullScreenMatch.method.runRunnableAndReturn(
@@ -246,9 +271,103 @@ val removeAdsPatch = bytecodePatch(
         Pp0FullScreenSelectorFingerprint.matchAll(1..1).first().method.returnEarly(false)
         Pp0RefreshTimerFingerprint.matchAll(1..1).first().method.returnEarly()
 
-        // Refinements in MainActivity: disable the sale state and hide the drawer upgrade footer.
-        // The title method reads the update flag first and the sale flag second; preserve the
-        // legitimate update behaviour by only forcing the sale flag assignment in onCreate.
+        // Also disarm the pp0 case inside the shared Runnable/TimerTask dispatcher (Li/q6;->run).
+        val dispatcherRun = RunnableDispatcherRunFingerprint.matchAll(1..1).first().method
+        val pp0CastIdx = dispatcherRun.instructions.indexOfFirst { insn ->
+            insn.opcode == Opcode.CHECK_CAST && insn.getReference<TypeReference>()?.type == PP0
+        }
+        if (pp0CastIdx < 0) throw PatchException("Could not find $PP0 case in $dispatcherRun")
+        dispatcherRun.addInstructionsAtControlFlowLabel(pp0CastIdx + 1, "return-void")
+
+        // 6. BrowserApp.initApp: skip Play Store InstallReferrerClient IPC and BannerManager.load
+        // while preserving ProcessLifecycleOwner.addObserver and libtorrent_jni + PosixCalls below.
+        val initApp = BrowserAppInitAppFingerprint.matchAll(1..1).first().method
+        val addObserverIdx = initApp.instructions.indexOfFirst { insn ->
+            insn.getReference<MethodReference>()?.name == "addObserver"
+        }
+        if (addObserverIdx < 0) throw PatchException("Could not find addObserver in $initApp")
+        val torrentConfigIdx = (addObserverIdx + 1 until initApp.instructions.size).firstOrNull { idx ->
+            val insn = initApp.getInstruction(idx)
+            val ref = insn.getReference<MethodReference>() ?: return@firstOrNull false
+            insn.opcode == Opcode.INVOKE_STATIC &&
+                ref.parameterTypes.isEmpty() &&
+                ref.definingClass == ref.returnType &&
+                ref.definingClass != "Li/xk;"
+        } ?: throw PatchException("Could not find post-referrer torrent config block in $initApp")
+        initApp.addInstructionsWithLabels(
+            addObserverIdx + 1,
+            "goto :onedm_skip_referrer_and_banner",
+            ExternalLabel("onedm_skip_referrer_and_banner", initApp.getInstruction(torrentConfigIdx))
+        )
+
+        // 7. ActivityLifecycleListener: strip post-ad WebView timer hack, resume interstitial check,
+        // and Maximized/Minimized pp0 + AmazonService + AudioManager ad-volume loops while keeping
+        // LocalBroadcastManager overlay updates and AppEvent$Maximized/Minimized bus events intact.
+        val onResumed = LifecycleOnActivityResumedFingerprint.matchAll(1..1).first().method
+        val afterWebViewHackIdx = onResumed.instructions.indexOfFirst { insn ->
+            val ref = insn.getReference<MethodReference>() ?: return@indexOfFirst false
+            ref.definingClass == "Ljava/lang/Object;" && ref.name == "getClass"
+        }
+        if (afterWebViewHackIdx < 0) {
+            throw PatchException("Could not find post-WebView getClass() in $onResumed")
+        }
+        val appWasMinimizedIdx = onResumed.instructions.indexOfFirst { insn ->
+            insn.opcode == Opcode.IGET_OBJECT &&
+                insn.getReference<FieldReference>()?.name == "appWasMinimized"
+        }
+        if (appWasMinimizedIdx < 0) {
+            throw PatchException("Could not find appWasMinimized check in $onResumed")
+        }
+        onResumed.addInstructionsAtControlFlowLabel(appWasMinimizedIdx, "return-void")
+        onResumed.addInstructionsWithLabels(
+            0,
+            "goto :onedm_skip_resumed_webview",
+            ExternalLabel("onedm_skip_resumed_webview", onResumed.getInstruction(afterWebViewHackIdx))
+        )
+
+        val onStateChanged = LifecycleOnStateChangedFingerprint.matchAll(1..1).first().method
+        val eventBusNewInstances = onStateChanged.instructions.withIndex().filter { (_, insn) ->
+            insn.opcode == Opcode.NEW_INSTANCE &&
+                insn.getReference<TypeReference>()?.type in setOf(
+                    "Lacr/browser/lightning/bus/AppEvent\$Maximized;",
+                    "Lacr/browser/lightning/bus/AppEvent\$Minimized;",
+                )
+        }.map { it.index }
+        if (eventBusNewInstances.size != 2) {
+            throw PatchException("Expected Maximized and Minimized bus events in $onStateChanged")
+        }
+        // Each NEW_INSTANCE is followed by <init> (+1), bus.post (+2), and the catch/merge target (+3).
+        eventBusNewInstances.sortedDescending().forEach { newEventIdx ->
+            val mergeIdx = newEventIdx + 3
+            onStateChanged.addInstructionsAtControlFlowLabel(mergeIdx, "return-void")
+        }
+
+        // 8. MainActivity startup worker (Li/d34;->doInBackground): skip FirebaseMessaging topic RPCs
+        // ("notify" / "notify_v2") before FirebaseMessaging.getInstance() is invoked.
+        val doInBackground = MainStartupTaskDoInBackgroundFingerprint.matchAll(1..1).first().method
+        val fcmStartIdx = doInBackground.instructions.indexOfFirst { insn ->
+            insn.getReference<MethodReference>()?.definingClass ==
+                "Lcom/google/firebase/messaging/FirebaseMessaging;"
+        }
+        val notifyV2SubIdx = doInBackground.instructions.indexOfFirst { insn ->
+            val ref = insn.getReference<MethodReference>() ?: return@indexOfFirst false
+            ref.definingClass == "Lcom/google/firebase/messaging/FirebaseMessaging;" &&
+                ref.name == "subscribeToTopic"
+        }
+        if (fcmStartIdx < 0 || notifyV2SubIdx < 0) {
+            throw PatchException("Could not find FirebaseMessaging topic calls in $doInBackground")
+        }
+        val afterFcmIdx = notifyV2SubIdx + 8
+        if (doInBackground.getInstruction(afterFcmIdx - 2).opcode != Opcode.MOVE_EXCEPTION) {
+            throw PatchException("Unexpected catch layout after subscribeToTopic in $doInBackground")
+        }
+        doInBackground.addInstructionsWithLabels(
+            fcmStartIdx,
+            "goto :onedm_skip_fcm_topics",
+            ExternalLabel("onedm_skip_fcm_topics", doInBackground.getInstruction(afterFcmIdx))
+        )
+
+        // 9. Refinements in MainActivity: disable the sale state and hide the drawer upgrade footer.
         val titleBooleanFields = MainActivityTitleFingerprint.originalMethod.instructions.mapNotNull { instruction ->
             if (instruction.opcode != Opcode.IGET_BOOLEAN) return@mapNotNull null
             val reference = instruction.getReference<FieldReference>() ?: return@mapNotNull null
@@ -274,8 +393,10 @@ val removeAdsPatch = bytecodePatch(
         } ?: throw PatchException("Could not find sale flag assignment in MainActivity.onCreate")
         val saleSourceRegister = (salePut.value as TwoRegisterInstruction).registerA
 
-        // Patch the later nav_upgrade site first so the earlier sale-site index stays valid.
         val navTempRegister = onCreate.findFreeRegister(navInsertIndex, navViewRegister, onCreate.p0Register)
+        if (navTempRegister > 15 || navViewRegister > 15 || saleSourceRegister > 15) {
+            throw PatchException("MainActivity.onCreate requires 4-bit registers for View.setVisibility / sale flag")
+        }
         onCreate.addInstructions(
             navInsertIndex,
             """
@@ -288,7 +409,7 @@ val removeAdsPatch = bytecodePatch(
             "const/4 v$saleSourceRegister, 0x0"
         )
 
-        // Collapse the 60dp banner container everywhere it is inflated.
+        // 10. Collapse the 60dp banner container everywhere it is inflated.
         MaxHeightConstructorTwoArgsFingerprint.method.hideThisBeforeReturn()
         MaxHeightConstructorThreeArgsFingerprint.method.hideThisBeforeReturn()
         MaxHeightOnMeasureFingerprint.method.addInstructions(
@@ -301,25 +422,14 @@ val removeAdsPatch = bytecodePatch(
             """
         )
 
-        // Downloads-home promotional strip (`offer_vpnLL`): p1 is this updater's own
-        // force-hide flag. Forcing it true reuses the app's existing path that tags the
-        // container "0", sets it GONE and returns, so neither the ProtonVPN offer nor the
-        // strip's other promo variants can be shown. VPN settings/functionality elsewhere
-        // in the app are not touched.
+        // 11. Downloads-home promotional strip (`offer_vpnLL`) and browser sponsored start-page tiles.
         MainActivityPromoBarFingerprint.matchAll(1..1).first().method.addInstructions(
             0,
             "const/4 p1, 0x1"
         )
 
-        // Modern browser start page: BannerInfo entries are emitted as sponsored shortcut
-        // tiles only if isTileAd() (adType == 1) returns true. Returning false removes those
-        // database-backed promo tiles even if they were cached before patching. Custom
-        // StartPageShortcutStore tiles and the Add Shortcut tile use a separate path.
         BannerInfoIsTileAdFingerprint.method.returnEarly(false)
 
-        // Legacy/simple start page: null its two remotely configured sponsored shortcuts
-        // just before their icon CSS is read. getIconCss() accepts null, and the HTML link
-        // branches below only render a sponsored button when an object is non-null.
         val legacyStartPageMatch = LegacyStartPageHomepageFingerprint.matchAll(1..1).first()
         val firstSponsoredShortcutMatch = legacyStartPageMatch.instructionMatches[0]
         val secondSponsoredShortcutMatch = legacyStartPageMatch.instructionMatches[1]

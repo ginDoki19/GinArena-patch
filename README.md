@@ -18,9 +18,9 @@ github.com/ginDoki19/GinArena-patch
 ## 🩹 Patches list
 
 <!-- PATCHES_START EXPANDED -->
-> **[v2.4.2](https://github.com/ginDoki19/GinArena-patch/releases/tag/v2.4.2)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;10 patches total
+> **[v2.4.2](https://github.com/ginDoki19/GinArena-patch/releases/tag/v2.4.2)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;12 patches total
 <details open>
-<summary>📦 1DM&nbsp;&nbsp;•&nbsp;&nbsp;3 patches</summary>
+<summary>📦 1DM&nbsp;&nbsp;•&nbsp;&nbsp;5 patches</summary>
 <br>
 
 **🎯 Supported versions:**
@@ -31,9 +31,11 @@ github.com/ginDoki19/GinArena-patch
 
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
-| [Browser setup prompts only once](#browser-setup-prompts-only-once) | Shows the browser accessibility and shortcut-menu-strip setup prompts once, then records each as shown as soon as it appears so closing the browser before dismissing it cannot make it repeat. |  |
+| [AdBlocker turbo & userscript bundle](#adblocker-turbo-userscript-bundle) | Syncs SHA-256-verified weekly pre-compiled AdBlocker binary engines (28 default lists including OISD, HaGeZi Pro, uBlock, EasyList, and AdGuard) from GitHub to eliminate 14-90s CPU compilation lag on low-end devices with automatic Local Turbo fallback, and optionally seeds and auto-updates the mobile-adapted Bypass All Shortlinks userscript. | • AdBlocker engine mode<br>• Bundle Bypass All Shortlinks userscript |
+| [Browser setup prompts only once](#browser-setup-prompts-only-once) | Shows the default-browser, accessibility, shortcut-menu-strip, and adblocker setup prompts once, recording each as shown as soon as it appears so closing the browser before dismissing cannot make it repeat. |  |
+| [Optimize cold start and battery](#optimize-cold-start-and-battery) | Eliminates cold-start Chromium WebView initialization in Download Manager and background services, defers Browser AdBlock filter parsing until Browser launch, defers the CheckAppVersion subprocess past startup, and pauses MainActivity's 1 Hz background wakeup loop when minimized. |  |
 | [Preset browser settings](#preset-browser-settings) | Sets fresh-install browser fallbacks for normal and incognito modes: Brave search, matching suggestions, and Google search by image by default. Saved or imported choices are preserved and can be changed later in 1DM. | • Search engine<br>• Search suggestions<br>• Search by image |
-| [Remove ads and promotions](#remove-ads-and-promotions) | Removes visible banner/full-screen ads and 1DM+ promotions from free 1DM 20.0 (30257), including the downloads-home VPN promo bar and sponsored browser start-page tiles. User shortcuts remain available. |  |
+| [Remove ads and promotions](#remove-ads-and-promotions) | Removes banner, interstitial, fallback, and Amazon ads, 1DM+ sale/VPN/drawer/rate promotions, sponsored browser tiles, promo FCM topics, and 17 ad/telemetry SDK initializers and native/asset payloads from free 1DM 20.0 (30257). |  |
 
 </details>
 
@@ -115,41 +117,47 @@ github.com/ginDoki19/GinArena-patch
 
 ### What it does
 
-It removes visible advertising and promotion UI from the free app while keeping the app's own
-flow intact:
+#### Remove ads and promotions (default: on)
 
-- Consent / ad-SDK initialization is short-circuited, but the app's continuation callbacks still run.
-- Persistent network banners and the built-in 1DM+ house/promo banners are never loaded or shown,
-  and their views are forced `GONE`.
-- Full-screen interstitial paths are skipped, again running the caller's continuation.
-- The navigation drawer **“Upgrade to 1DM+”** item is hidden.
-- The **“1DM+ on sale”** toolbar subtitle is disabled (the legitimate *Update app* subtitle is kept).
-- The empty banner container (`MaxHeightLinearLayout`) is collapsed to 0×0 so no blank strip remains.
-- The downloads-home promo strip (`offer_vpnLL`) is forced onto the app's own hide path, so the
-  ProtonVPN installation offer—and the other promo messages rotated through that same strip—are not
-  shown. This does not alter 1DM's actual VPN settings or functionality.
-- Sponsored browser start-page tiles are removed:
-  - the modern start page no longer selects database `BannerInfo` tile ads (`isTileAd()` now
-    returns false), including previously cached *Play Quiz / Play Games* promotions;
-  - the legacy/simple start page's two remotely configured sponsored shortcuts are nulled before
-    its HTML is built.
+Removes advertising, promotions, nags, and third-party ad/telemetry SDK bloat from free **1DM 20.0 (30257)** while keeping all legitimate download, torrent, VPN, and browser flows intact:
 
-User-created browser shortcuts and the **Add Shortcut** tile use a separate path and remain available.
+- **Manifest & cold-start SDK debloat:** Strips all **17** synchronous ad/mediation/Sentry/AppMetrica/Firebase `ContentProvider`s and UnityAds `AdsSdkInitializer` (preserving `FileProvider`, `StartPageClipboardImageProvider`, `TrayContentProvider`, and `androidx.startup.InitializationProvider`), removes **16** ad/FCM `<service>`s (`IDMFirebaseMessagingService`, `AppMetricaService`, `StartApp`, `MBridge`, `Chartboost`, …), **7** background wakeup `<receiver>`s (`AppodealPackageAddedReceiver`, `BootCompleteListener`, `NetWorkChangeReceiver`, …), ~115 ad `<activity>` entries (preserving Dropbox, Biometric, Billing, and Play Services activities), and ad/tracking permissions (`AD_ID`, `ACCESS_ADSERVICES_*`, `BIND_GET_INSTALL_REFERRER_SERVICE`, `c2dm.permission.RECEIVE`).
+- **Native & asset payload cleanup (~10.5 MB):** Removes **11** third-party ad/Sentry/Pangle/AppLovin/UnityAds native `.so` libraries per ABI and **64** third-party MRAID/VAST/OMSDK/APS/Maticoo/MobileFuse/BidMachine ad asset files while keeping all **14** functional `.so` libraries (`libarchSupport.so`, `libjlibtorrent.so`, FFmpeg, AndroidX) and the built-in browser adblocker (`assets/adblocker/`) and userscript engine untouched.
+- **Complete bytecode ad, fallback & nag removal:**
+  - Short-circuits consent/ad initialization while still running caller continuation callbacks.
+  - Disarms Appodeal mediation (`Li/om;`), the SQLite `FallbackNetwork` banner adapter (`Li/l82;`), `AmazonService`, `BannerManager`, `CheckAppVersion`'s daily remote house-banner sync, and `pp0`'s 5-second waterfall timer.
+  - Skips Play Store `InstallReferrerClient` startup IPC, `FirebaseMessaging` promo-topic subscriptions (`notify` / `notify_v2`), post-ad `WebView` timer workarounds, resume interstitial checks, and `AudioManager` ad-volume polling.
+  - Disables the **“Rate 1DM”** nag dialog (`rate_me_maybe`) and its synchronous main-thread `SharedPreferences.commit()` disk flush.
+  - Hides the drawer **“Upgrade to 1DM+”** item, disables the **“1DM+ on sale”** subtitle (preserving legitimate *Update app* notices), collapses `MaxHeightLinearLayout` (`0×0`), forces the `offer_vpnLL` promo strip hidden, and removes sponsored browser start-page tiles while preserving user shortcuts and **Add Shortcut**.
+
+#### Optimize cold start and battery (default: on)
+
+Eliminates cold-start UI freezes (especially noticeable on low-RAM / eMMC devices such as Redmi 8A), thermal overhead, and idle background battery drain:
+
+- **Zero Chromium WebView cold-boot in Download Manager & `:DownloadService`:** Guards `WebView.setWebContentsDebuggingEnabled(z)` in `BrowserApp.initApp` so the default `false` path never loads the `120+ MB` Android WebView/Trichrome engine on the UI thread during process startup, and gates Browser crash-exit `WebView` cleanup in `ActivityLifecycleListener.onActivityCreated` behind `BrowserActivity`.
+- **Lazy Browser AdBlock initialization:** Defers eager `AdBlock.Delegate.initialize` during `BrowserApp.initApp`; opening the built-in Browser automatically initializes the AdBlock filter engine via Dagger's `@Singleton AdBlock(Context)` constructor on background worker threads.
+- **Post-startup `:CheckAppVersion` subprocess deferral:** Defers `MainActivity`'s `:CheckAppVersion` service launch by `5,000 ms` on the main `Handler` (and skips it if the app was already minimized or closed) so Zygote process forking never competes with `MainActivity`'s cold-start database/UI render.
+- **Zero 1 Hz background wakeup & Binder IPC drain:** Guards `MainActivity`'s 1-second `TimerTask` (`Li/q6;`) with `MainActivity`'s `isPaused` state, eliminating **86,400 CPU wakeups and `ActivityManager.getRunningServices` Binder IPC calls per day** while 1DM is minimized, with instant live progress updates when foregrounded.
+
+#### AdBlocker turbo & userscript bundle (default: on)
+
+Upgrades 1DM 20.0's built-in Browser AdBlocker and Userscript engine without bloating the `.mpp` bundle (`~602 KB` total across all 5 apps) or requiring manual user maintenance:
+
+- **AdBlocker engine mode** (`adblockerMode`, default `cloud_sync`):
+  - **Cloud Pre-Built + Weekly Auto-Sync (`cloud_sync`):** Downloads SHA-256-verified pre-compiled format-`20` binary filter engines (`abnfp.bin`, `abnhp.bin`, `abcfp.bin` built weekly by `.github/workflows/onedm-cache.yml` across all **28** default-enabled 1DM `20.0` filter lists) from the `onedm-cache` GitHub Release, swaps them atomically under `ab_filter_compile.lock`, and broadcasts `intent.action.ACTION_REFRESH_ADBLOCK` so full 28-list protection is active in `< 2s` with zero on-device compilation heat — even if `BrowserActivity` is opened immediately on first launch. Manual `My Filter` (`MFSU`) rules remain fully compatible, and toggling any non-default filter list or adding a custom filter URL automatically hands compilation back to the Local Turbo engine.
+  - **Local Turbo Parser + Weekly Auto-Rebuild (`local_turbo`):** Compiles filter lists locally on-device with `enableAutoUpdate = true` (`7`-day interval), replacing 4× 1-byte `RandomAccessFile.write(I)V` syscalls in `Li/j12;` with buffered 4-byte `write([B)V` writes (**75% fewer write syscalls**) and running compilation at `THREAD_PRIORITY_BACKGROUND` (`10`) instead of `THREAD_PRIORITY_DEFAULT` (`0`) so UI scrolling never stutters on low-end CPUs.
+  - **Stock 1DM (`stock`):** Leaves 1DM's stock AdBlocker behavior untouched.
+- **Bundle Bypass All Shortlinks userscript** (`bundleBypassShortlinks`, default `true`):
+  - Automatically seeds and updates the mobile-patched **Bypass All Shortlinks Debloated** (`bde72f0c-54aa-3f79-b2c6-9d96f479e580`) `.1dmus.gz` bundle in the background (`window.close` grant added, explicit `@connect` hosts pre-authorized so background/redirect XHR calls never silently fail, offline-cached `MonkeyConfig-Mod.js` bundled with responsive mobile viewport `min(92vw, 600px)` × `min(80vh, 480px)` and nested `@require` stripped).
+  - Preserves your `enabled` / `disabled` toggle across automatic updates, intercepts per-script *Check for update* (`Li/kh7;`) so it never pulls raw unpatched JS from Codeberg, and never re-imports the script if you delete it in 1DM.
 
 #### Browser setup prompts only once (opt-in)
 
-This separate patch is **off by default**. The stock browser can show its
-**Accessibility settings** and **shortcut menu strip** setup
-prompts again if the browser activity/process ends before their dismiss callbacks save the
-“shown” flags. This patch lets each prompt appear normally the first time, then performs the
-same in-memory and persisted shown-flag write immediately after `show()`. Closing the browser
-before dismissing either dialog therefore cannot make that same setup prompt keep returning.
+This separate patch is **off by default**. Records the **Set as default browser** (`cdbs_shown`), **Accessibility settings** (`cas_shown`), **Shortcut menu strip** (`csmss_shown`), and **Setup adblocker** (`cabs_shown_n`) setup prompts as shown immediately after `show()`, so closing the browser before dismissing any of them cannot make that prompt repeat on subsequent launches.
 
 #### Preset browser settings (opt-in)
 
-This separate patch is **off by default**, so it is not selected accidentally. When a user
-enables it, it changes only the fresh-install/missing-key fallbacks for normal and incognito
-browsing:
+This separate patch is **off by default**, so it is not selected accidentally. When enabled, it changes only the fresh-install/missing-key fallbacks for normal and incognito browsing:
 
 - **Search engine:** Brave by default, with Google, DuckDuckGo/Lite, Bing, StartPage/Mobile,
   Yahoo/Japan, Yandex/Russian, Baidu, and AOL available as patch options.
