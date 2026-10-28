@@ -167,14 +167,14 @@ jobs:
           AB_SHA=$(jq -r '.adblockSha256' /tmp/onedm-build/dist/manifest.json)
           US_SHA=$(jq -r '.userscriptSha256' /tmp/onedm-build/dist/manifest.json)
 
-          NOTES=$(cat <<EOF
-          Automated weekly pre-compiled cache for **1DM 20.0 (30257)** (\`GinArena-patch\`, schema \`v2\`).
-
-          - **Built at (UTC):** \`$BUILT_AT\`
-          - **AdBlocker Pack (\`onedm-v20-adblock-pack.zip\`):** 28 default filter lists (\`$TOTAL_FILTERS\` total active filters including \`+js\` scriptlets & \`$redirect\` resources) + \`sources_meta.json\` + \`STORED\` per-UUID \`.zip\` archives, binary format \`v20\`, SHA-256: \`$AB_SHA\`
-          - **Userscript Pack (\`bypass-shortlinks-1dm.1dmus.gz\`):** \`Bypass All Shortlinks Debloated\` \`v$US_VER\` + bundled mobile-adapted \`MonkeyConfig-Mod.js\`, SHA-256: \`$US_SHA\`
-          EOF
-          )
+          NOTES_FILE="/tmp/onedm-build/release-notes.md"
+          {
+            echo "Automated weekly pre-compiled cache for **1DM 20.0 (30257)** (\`GinArena-patch\`, schema \`v2\`)."
+            echo ""
+            echo "- **Built at (UTC):** \`${BUILT_AT}\`"
+            echo "- **AdBlocker Pack (\`onedm-v20-adblock-pack.zip\`):** 28 default filter lists (\`${TOTAL_FILTERS}\` total active filters including \`+js\` scriptlets & \`\$redirect\` resources) + \`sources_meta.json\` + \`STORED\` per-UUID \`.zip\` archives, binary format \`v20\`, SHA-256: \`${AB_SHA}\`"
+            echo "- **Userscript Pack (\`bypass-shortlinks-1dm.1dmus.gz\`):** \`Bypass All Shortlinks Debloated\` \`v${US_VER}\` + bundled mobile-adapted \`MonkeyConfig-Mod.js\`, SHA-256: \`${US_SHA}\`"
+          } > "$NOTES_FILE"
 
           if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
             # Upload binary packs first, then manifest.json last so clients never see a manifest ahead of its blobs
@@ -185,7 +185,7 @@ jobs:
             gh release upload "$RELEASE_TAG" \
               /tmp/onedm-build/dist/manifest.json \
               --clobber
-            gh release edit "$RELEASE_TAG" --prerelease --title "1DM 20.0 Cloud Cache (Auto-Sync)" --notes "$NOTES"
+            gh release edit "$RELEASE_TAG" --prerelease --title "1DM 20.0 Cloud Cache (Auto-Sync)" --notes-file "$NOTES_FILE"
           else
             gh release create "$RELEASE_TAG" \
               /tmp/onedm-build/dist/onedm-v20-adblock-pack.zip \
@@ -193,7 +193,7 @@ jobs:
               /tmp/onedm-build/dist/manifest.json \
               --prerelease \
               --title "1DM 20.0 Cloud Cache (Auto-Sync)" \
-              --notes "$NOTES"
+              --notes-file "$NOTES_FILE"
           fi
 
       - name: Cleanup temporary files
