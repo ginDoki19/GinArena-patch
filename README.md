@@ -129,66 +129,56 @@ github.com/ginDoki19/GinArena-patch
 ## 📦 1DM (20.0, build 30257)
 
 <details>
-<summary><b>📖 App details</b> — what it does, target version and notes (click to expand)</summary>
+<summary><b>📖 App details</b> — what it does, cloud architecture, target version and notes (click to expand)</summary>
 
 ### What it does
 
-#### Remove ads and promotions (default: on)
+Turns free **1DM 20.0** (`idm.internet.download.manager`) into an instant-opening, zero-drain download manager and browser — backed by an automated **Cloud Pre-Built AdBlocker (`~1.22M` active rules)** and **Shortlink Bypass** pipeline so you never wait 4 minutes on *"Rebuilding filters..."* or cook your phone's CPU, while keeping the `.mpp` patch bundle tiny (`~630 KB`) and free-1DM boundaries strictly intact.
 
-Removes advertising, promotions, nags, and third-party ad/telemetry SDK bloat from free **1DM 20.0 (30257)** while keeping all legitimate download, torrent, VPN, and browser flows intact:
+#### AdBlocker turbo & userscript bundle *(default: on — flagship cloud suite)*
 
-- **Manifest & cold-start SDK debloat:** Strips all **17** synchronous ad/mediation/Sentry/AppMetrica/Firebase `ContentProvider`s and UnityAds `AdsSdkInitializer` (preserving `FileProvider`, `StartPageClipboardImageProvider`, `TrayContentProvider`, and `androidx.startup.InitializationProvider`), removes **16** ad/FCM `<service>`s (`IDMFirebaseMessagingService`, `AppMetricaService`, `StartApp`, `MBridge`, `Chartboost`, …), **7** background wakeup `<receiver>`s (`AppodealPackageAddedReceiver`, `BootCompleteListener`, `NetWorkChangeReceiver`, …), ~115 ad `<activity>` entries (preserving Dropbox, Biometric, Billing, and Play Services activities), and ad/tracking permissions (`AD_ID`, `ACCESS_ADSERVICES_*`, `BIND_GET_INSTALL_REFERRER_SERVICE`, `c2dm.permission.RECEIVE`).
-- **Native & asset payload cleanup (~10.5 MB):** Removes **11** third-party ad/Sentry/Pangle/AppLovin/UnityAds native `.so` libraries per ABI and **64** third-party MRAID/VAST/OMSDK/APS/Maticoo/MobileFuse/BidMachine ad asset files while keeping all **14** functional `.so` libraries (`libarchSupport.so`, `libjlibtorrent.so`, FFmpeg, AndroidX) and the built-in browser adblocker (`assets/adblocker/`) and userscript engine untouched.
-- **Complete bytecode ad, fallback & nag removal:**
-  - Short-circuits consent/ad initialization while still running caller continuation callbacks.
-  - Disarms Appodeal mediation (`Li/om;`), the SQLite `FallbackNetwork` banner adapter (`Li/l82;`), `AmazonService`, `BannerManager`, `CheckAppVersion`'s daily remote house-banner sync, and `pp0`'s 5-second waterfall timer.
-  - Skips Play Store `InstallReferrerClient` startup IPC, `FirebaseMessaging` promo-topic subscriptions (`notify` / `notify_v2`), post-ad `WebView` timer workarounds, resume interstitial checks, and `AudioManager` ad-volume polling.
-  - Disables the **“Rate 1DM”** nag dialog (`rate_me_maybe`) and its synchronous main-thread `SharedPreferences.commit()` disk flush.
-  - Hides the drawer **“Upgrade to 1DM+”** item, disables the **“1DM+ on sale”** subtitle (preserving legitimate *Update app* notices), collapses `MaxHeightLinearLayout` (`0×0`), forces the `offer_vpnLL` promo strip hidden, and removes sponsored browser start-page tiles while preserving user shortcuts and **Add Shortcut**.
+Upgrades 1DM 20.0's built-in Browser AdBlocker and Userscript engine with zero `.mpp` size bloat and zero manual upkeep:
 
-#### Optimize cold start and battery (default: on)
+- **AdBlocker engine mode** (`adblockerMode`, default: **Cloud Pre-Built + Weekly Auto-Sync**):
+  - **☁️ Cloud Pre-Built + Weekly Auto-Sync (`cloud_sync`):** Every week, GitHub Actions runs 1DM 20.0's real filter compiler headlessly against live upstream sources (with 1DM's embedded `js_resources.txt` `+js` scriptlets & `$redirect` resources mounted) and publishes a SHA-256-verified `schema: 2` pack to the rolling `onedm-cache` release. On your device, 1DM quietly fetches and swaps the pre-compiled binary engines (`abnfp.bin`, `abnhp.bin`, `abcfp.bin`) + all **28** default filter list archives (EasyList, EasyPrivacy, uBlock Origin, AdGuard, OISD Full, HaGeZi Pro, Peter Lowe, regional & anti-adblock lists) in **under 2 seconds**:
+    - **Instant `Hosts & filters` hydration:** Populates 1DM's filter database and `.adblocker_1dm` archives automatically so **Hosts & filters** immediately displays all **`~1,224,500+` active filters** alongside each list's rule count, size, and last-updated date — no manual *Update* tap required, and the redundant *"Enable filter lists auto-update?"* prompt is suppressed.
+    - **Smart hybrid handoff:** Custom **My Filter** rules keep working natively. Tapping **Update** on the default 28-list set runs a fast ~1–2s Cloud check, while toggling extra lists or adding custom filter URLs automatically hands compilation over to **Local Turbo**.
+  - **⚡ Local Turbo Parser + Weekly Auto-Rebuild (`local_turbo`):** Prefers 100% on-device compilation with `7`-day auto-updates. Replaces 1DM's unbuffered `RandomAccessFile` compiler output with a `64 KB` buffered writer + in-memory index patching (eliminating **~4,000,000 flash syscalls** per rebuild with 100% byte-identical output) and keeps worker scheduling on foreground CPU cores (`priority = 1`) so local rebuilds finish dramatically faster without UI lag.
+  - **Stock 1DM (`stock`):** Leaves 1DM's stock AdBlocker untouched.
+- **🔗 Bundled Bypass All Shortlinks userscript** (`bundleBypassShortlinks`, default: **on**):
+  - Automatically installs and updates a mobile-adapted **Bypass All Shortlinks Debloated** `.1dmus` bundle from the weekly Cloud cache — pre-authorizing redirect/background XHR `@connect` domains (which otherwise fail silently in 1DM), adding `window.close` grant support, and bundling offline `MonkeyConfig` resized for phone screens (`min(92vw, 600px)` × `min(80vh, 480px)`).
+  - Preserves your **enabled / disabled** toggle across updates, routes per-script *Check for update* safely through the mobile-adapted bundle instead of raw desktop JS, and **never re-installs** the script if you choose to delete it.
 
-Eliminates cold-start UI freezes (especially noticeable on low-RAM / eMMC devices such as Redmi 8A), thermal overhead, and idle background battery drain:
+#### Optimize cold start and battery *(default: on)*
 
-- **Zero Chromium WebView cold-boot in Download Manager & `:DownloadService`:** Guards `WebView.setWebContentsDebuggingEnabled(z)` in `BrowserApp.initApp` so the default `false` path never loads the `120+ MB` Android WebView/Trichrome engine on the UI thread during process startup, and gates Browser crash-exit `WebView` cleanup in `ActivityLifecycleListener.onActivityCreated` behind `BrowserActivity`.
-- **Lazy Browser AdBlock initialization:** Defers eager `AdBlock.Delegate.initialize` during `BrowserApp.initApp`; opening the built-in Browser automatically initializes the AdBlock filter engine via Dagger's `@Singleton AdBlock(Context)` constructor on background worker threads.
-- **Post-startup `:CheckAppVersion` subprocess deferral:** Defers `MainActivity`'s `:CheckAppVersion` service launch by `5,000 ms` on the main `Handler` (and skips it if the app was already minimized or closed) so Zygote process forking never competes with `MainActivity`'s cold-start database/UI render.
-- **Zero 1 Hz background wakeup & Binder IPC drain:** Guards `MainActivity`'s 1-second `TimerTask` (`Li/q6;`) with `MainActivity`'s `isPaused` state, eliminating **86,400 CPU wakeups and `ActivityManager.getRunningServices` Binder IPC calls per day** while 1DM is minimized, with instant live progress updates when foregrounded.
-- **Standard Android Recents & background-download preservation on Back press:** Replaces `MainActivity.onBackPressed()`'s destructive `finishAndRemoveTask()` + `Process.killProcess` exit call with `Activity.moveTaskToBack(true)` so pressing Back moves 1DM cleanly to the background, keeps 1DM visible in Android Recents, and never kills active or queued background downloads (while keeping the explicit drawer **Exit** button intact).
+Built specifically to eliminate opening lag (especially on budget / low-RAM / eMMC phones like Redmi 8A), phone heating, and idle background drain:
 
-#### AdBlocker turbo & userscript bundle (default: on)
+- **Zero `120+ MB` Chromium WebView spin-up on cold start:** Stops 1DM from initializing the Android System WebView / Trichrome engine on the main UI thread when you only open the Download Manager or run a background download. WebView only loads when you actually open the built-in Browser.
+- **Deferred Browser AdBlock & `:CheckAppVersion` startup work:** Defers AdBlock engine loading until Browser launch and delays the secondary `:CheckAppVersion` subprocess past startup (skipping it completely if the app was already minimized), keeping cold-start UI rendering fast and smooth.
+- **Zero `1 Hz` idle battery drain (86,400 wakeups/day saved):** Pauses `MainActivity`'s 1-second background `TimerTask` and `ActivityManager` Binder IPC polling whenever 1DM is minimized, resuming live progress updates instantaneously when brought back to the screen.
+- **Keeps 1DM in Android Recents & protects background downloads on Back press:** Replaces 1DM's destructive `finishAndRemoveTask()` + `Process.killProcess` Back-button behavior with standard Android `moveTaskToBack(true)` — pressing **Back** sends 1DM cleanly to the background without vanishing from Recent Apps or interrupting active downloads, while the explicit drawer **Exit** button still closes the app completely.
 
-Upgrades 1DM 20.0's built-in Browser AdBlocker and Userscript engine without bloating the `.mpp` bundle (`~626 KB` total across all 5 apps) or requiring manual user maintenance:
+#### Remove ads and promotions *(default: on)*
 
-- **AdBlocker engine mode** (`adblockerMode`, default `cloud_sync`):
-  - **Cloud Pre-Built + Weekly Auto-Sync (`cloud_sync`):** Automatically downloads SHA-256-verified `schema: 2` pre-compiled format-`20` binary filter engines (`abnfp.bin`, `abnhp.bin`, `abcfp.bin`) plus `sources_meta.json` and all **28** default-enabled per-list `UUID*.zip` archives (built weekly by `.github/workflows/onedm-cache.yml` with 1DM's embedded `adblocker/js_resources.txt` asset mounted) from the `onedm-cache` GitHub Release, swaps them atomically under `ab_filter_compile.lock`, hydrates SQLite (`adblocker_filter_source_details`) so **Hosts & filters** immediately displays the full `~1,224,652` active filters alongside populated per-list filter counts, compressed/raw sizes, and last-updated dates (migrating `.zip` files automatically into `.adblocker_1dm` once 1DM's download folder is configured), suppresses the redundant `"Enable filter lists auto-update?"` dialog (`abau_shown`), intercepts manual **Update** taps on the default list set for fast ~1-2s Cloud refreshes, and broadcasts `intent.action.ACTION_REFRESH_ADBLOCK`. Manual `My Filter` (`MFSU`) rules remain fully compatible, and toggling any non-default filter list or adding a custom filter URL automatically hands compilation back to the Local Turbo engine.
-  - **Local Turbo Parser + Weekly Auto-Rebuild (`local_turbo`):** Compiles filter lists locally on-device with `enableAutoUpdate = true` (`7`-day interval), wrapping `Li/j12;`'s `.bin.tmp` writers (`abnfp.bin`, `abnhp.bin`, `abcfp.bin`) in a `64 KB` `BufferedRandomAccessFile` + in-buffer `writeIntAtIndex` (eliminating ~4,000,000 unbuffered `lseek` + `write` syscalls per rebuild while preserving 100% SHA-256 byte-for-byte output parity) and running `compileWorker` at `Process.setThreadPriority(1)` (`THREAD_PRIORITY_DEFAULT + 1`, keeping big-core foreground `cpuset` access on MIUI/ColorOS/OneUI without starving the UI thread).
-  - **Stock 1DM (`stock`):** Leaves 1DM's stock AdBlocker behavior untouched.
-- **Bundle Bypass All Shortlinks userscript** (`bundleBypassShortlinks`, default `true`):
-  - Automatically seeds and updates the mobile-patched **Bypass All Shortlinks Debloated** (`bde72f0c-54aa-3f79-b2c6-9d96f479e580`) `.1dmus.gz` bundle in the background (`window.close` grant added, explicit `@connect` hosts pre-authorized so background/redirect XHR calls never silently fail, offline-cached `MonkeyConfig-Mod.js` bundled with responsive mobile viewport `min(92vw, 600px)` × `min(80vh, 480px)` and nested `@require` stripped).
-  - Preserves your `enabled` / `disabled` toggle across automatic updates, intercepts per-script *Check for update* (`Li/kh7;`) so it never pulls raw unpatched JS from Codeberg, and never re-imports the script if you delete it in 1DM.
+Strips all advertising, nags, and third-party tracking bloat from free **1DM 20.0 (30257)** while keeping every download, torrent (`libjlibtorrent`), FFmpeg, VPN, and browser feature working:
 
-#### Browser setup prompts only once (opt-in)
+- **Manifest & startup SDK debloat:** Removes **17** startup ad/mediation/Sentry/AppMetrica/Firebase `ContentProvider`s and UnityAds initializers, **16** ad/FCM background services, **7** wakeup receivers, ~115 ad activities (keeping Dropbox, Biometric, Billing, and Play Services intact), and tracking permissions (`AD_ID`, `ACCESS_ADSERVICES_*`, Install Referrer, C2DM).
+- **~10.5 MB native & asset cleanup:** Strips **11** third-party ad/telemetry `.so` libraries per ABI and **64** MRAID/VAST/OMSDK ad asset files while keeping all **14** core functional native libraries and 1DM's built-in AdBlocker/Userscript assets untouched.
+- **Clean UI & zero nags:** Disables Appodeal, Amazon, and SQLite fallback banners, interstitials, waterfall timers, *"Rate 1DM"* popups, *"Upgrade to 1DM+"* / *"1DM+ on sale"* / VPN promo banners, sponsored browser start-page shortcuts (preserving user shortcuts and **Add Shortcut**), and promotional FCM topics.
 
-This separate patch is **off by default**. Records the **Set as default browser** (`cdbs_shown`), **Accessibility settings** (`cas_shown`), **Shortcut menu strip** (`csmss_shown`), and **Setup adblocker** (`cabs_shown_n`) setup prompts as shown immediately after `show()`, so closing the browser before dismissing any of them cannot make that prompt repeat on subsequent launches.
+#### Browser setup prompts only once *(optional — off by default)*
 
-#### Preset browser settings (opt-in)
+Records the **Set as default browser**, **Accessibility settings**, **Shortcut menu strip**, and **Setup adblocker** prompts as shown as soon as they appear, so closing the browser without dismissing them won't make them nag you again next launch.
 
-This separate patch is **off by default**, so it is not selected accidentally. When enabled, it changes only the fresh-install/missing-key fallbacks for normal and incognito browsing:
+#### Preset browser settings *(optional — off by default)*
 
-- **Search engine:** Brave by default, with Google, DuckDuckGo/Lite, Bing, StartPage/Mobile,
-  Yahoo/Japan, Yandex/Russian, Baidu, and AOL available as patch options.
-- **Search suggestions:** matched to the selected search provider where 1DM supports it;
-  providers without a matching suggestion service use **None** instead of silently using
-  Google. A supported provider or None can also be chosen explicitly.
-- **Search by image:** Google by default, with Bing, Yandex, TinEye, SauceNAO, and Sogou
-  available. 1DM does not offer Brave or DuckDuckGo for reverse image search.
+Sets clean fresh-install fallbacks for normal and incognito browsing without overwriting any setting you've already saved or imported:
 
-Saved or imported 1DM choices are not overwritten, and every provider can still be changed
-later inside 1DM's General Settings.
+- **Search engine:** Brave by default (Google, DuckDuckGo/Lite, Bing, StartPage/Mobile, Yahoo/Japan, Yandex/Russian, Baidu, and AOL available).
+- **Search suggestions:** Matched automatically to your chosen search engine where supported (or **None** instead of silently leaking keystrokes to Google).
+- **Search by image:** Google by default (Bing, Yandex, TinEye, SauceNAO, and Sogou available).
 
-GinArena Patch does **not** unlock any 1DM+ paid features (scheduler, higher part/concurrency
-caps, paid DNS entries, …), and it contains no 1DM+ code or resources.
+GinArena Patch does **not** unlock paid **1DM+** features (scheduler, higher part/concurrency caps, paid DNS entries, …) and contains no 1DM+ code or resources.
 
 ### Target app (1DM)
 
@@ -549,15 +539,14 @@ short readable build labels and validate the package name, file type, version, `
 > patch your saved/patched APK again. Re-download the exact stock file from the links above and
 > patch it from the beginning.
 >
-> **New in v2.4.x:** adds **MX Player (`3.4.1`)** support — turns MX Player
-> into a clean, ad-free local video and music player with 1-tap offline & online **Classic Themes**
-> (16 Light + 16 Dark Slate swatches) and a tidier **Me** tab, plus optional patches to hide the
-> bottom navigation bar and bundle the **v3.1.0 Custom Codec** (`aio-v3.1.0_r1.zip`) directly into
-> the APK for Dolby / DTS audio. It also adds **PlayZ TV (`2.3.1`)** support — ad-free with
-> working encrypted channel/event feeds (pure-Java replacement of the signature-locked native
-> decryption, like CricZ TV). On CRICFy TV and CricZ TV, environment-check bypass and
-> native-library stripping remain **off by default** — if your current patched 1DM, CRICFy TV, or
-> CricZ TV works fine, you don't need to re-patch it.
+> **New in v2.5.0:** overhauls **1DM (`20.0`, build `30257`)** with an automated
+> **Cloud Pre-Built AdBlocker** (`~1.22M` active rules across 28 filter lists synced in `< 2s` with
+> full `Hosts & filters` hydration and zero 4-minute local rebuild), **Local Turbo** `64 KB`
+> buffered compilation, auto-synced mobile **Bypass All Shortlinks** userscript, zero-WebView cold
+> start, zero `1 Hz` background battery drain, **Back**-press Recents/download preservation, and
+> ~10.5 MB of ad/SDK debloat. If you use **MX Player (`3.4.1`)**, **PlayZ TV (`2.3.1`)**,
+> **CRICFy TV (`7.3`)**, or **CricZ TV (`7.3`)** and are already on `v2.4.2`, you don't need to
+> re-patch those apps.
 
 ## Building from source
 
