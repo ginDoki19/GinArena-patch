@@ -19,7 +19,7 @@ github.com/ginDoki19/GinArena-patch
 
 <!-- PATCHES_START -->
 > **[v2.5.0](https://github.com/ginDoki19/GinArena-patch/releases/tag/v2.5.0)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;13 patches total
-<details open>
+<details>
 <summary>📦 1DM&nbsp;&nbsp;•&nbsp;&nbsp;5 patches</summary>
 <br>
 
@@ -39,7 +39,7 @@ github.com/ginDoki19/GinArena-patch
 
 </details>
 
-<details open>
+<details>
 <summary>📦 MX Player&nbsp;&nbsp;•&nbsp;&nbsp;4 patches</summary>
 <br>
 
@@ -58,7 +58,7 @@ github.com/ginDoki19/GinArena-patch
 
 </details>
 
-<details open>
+<details>
 <summary>📦 PlayZ TV&nbsp;&nbsp;•&nbsp;&nbsp;1 patch</summary>
 <br>
 
@@ -74,7 +74,7 @@ github.com/ginDoki19/GinArena-patch
 
 </details>
 
-<details open>
+<details>
 <summary>📦 CRICFy TV&nbsp;&nbsp;•&nbsp;&nbsp;1 patch</summary>
 <br>
 
@@ -90,7 +90,7 @@ github.com/ginDoki19/GinArena-patch
 
 </details>
 
-<details open>
+<details>
 <summary>📦 CricZ TV&nbsp;&nbsp;•&nbsp;&nbsp;1 patch</summary>
 <br>
 
@@ -106,7 +106,7 @@ github.com/ginDoki19/GinArena-patch
 
 </details>
 
-<details open>
+<details>
 <summary>📦 SK Tech TV&nbsp;&nbsp;•&nbsp;&nbsp;1 patch</summary>
 <br>
 
