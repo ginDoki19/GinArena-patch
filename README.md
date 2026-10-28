@@ -17,9 +17,9 @@ github.com/ginDoki19/GinArena-patch
 
 ## 🩹 Patches list
 
-<!-- PATCHES_START EXPANDED -->
+<!-- PATCHES_START -->
 > **[v2.5.0-dev.4](https://github.com/ginDoki19/GinArena-patch/releases/tag/v2.5.0-dev.4)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;13 patches total
-<details open>
+<details>
 <summary>📦 1DM&nbsp;&nbsp;•&nbsp;&nbsp;5 patches</summary>
 <br>
 
@@ -39,7 +39,7 @@ github.com/ginDoki19/GinArena-patch
 
 </details>
 
-<details open>
+<details>
 <summary>📦 MX Player&nbsp;&nbsp;•&nbsp;&nbsp;4 patches</summary>
 <br>
 
@@ -58,7 +58,7 @@ github.com/ginDoki19/GinArena-patch
 
 </details>
 
-<details open>
+<details>
 <summary>📦 PlayZ TV&nbsp;&nbsp;•&nbsp;&nbsp;1 patch</summary>
 <br>
 
@@ -74,7 +74,7 @@ github.com/ginDoki19/GinArena-patch
 
 </details>
 
-<details open>
+<details>
 <summary>📦 CRICFy TV&nbsp;&nbsp;•&nbsp;&nbsp;1 patch</summary>
 <br>
 
@@ -90,7 +90,7 @@ github.com/ginDoki19/GinArena-patch
 
 </details>
 
-<details open>
+<details>
 <summary>📦 CricZ TV&nbsp;&nbsp;•&nbsp;&nbsp;1 patch</summary>
 <br>
 
@@ -106,7 +106,7 @@ github.com/ginDoki19/GinArena-patch
 
 </details>
 
-<details open>
+<details>
 <summary>📦 SK Tech TV&nbsp;&nbsp;•&nbsp;&nbsp;1 patch</summary>
 <br>
 
@@ -195,6 +195,93 @@ GinArena Patch does **not** unlock paid **1DM+** features (scheduler, higher par
 Do **not** use the separate **20257** variant for this patch.
 
 > **Uptodown note:** If Morphe’s “help me find an APK” flow opens Uptodown and downloads the 1DM 20.0 XAPK, that file has also been tested successfully. Select it in Morphe Manager instead of installing it. For x86/x86_64 devices, or if the Uptodown result is not exactly 20.0, use the APKMirror universal APKM above.
+
+</details>
+
+---
+
+## 📦 MX Player (3.4.1, build 2001003551)
+
+<details>
+<summary><b>📖 App details</b> — what it does, target version and notes (click to expand)</summary>
+
+### What it does
+
+Keeping it simple here: these patches turn free **MX Player** (`com.mxtech.videoplayer.ad`)
+into what it should've been in the first place — a clean, fast local video and music player.
+No ads, no online junk, no weird surprises. Patch it, open it, it just works. Signature
+stuff is handled quietly under the hood, so there's nothing extra for you to configure.
+
+Choices are **minimal on purpose**: two patches are **on by default** (that's the actual
+debloat), and two small extras are **optional**. No endless toggle maze — pick the optional
+stuff only if you want it.
+
+> **Want heavy customization instead?** Totally fair — this probably isn't your patch then.
+> Go with the OG MX Player patches by **BlazeFTL** 👉
+> [FTL-Patches](https://github.com/BlazeFTL/FTL-Patches). They go much deeper with options
+> and tweaks. GinArena's version is deliberately the opposite: few choices, debloated,
+> stable, done. Use whichever style suits you — no hard feelings. 🤝
+
+<a id="remove-ads-bloat"></a>
+#### Remove ads & bloat
+
+*On by default — the main one.* Kills ads everywhere (home banners, folder ads, player and
+pause ads, pop-ups, Me-page promos, exit ads), removes the shortcut strip at the top of
+Home and the online ad-locked *Other Themes* (Zodiac etc.), and switches off the online
+clutter: **Live TV**, **OTT shows**, **MX Tube**, **Shorts**, and **Games**. The stuff you
+actually use stays right where it was — **Local Music**, **Continue Watching**, the
+**All-Files-Access** screen, **Adaptive / Light / Dark** modes, and all **32 Classic Themes**
+(applying in 1 tap, offline and online).
+
+#### Clean Me page
+
+*On by default.* Just tidies up the **Me** tab: WhatsApp Status Saver, promo banners,
+**Legal**, **Help**, and **Data Privacy** clutter are gone, while your 8 local tool
+shortcuts (*Video Playlist*, *Private Folder*, *FolderCleaner*, *Bookmarks*, *File
+Transfer*, *Equalizer*, *Smooth Play*, *Decoder*), **App Theme**, **Settings**, and
+**Custom Pop-up Play** all stay.
+
+#### Remove bottom navigation bar
+
+*Optional — off by default.* Like the normal bottom bar (**Folders**, **Music**,
+**Transfer**, **Me**)? Leave this off. Want a cleaner, full-height folder list instead?
+Turn it on — the bottom bar hides and **Me** moves to the top-right of the Home toolbar
+(*Music* and *File Transfer* are still easy to reach inside *Me*). Entirely your call.
+
+#### Custom codec
+
+*Optional — off by default.* Only if you care about Dolby/DTS audio: pick
+`aio-v3.1.0_r1.zip` in the patch option while patching, and **E-AC-3 (Dolby Digital Plus)**,
+**TrueHD**, **MLP**, **DTS**, and **AC-3** videos just play out of the box
+(`Settings → Decoder → Custom codec` will show `Bundled custom codec (v3.1.0)`). Don't need
+it? Skip it — nothing else changes.
+
+### Target app & downloads (MX Player)
+
+> **Important:** Download the **standalone `.apk` file** (~111 MB), **not** a `.xapk` or
+> `.apkm` split bundle. APKPure, Uptodown, and APKMirror all distribute the exact same official
+> Amazon Mobile LLC signed standalone APK below.
+
+| Field | Value |
+| --- | --- |
+| Package | `com.mxtech.videoplayer.ad` |
+| Version | **3.4.1** (versionCode 2001003551) — standalone universal APK (`arm64-v8a` + `armeabi-v7a`, Android 7.0+) |
+| Stock APK — **APKPure** | [Latest 3.4.1 APK](https://apkpure.com/mx-player-app/com.mxtech.videoplayer.ad) · [Version history (`3.4.1`)](https://apkpure.com/mx-player-app/com.mxtech.videoplayer.ad/versions) *(choose the **APK** download, not `XAPK`)* |
+| Stock APK — **Uptodown** | [MX Player versions (`apk 3.4.1`)](https://mx-player.en.uptodown.com/android/versions) *(choose the **`apk`** variant)* |
+| Stock APK — **APKMirror** | [MX Player releases on APKMirror](https://www.apkmirror.com/apk/amazon-mobile-llc/mx-player/) *(choose the **`3.4.1` `APK`** variant, not `BUNDLE`)* |
+| Signing certificate SHA-256 | `0d9b4c778672e753d45aba4f10df31e1d10bf75b1245469131ef01b82f0f91b6` |
+| `3.4.1` APK SHA-256 | `db775bd81460e31bd21602cf0b842bc3e2fd769b0bd23250e70036cc4cf95bf4` |
+| Optional **Custom Codec v3.1.0** | [GitHub — `iDNA420/MX-FFmpeg` `v3.1.0_r1` (`aio-v3.1.0_r1.zip` recommended)](https://github.com/iDNA420/MX-FFmpeg/releases/tag/v3.1.0_r1) (`SHA-256: ebb0bd5db0f855caca6167747987a229836d7cc0062a2d5c23dbf91d057c617b`) — keep it as a `.zip` and select it inside the **Custom codec** patch option in Morphe Manager |
+
+---
+
+### Stock download note
+
+Morphe patch metadata does not have a dedicated “stock app download URL” field, and Morphe Manager
+does not read a download destination from a patch bundle. Exact download URLs and SHA-256 hashes
+therefore stay in this README, where they are clickable, while the in-Manager version cards carry
+short readable build labels and validate the package name, file type, version, `versionCode`,
+`minSdk`, and official signing-certificate SHA-256.
 
 </details>
 
@@ -383,7 +470,7 @@ server-compatible experience on **PlayZ TV 2.3.1** across phones, tablets, and A
 ### What it does
 
 The **Remove ads, telemetry & restrictions** patch (enabled by default) provides a clean,
-server-compatible experience on **SK Tech TV 2.7** across phones, tablets, and Android TV:
+server-compatible experience on [**SK Tech TV 2.7**](https://sktech.site/) across phones, tablets, and Android TV:
 
 - **Pure-Java signature-independent decryption:** Replaces the native signature-locked feed
   decryption in pure Java, so the encrypted app config, live event feeds, and live TV channel
@@ -422,7 +509,8 @@ server-compatible experience on **SK Tech TV 2.7** across phones, tablets, and A
 | --- | --- |
 | Package | `com.live.sktechtv` |
 | Version | **2.7** (versionCode 17), universal APK (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`) |
-| Stock download | Use the exact stock **2.7** APK and verify the APK SHA-256 below before patching |
+| Official site | [sktech.site](https://sktech.site/) |
+| Stock download | [Official SK Tech download page](https://downloadsktech.pages.dev/download) — use the exact stock **2.7** APK and verify the APK SHA-256 below before patching |
 | Signing certificate SHA-256 | `9ff349c0c047abd68e169980484b43926b6ff2d251a430fe44e3ae3e2930e1d2` |
 | APK SHA-256 | `5095235d7a77e588d570780cea99a25dd807c9cb3ee814e450af82a49423cdcd` |
 
@@ -433,91 +521,6 @@ server-compatible experience on **SK Tech TV 2.7** across phones, tablets, and A
 </details>
 
 ---
-
-## 📦 MX Player (3.4.1, build 2001003551)
-
-<details>
-<summary><b>📖 App details</b> — what it does, target version and notes (click to expand)</summary>
-
-### What it does
-
-Keeping it simple here: these patches turn free **MX Player** (`com.mxtech.videoplayer.ad`)
-into what it should've been in the first place — a clean, fast local video and music player.
-No ads, no online junk, no weird surprises. Patch it, open it, it just works. Signature
-stuff is handled quietly under the hood, so there's nothing extra for you to configure.
-
-Choices are **minimal on purpose**: two patches are **on by default** (that's the actual
-debloat), and two small extras are **optional**. No endless toggle maze — pick the optional
-stuff only if you want it.
-
-> **Want heavy customization instead?** Totally fair — this probably isn't your patch then.
-> Go with the OG MX Player patches by **BlazeFTL** 👉
-> [FTL-Patches](https://github.com/BlazeFTL/FTL-Patches). They go much deeper with options
-> and tweaks. GinArena's version is deliberately the opposite: few choices, debloated,
-> stable, done. Use whichever style suits you — no hard feelings. 🤝
-
-<a id="remove-ads-bloat"></a>
-#### Remove ads & bloat
-
-*On by default — the main one.* Kills ads everywhere (home banners, folder ads, player and
-pause ads, pop-ups, Me-page promos, exit ads), removes the shortcut strip at the top of
-Home and the online ad-locked *Other Themes* (Zodiac etc.), and switches off the online
-clutter: **Live TV**, **OTT shows**, **MX Tube**, **Shorts**, and **Games**. The stuff you
-actually use stays right where it was — **Local Music**, **Continue Watching**, the
-**All-Files-Access** screen, **Adaptive / Light / Dark** modes, and all **32 Classic Themes**
-(applying in 1 tap, offline and online).
-
-#### Clean Me page
-
-*On by default.* Just tidies up the **Me** tab: WhatsApp Status Saver, promo banners,
-**Legal**, **Help**, and **Data Privacy** clutter are gone, while your 8 local tool
-shortcuts (*Video Playlist*, *Private Folder*, *FolderCleaner*, *Bookmarks*, *File
-Transfer*, *Equalizer*, *Smooth Play*, *Decoder*), **App Theme**, **Settings**, and
-**Custom Pop-up Play** all stay.
-
-#### Remove bottom navigation bar
-
-*Optional — off by default.* Like the normal bottom bar (**Folders**, **Music**,
-**Transfer**, **Me**)? Leave this off. Want a cleaner, full-height folder list instead?
-Turn it on — the bottom bar hides and **Me** moves to the top-right of the Home toolbar
-(*Music* and *File Transfer* are still easy to reach inside *Me*). Entirely your call.
-
-#### Custom codec
-
-*Optional — off by default.* Only if you care about Dolby/DTS audio: pick
-`aio-v3.1.0_r1.zip` in the patch option while patching, and **E-AC-3 (Dolby Digital Plus)**,
-**TrueHD**, **MLP**, **DTS**, and **AC-3** videos just play out of the box
-(`Settings → Decoder → Custom codec` will show `Bundled custom codec (v3.1.0)`). Don't need
-it? Skip it — nothing else changes.
-
-### Target app & downloads (MX Player)
-
-> **Important:** Download the **standalone `.apk` file** (~111 MB), **not** a `.xapk` or
-> `.apkm` split bundle. APKPure, Uptodown, and APKMirror all distribute the exact same official
-> Amazon Mobile LLC signed standalone APK below.
-
-| Field | Value |
-| --- | --- |
-| Package | `com.mxtech.videoplayer.ad` |
-| Version | **3.4.1** (versionCode 2001003551) — standalone universal APK (`arm64-v8a` + `armeabi-v7a`, Android 7.0+) |
-| Stock APK — **APKPure** | [Latest 3.4.1 APK](https://apkpure.com/mx-player-app/com.mxtech.videoplayer.ad) · [Version history (`3.4.1`)](https://apkpure.com/mx-player-app/com.mxtech.videoplayer.ad/versions) *(choose the **APK** download, not `XAPK`)* |
-| Stock APK — **Uptodown** | [MX Player versions (`apk 3.4.1`)](https://mx-player.en.uptodown.com/android/versions) *(choose the **`apk`** variant)* |
-| Stock APK — **APKMirror** | [MX Player releases on APKMirror](https://www.apkmirror.com/apk/amazon-mobile-llc/mx-player/) *(choose the **`3.4.1` `APK`** variant, not `BUNDLE`)* |
-| Signing certificate SHA-256 | `0d9b4c778672e753d45aba4f10df31e1d10bf75b1245469131ef01b82f0f91b6` |
-| `3.4.1` APK SHA-256 | `db775bd81460e31bd21602cf0b842bc3e2fd769b0bd23250e70036cc4cf95bf4` |
-| Optional **Custom Codec v3.1.0** | [GitHub — `iDNA420/MX-FFmpeg` `v3.1.0_r1` (`aio-v3.1.0_r1.zip` recommended)](https://github.com/iDNA420/MX-FFmpeg/releases/tag/v3.1.0_r1) (`SHA-256: ebb0bd5db0f855caca6167747987a229836d7cc0062a2d5c23dbf91d057c617b`) — keep it as a `.zip` and select it inside the **Custom codec** patch option in Morphe Manager |
-
----
-
-### Stock download note
-
-Morphe patch metadata does not have a dedicated “stock app download URL” field, and Morphe Manager
-does not read a download destination from a patch bundle. Exact download URLs and SHA-256 hashes
-therefore stay in this README, where they are clickable, while the in-Manager version cards carry
-short readable build labels and validate the package name, file type, version, `versionCode`,
-`minSdk`, and official signing-certificate SHA-256.
-
-</details>
 
 ## Usage (Morphe Manager)
 
