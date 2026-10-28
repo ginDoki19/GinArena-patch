@@ -1,3 +1,9 @@
+## [2.5.0-dev.3](https://github.com/ginDoki19/GinArena-patch/compare/v2.5.0-dev.2...v2.5.0-dev.3) (2026-10-28)
+
+### 🐛 Bug Fixes
+
+* **1dm:** auto-hydrate cloud Hosts & filters UI, speed up local rebuild, and keep task in Recents on Back ([87ebd7c](https://github.com/ginDoki19/GinArena-patch/commit/87ebd7ca98defa4a431ceb613e3cdd2190bc1673))
+
 ## [2.5.0-dev.2](https://github.com/ginDoki19/GinArena-patch/compare/v2.5.0-dev.1...v2.5.0-dev.2) (2026-10-28)
 
 ### 🐛 Bug Fixes
