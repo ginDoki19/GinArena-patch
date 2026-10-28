@@ -1,3 +1,9 @@
+## [2.5.0-dev.4](https://github.com/ginDoki19/GinArena-patch/compare/v2.5.0-dev.3...v2.5.0-dev.4) (2026-10-28)
+
+### ✨ New Features
+
+* **sktech:** add SK Tech TV 2.7 clean-experience patch ([87bc9fb](https://github.com/ginDoki19/GinArena-patch/commit/87bc9fb9b46205fff1c0f12cb0080b36e04086ca))
+
 ## [2.5.0-dev.3](https://github.com/ginDoki19/GinArena-patch/compare/v2.5.0-dev.2...v2.5.0-dev.3) (2026-10-28)
 
 ### 🐛 Bug Fixes
