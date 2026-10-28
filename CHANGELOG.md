@@ -1,3 +1,9 @@
+## [2.5.0-dev.2](https://github.com/ginDoki19/GinArena-patch/compare/v2.5.0-dev.1...v2.5.0-dev.2) (2026-10-28)
+
+### 🐛 Bug Fixes
+
+* **onedm:** fix VerifyError crash in AdBlock j12 and harden startup lifecycle ([70f96ab](https://github.com/ginDoki19/GinArena-patch/commit/70f96abfe82b5869cca951ebc35baed8d3c19ea6))
+
 ## [2.5.0-dev.1](https://github.com/ginDoki19/GinArena-patch/compare/v2.4.2...v2.5.0-dev.1) (2026-10-28)
 
 ### ✨ New Features
