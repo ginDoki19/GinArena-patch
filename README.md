@@ -369,6 +369,65 @@ server-compatible experience on **PlayZ TV 2.3.1** across phones, tablets, and A
 
 ---
 
+## 📦 SK Tech TV (2.7, build 17)
+
+<details>
+<summary><b>📖 App details</b> — what it does, target version and notes (click to expand)</summary>
+
+### What it does
+
+The **Remove ads, telemetry & restrictions** patch (enabled by default) provides a clean,
+server-compatible experience on **SK Tech TV 2.7** across phones, tablets, and Android TV:
+
+- **Pure-Java signature-independent decryption:** Replaces the native signature-locked feed
+  decryption in pure Java, so the encrypted app config, live event feeds, and live TV channel
+  feeds keep loading and playing after Morphe re-signs the APK. The native library is never
+  loaded anymore, and any decode failure returns an empty result instead of crashing.
+- **Complete ad & popunder removal:** Sanitizes the parsed remote config at its single choke
+  point (banner/start ads off, sponsor-gate URL and promo marquee blanked, external-ad
+  preferences cleared), disables the browser / Chrome CustomTabs popunder, and bypasses the
+  timed "support" sponsor gate so streams open directly in the player.
+- **Startup integrity neutralized:** The Java anti-tamper crash-bombs are disabled, so the
+  re-signed build starts normally on phones and TVs.
+
+#### Options
+
+- **Remove push notifications** *(default: on)* — Disables the FCM push service and its manifest
+  entries, skips the Android 13+ notification permission prompts, and removes the push
+  permissions.
+- **Bypass update & force-update screen** *(default: on)* — Skips forced and optional update
+  lockouts at startup and on player exit, and removes the install permission used by the in-app
+  self-updater. With this on, the app will never update itself; update instead by re-patching a
+  newer audited stock build.
+- **Bypass root & sniffer checks** *(default: off)* — Neutralizes the RootBeer root lockout,
+  Frida/sniffer package detection, and the proxy-certificate lockout. Only needed if the stock
+  app refuses to run on your device (rooted, or a packet-capture app is installed); certificate
+  validation itself still goes through the system trust manager.
+- **Strip native & telemetry bloat** *(default: off)* — Deletes the now-unused native library
+  (plus the root-check library when the root bypass is also on) and strips Firebase Analytics,
+  Crashlytics, Sessions, DataTransport, and AdServices manifest entries. Purely a size saving.
+- **Disable WebActivity (potential ad surface)** *(default: off)* — Closes the in-app WebView
+  immediately so remote config can never open ad landing pages. Anything that legitimately uses
+  it (for example score pages) will simply close as well.
+
+### Target app (SK Tech TV)
+
+| Field | Value |
+| --- | --- |
+| Package | `com.live.sktechtv` |
+| Version | **2.7** (versionCode 17), universal APK (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`) |
+| Stock download | Use the exact stock **2.7** APK and verify the APK SHA-256 below before patching |
+| Signing certificate SHA-256 | `9ff349c0c047abd68e169980484b43926b6ff2d251a430fe44e3ae3e2930e1d2` |
+| APK SHA-256 | `5095235d7a77e588d570780cea99a25dd807c9cb3ee814e450af82a49423cdcd` |
+
+> **Version safety:** only **2.7 (17)** is supported. Always patch a **fresh stock** APK — never
+> re-patch an already patched build. Future SK Tech TV versions are refused by design until they
+> receive a fresh audit — do not force-patch other versions in Expert Mode.
+
+</details>
+
+---
+
 ## 📦 MX Player (3.4.1, build 2001003551)
 
 <details>
