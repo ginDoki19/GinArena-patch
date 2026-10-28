@@ -1,11 +1,12 @@
 package app.template.patches.onedm
 
+import app.morphe.patcher.extensions.InstructionExtensions.addInstruction
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructionsWithLabels
 import app.morphe.patcher.extensions.InstructionExtensions.getInstruction
 import app.morphe.patcher.extensions.InstructionExtensions.instructions
-import app.morphe.patcher.extensions.InstructionExtensions.removeInstruction
 import app.morphe.patcher.extensions.InstructionExtensions.removeInstructions
+import app.morphe.patcher.extensions.InstructionExtensions.replaceInstruction
 import app.morphe.patcher.patch.PatchException
 import app.morphe.patcher.patch.booleanOption
 import app.morphe.patcher.patch.bytecodePatch
@@ -354,8 +355,7 @@ val adblockAndUserscriptPatch = bytecodePatch(
             ) {
                 throw PatchException("Unexpected instruction before enableAutoUpdate init in $settingsInit")
             }
-            settingsInit.removeInstruction(enableAutoUpdatePutIdx - 1)
-            settingsInit.addInstructions(enableAutoUpdatePutIdx - 1, "const/4 v$putReg, 0x1")
+            settingsInit.replaceInstruction(enableAutoUpdatePutIdx - 1, "const/4 v$putReg, 0x1")
 
             // (b) Replace 4x 1-byte RandomAccessFile.write(I)V syscalls in j12's int32 writer
             //     with a single 4-byte RandomAccessFile.write([B)V call (75% fewer write syscalls).
@@ -428,13 +428,16 @@ val adblockAndUserscriptPatch = bytecodePatch(
             if (!v0OverwrittenCleanly) {
                 throw PatchException("Expected dead v0 before IGET_OBJECT in $compileWorker")
             }
-            compileWorker.removeInstruction(prioIdx)
-            compileWorker.addInstructions(
+            // IMPORTANT: Use replaceInstruction (singular) BEFORE addInstruction so the existing
+            // MethodLocation inside stock's `try { Process.setThreadPriority(0); } catch {}` block
+            // is mutated in-place and never collapses try_item #0 to insn_count == 0 (VerifyError).
+            compileWorker.replaceInstruction(
                 prioIdx,
-                """
-                    const/16 v0, 0xa
-                    invoke-static {v0}, Landroid/os/Process;->setThreadPriority(I)V
-                """.trimIndent()
+                "invoke-static {v0}, Landroid/os/Process;->setThreadPriority(I)V"
+            )
+            compileWorker.addInstruction(
+                prioIdx,
+                "const/16 v0, 0xa"
             )
         }
 

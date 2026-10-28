@@ -4,10 +4,9 @@ import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructionsWithLabels
 import app.morphe.patcher.extensions.InstructionExtensions.getInstruction
 import app.morphe.patcher.extensions.InstructionExtensions.instructions
-import app.morphe.patcher.extensions.InstructionExtensions.removeInstruction
+import app.morphe.patcher.extensions.InstructionExtensions.replaceInstruction
 import app.morphe.patcher.patch.PatchException
 import app.morphe.patcher.patch.bytecodePatch
-import app.morphe.patcher.util.addInstructionsAtControlFlowLabel
 import app.morphe.patcher.util.getReference
 import app.morphe.patcher.util.p0Register
 import app.morphe.patcher.util.proxy.mutableTypes.MutableField.Companion.toMutable
@@ -17,6 +16,8 @@ import app.template.patches.shared.Constants.COMPATIBILITY_ONEDM
 import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.instruction.FiveRegisterInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.NarrowLiteralInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
@@ -44,14 +45,19 @@ val optimizeColdStartAndBatteryPatch = bytecodePatch(
     compatibleWith(COMPATIBILITY_ONEDM)
 
     execute {
-        // 1. BrowserApp.initApp:
+        // 1. BrowserApp.initApp & BrowserApp.lambda$initApp$1:
         //    (a) Guard WebView.setWebContentsDebuggingEnabled(z) with `if (z)` so the default
         //        `false` path never loads the 120+ MB Android WebView engine on cold start in
         //        MainActivity or :DownloadService.
-        //    (b) Skip eager AdBlock.Delegate.initialize (queued immediately before
-        //        DaggerAppComponent.builder()); Dagger's @Singleton AdBlock(Context) constructor
-        //        automatically initializes the AdBlock filter engine when BrowserActivity opens.
-        val initApp = BrowserAppInitAppFingerprint.matchAll(1..1).first().method
+        //    (b) Keep BrowserApp's background warmup worker (`lambda$initApp$1`) intact so
+        //        bundled `assets/js/*.js` scripts (`adblock.js`, `userscripts_pre.js`, etc.),
+        //        `ug7` userscript DB cache, and `UISettings` are extracted/initialized cleanly,
+        //        while guarding ONLY `WorkManager.getInstance` and `AdBlock.Delegate.initialize`
+        //        (Dagger's @Singleton `AdBlock(Context)` initializes the filter engine on demand
+        //        when Browser / Userscripts / Adblock Management opens, saving ~178-220 MB RAM
+        //        during Download-Manager-only sessions on low-RAM devices).
+        val initAppMatch = BrowserAppInitAppFingerprint.matchAll(1..1).first()
+        val initApp = initAppMatch.method
 
         val webDebugIdx = initApp.instructions.indexOfFirst { insn ->
             val ref = insn.getReference<MethodReference>() ?: return@indexOfFirst false
@@ -71,103 +77,53 @@ val optimizeColdStartAndBatteryPatch = bytecodePatch(
             ExternalLabel("onedm_skip_webview_debug", initApp.getInstruction(webDebugIdx + 4))
         )
 
-        val daggerBuilderIdx = initApp.instructions.indexOfFirst { insn ->
-            insn.getReference<MethodReference>()?.definingClass ==
-                "Lacr/browser/lightning/app/DaggerAppComponent;"
+        val bgWarmupMethod = initAppMatch.classDef.methods.firstOrNull { method ->
+            AccessFlags.STATIC.isSet(method.accessFlags) &&
+                method.parameterTypes.map { it.toString() } == listOf(CONTEXT) &&
+                method.returnType == "V" &&
+                method.implementation?.instructions?.any { insn ->
+                    val ref = insn.getReference<MethodReference>() ?: return@any false
+                    ref.definingClass == "Lacr/browser/lightning/utils/AdBlock\$Delegate;" &&
+                        ref.name == "initialize"
+                } == true
+        } ?: throw PatchException("Could not find background warmup lambda on ${initAppMatch.classDef.type}")
+
+        val zeroConstReg = bgWarmupMethod.instructions.firstNotNullOfOrNull { insn ->
+            if (insn.opcode == Opcode.CONST_4 &&
+                (insn as NarrowLiteralInstruction).narrowLiteral == 0
+            ) {
+                (insn as OneRegisterInstruction).registerA
+            } else {
+                null
+            }
+        } ?: throw PatchException("Could not find zero register in $bgWarmupMethod")
+
+        val adblockGetIdx = bgWarmupMethod.instructions.indexOfFirst { insn ->
+            val ref = insn.getReference<MethodReference>() ?: return@indexOfFirst false
+            ref.definingClass == "Lacr/browser/lightning/utils/AdBlock\$Delegate;" &&
+                ref.name == "getInstance"
         }
-        if (daggerBuilderIdx < 5) {
-            throw PatchException("Could not find DaggerAppComponent.builder() in $initApp")
+        val bgReturnIdx = bgWarmupMethod.instructions.size - 1
+        if (adblockGetIdx < 0 || bgWarmupMethod.getInstruction(bgReturnIdx).opcode != Opcode.RETURN_VOID) {
+            throw PatchException("Unexpected AdBlock.Delegate tail in $bgWarmupMethod")
         }
-        val eagerAdBlockStartIdx = daggerBuilderIdx - 5
-        val eagerTaskType = initApp.getInstruction(daggerBuilderIdx - 3)
-            .getReference<TypeReference>()?.type
-        if (initApp.getInstruction(daggerBuilderIdx - 3).opcode != Opcode.NEW_INSTANCE ||
-            eagerTaskType == null
-        ) {
-            throw PatchException("Unexpected eager AdBlock task layout before DaggerAppComponent in $initApp")
-        }
-        initApp.addInstructionsWithLabels(
-            eagerAdBlockStartIdx,
-            "goto :onedm_defer_adblock_to_browser",
-            ExternalLabel("onedm_defer_adblock_to_browser", initApp.getInstruction(daggerBuilderIdx))
+        bgWarmupMethod.addInstructionsWithLabels(
+            adblockGetIdx,
+            "if-eqz v$zeroConstReg, :onedm_defer_adblock_to_browser",
+            ExternalLabel("onedm_defer_adblock_to_browser", bgWarmupMethod.getInstruction(bgReturnIdx))
         )
 
-        // 2. ActivityLifecycleListener.onActivityCreated:
-        //    Run the one-time AppActionBackupService trigger on first Activity creation, and
-        //    gate the Browser crash-exit cleanup (`key_app_possibly_killed_flag` -> WebView)
-        //    behind `activity instanceof BrowserActivity` so opening Download Manager never
-        //    cold-boots WebView or reads DefaultSharedPreferences on the UI thread.
-        val onCreated = LifecycleOnActivityCreatedFingerprint.matchAll(1..1).first().method
-        val appCreatedGetIdx = onCreated.instructions.indexOfFirst { insn ->
-            insn.opcode == Opcode.IGET_OBJECT &&
-                insn.getReference<FieldReference>()?.name == "appCreated"
+        val workMgrIdx = bgWarmupMethod.instructions.indexOfFirst { insn ->
+            val ref = insn.getReference<MethodReference>() ?: return@indexOfFirst false
+            ref.definingClass == "Landroidx/work/WorkManager;" && ref.name == "getInstance"
         }
-        if (appCreatedGetIdx < 0) {
-            throw PatchException("Could not find appCreated check in $onCreated")
+        if (workMgrIdx >= 0 && bgWarmupMethod.getInstruction(workMgrIdx + 5).opcode == Opcode.MOVE_EXCEPTION) {
+            bgWarmupMethod.addInstructionsWithLabels(
+                workMgrIdx,
+                "if-eqz v$zeroConstReg, :onedm_skip_uninit_workmanager",
+                ExternalLabel("onedm_skip_uninit_workmanager", bgWarmupMethod.getInstruction(workMgrIdx + 7))
+            )
         }
-        val firstIfNezIdx = appCreatedGetIdx + 3
-        val setTrueCompleteIdx = appCreatedGetIdx + 6 // points to SGET_OBJECT AtomicInteger (Browser cleanup start)
-        if (onCreated.getInstruction(firstIfNezIdx).opcode != Opcode.IF_NEZ) {
-            throw PatchException("Unexpected appCreated branch opcode at $firstIfNezIdx in $onCreated")
-        }
-
-        // Extract the exact executor singleton + backup Runnable constructor from the tail of onActivityCreated.
-        val returnVoidIdx = onCreated.instructions.size - 1
-        if (onCreated.getInstruction(returnVoidIdx).opcode != Opcode.RETURN_VOID) {
-            throw PatchException("Expected trailing return-void in $onCreated")
-        }
-        val backupExecutorStartIdx = returnVoidIdx - 5
-        val getExecutorMethod = onCreated.getInstruction(backupExecutorStartIdx)
-            .getReference<MethodReference>()?.toSmali()
-            ?: throw PatchException("Could not resolve executor getter in $onCreated")
-        val backupRunnableType = onCreated.getInstruction(backupExecutorStartIdx + 2)
-            .getReference<TypeReference>()?.type
-            ?: throw PatchException("Could not resolve backup Runnable type in $onCreated")
-        val backupRunnableInit = onCreated.getInstruction(backupExecutorStartIdx + 3)
-            .getReference<MethodReference>()?.toSmali()
-            ?: throw PatchException("Could not resolve backup Runnable <init> in $onCreated")
-        val executeRunnableMethod = onCreated.getInstruction(backupExecutorStartIdx + 4)
-            .getReference<MethodReference>()?.toSmali()
-            ?: throw PatchException("Could not resolve executor submit method in $onCreated")
-
-        // First terminate the Browser cleanup merge target (@009b) with return-void so it does
-        // not re-execute the backup task when BrowserActivity runs cleanup later.
-        onCreated.addInstructionsAtControlFlowLabel(backupExecutorStartIdx, "return-void")
-
-        // Replace `if-nez v5, :return_void` + `appCreated.set(true)` flow so:
-        //  - First activity in process sets appCreated=true and queues the backup Runnable once
-        //    (preserving v3=this, v4=activity, v0=1).
-        //  - Non-Browser activities skip the Browser exit-cleanup block straight to return-void.
-        val finalReturnInsn = onCreated.getInstruction(onCreated.instructions.size - 1)
-        val browserCleanupStartInsn = onCreated.getInstruction(setTrueCompleteIdx)
-        onCreated.removeInstruction(firstIfNezIdx)
-        onCreated.addInstructionsWithLabels(
-            firstIfNezIdx,
-            "if-nez v5, :onedm_check_browser_cleanup",
-            ExternalLabel("onedm_check_browser_cleanup", browserCleanupStartInsn)
-        )
-        // setTrueCompleteIdx is still the instruction immediately after `appCreated.set(v0)`.
-        onCreated.addInstructionsWithLabels(
-            setTrueCompleteIdx,
-            """
-                invoke-static {}, $getExecutorMethod
-                move-result-object v5
-                new-instance v1, $backupRunnableType
-                invoke-direct {v1, v4, v0}, $backupRunnableInit
-                invoke-virtual {v5, v1}, $executeRunnableMethod
-                :onedm_browser_gate
-                instance-of v5, v4, $BROWSER_ACTIVITY
-                if-eqz v5, :onedm_skip_browser_cleanup
-            """,
-            ExternalLabel("onedm_skip_browser_cleanup", finalReturnInsn)
-        )
-        // Re-point the `if-nez v5` branch onto `:onedm_browser_gate` (setTrueCompleteIdx + 5).
-        onCreated.removeInstruction(firstIfNezIdx)
-        onCreated.addInstructionsWithLabels(
-            firstIfNezIdx,
-            "if-nez v5, :onedm_to_browser_gate",
-            ExternalLabel("onedm_to_browser_gate", onCreated.getInstruction(setTrueCompleteIdx + 5))
-        )
 
         // 3. Resolve MainActivity's `isPaused` AtomicBoolean holder chain from MainActivity.onPause():
         //    insn 0: iget-object vX, p0, MainActivity->holderField:Li/zr0;
@@ -289,14 +245,16 @@ val optimizeColdStartAndBatteryPatch = bytecodePatch(
         )
         startupClass.virtualMethods.add(deferredRunMethod)
 
-        doInBackground.removeInstruction(startServiceIdx)
+        doInBackground.replaceInstruction(
+            startServiceIdx,
+            "invoke-virtual {v$intentReg, v$thisReg, v$delayLoReg, v$delayHiReg}, $HANDLER_TYPE->postDelayed($RUNNABLE_INTERFACE${"J"})Z"
+        )
         doInBackground.addInstructions(
             startServiceIdx,
             """
                 iput-object v$intentReg, v$thisReg, $deferredFieldSmali
                 sget-object v$intentReg, $mainHandlerField
                 const-wide/16 v$delayLoReg, 0x1388
-                invoke-virtual {v$intentReg, v$thisReg, v$delayLoReg, v$delayHiReg}, $HANDLER_TYPE->postDelayed($RUNNABLE_INTERFACE${"J"})Z
             """
         )
 

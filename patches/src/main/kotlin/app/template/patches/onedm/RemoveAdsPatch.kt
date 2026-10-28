@@ -4,6 +4,7 @@ import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructionsWithLabels
 import app.morphe.patcher.extensions.InstructionExtensions.getInstruction
 import app.morphe.patcher.extensions.InstructionExtensions.instructions
+import app.morphe.patcher.extensions.InstructionExtensions.replaceInstruction
 import app.morphe.patcher.patch.PatchException
 import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.patcher.util.addInstructionsAtControlFlowLabel
@@ -280,7 +281,7 @@ val removeAdsPatch = bytecodePatch(
         dispatcherRun.addInstructionsAtControlFlowLabel(pp0CastIdx + 1, "return-void")
 
         // 6. BrowserApp.initApp: skip Play Store InstallReferrerClient IPC and BannerManager.load
-        // while preserving ProcessLifecycleOwner.addObserver and libtorrent_jni + PosixCalls below.
+        // via structured in-place boolean-gate overrides (preserving try_items and CFG integrity).
         val initApp = BrowserAppInitAppFingerprint.matchAll(1..1).first().method
         val addObserverIdx = initApp.instructions.indexOfFirst { insn ->
             insn.getReference<MethodReference>()?.name == "addObserver"
@@ -294,52 +295,61 @@ val removeAdsPatch = bytecodePatch(
                 ref.definingClass == ref.returnType &&
                 ref.definingClass != "Li/xk;"
         } ?: throw PatchException("Could not find post-referrer torrent config block in $initApp")
-        initApp.addInstructionsWithLabels(
-            addObserverIdx + 1,
-            "goto :onedm_skip_referrer_and_banner",
-            ExternalLabel("onedm_skip_referrer_and_banner", initApp.getInstruction(torrentConfigIdx))
-        )
+        val initAppGates = (addObserverIdx + 1 until torrentConfigIdx).filter { idx ->
+            initApp.getInstruction(idx).opcode == Opcode.IGET_BOOLEAN &&
+                initApp.getInstruction(idx + 1).opcode == Opcode.IF_NEZ
+        }
+        if (initAppGates.size != 2) {
+            throw PatchException("Expected 2 boolean gates (InstallReferrer + BannerManager) in $initApp, found ${initAppGates.size}")
+        }
+        initAppGates.forEach { gateIdx ->
+            val gateReg = (initApp.getInstruction(gateIdx) as TwoRegisterInstruction).registerA
+            initApp.replaceInstruction(gateIdx, "const/4 v$gateReg, 0x1")
+        }
 
         // 7. ActivityLifecycleListener: strip post-ad WebView timer hack, resume interstitial check,
-        // and Maximized/Minimized pp0 + AmazonService + AudioManager ad-volume loops while keeping
-        // LocalBroadcastManager overlay updates and AppEvent$Maximized/Minimized bus events intact.
+        // and AudioManager ad-volume tracking via structured in-place replacements (0 dead blocks).
         val onResumed = LifecycleOnActivityResumedFingerprint.matchAll(1..1).first().method
-        val afterWebViewHackIdx = onResumed.instructions.indexOfFirst { insn ->
-            val ref = insn.getReference<MethodReference>() ?: return@indexOfFirst false
-            ref.definingClass == "Ljava/lang/Object;" && ref.name == "getClass"
+        if (onResumed.getInstruction(0).opcode != Opcode.INVOKE_STATIC ||
+            onResumed.getInstruction(1).opcode != Opcode.MOVE_RESULT ||
+            onResumed.getInstruction(2).opcode != Opcode.IF_NEZ
+        ) {
+            throw PatchException("Unexpected WebView-timer gate at start of $onResumed")
         }
-        if (afterWebViewHackIdx < 0) {
-            throw PatchException("Could not find post-WebView getClass() in $onResumed")
-        }
+        val resumedGateReg = (onResumed.getInstruction(1) as OneRegisterInstruction).registerA
+        onResumed.replaceInstruction(0, "nop")
+        onResumed.replaceInstruction(1, "const/4 v$resumedGateReg, 0x1")
+
         val appWasMinimizedIdx = onResumed.instructions.indexOfFirst { insn ->
             insn.opcode == Opcode.IGET_OBJECT &&
                 insn.getReference<FieldReference>()?.name == "appWasMinimized"
         }
-        if (appWasMinimizedIdx < 0) {
-            throw PatchException("Could not find appWasMinimized check in $onResumed")
+        if (appWasMinimizedIdx < 0 ||
+            onResumed.getInstruction(appWasMinimizedIdx + 1).opcode != Opcode.INVOKE_VIRTUAL ||
+            onResumed.getInstruction(appWasMinimizedIdx + 2).opcode != Opcode.MOVE_RESULT
+        ) {
+            throw PatchException("Unexpected appWasMinimized check layout in $onResumed")
         }
-        onResumed.addInstructionsAtControlFlowLabel(appWasMinimizedIdx, "return-void")
-        onResumed.addInstructionsWithLabels(
-            0,
-            "goto :onedm_skip_resumed_webview",
-            ExternalLabel("onedm_skip_resumed_webview", onResumed.getInstruction(afterWebViewHackIdx))
-        )
+        val minGateReg = (onResumed.getInstruction(appWasMinimizedIdx + 2) as OneRegisterInstruction).registerA
+        onResumed.replaceInstruction(appWasMinimizedIdx + 1, "nop")
+        onResumed.replaceInstruction(appWasMinimizedIdx + 2, "const/4 v$minGateReg, 0x0")
 
         val onStateChanged = LifecycleOnStateChangedFingerprint.matchAll(1..1).first().method
-        val eventBusNewInstances = onStateChanged.instructions.withIndex().filter { (_, insn) ->
-            insn.opcode == Opcode.NEW_INSTANCE &&
-                insn.getReference<TypeReference>()?.type in setOf(
-                    "Lacr/browser/lightning/bus/AppEvent\$Maximized;",
-                    "Lacr/browser/lightning/bus/AppEvent\$Minimized;",
-                )
-        }.map { it.index }
-        if (eventBusNewInstances.size != 2) {
-            throw PatchException("Expected Maximized and Minimized bus events in $onStateChanged")
-        }
-        // Each NEW_INSTANCE is followed by <init> (+1), bus.post (+2), and the catch/merge target (+3).
-        eventBusNewInstances.sortedDescending().forEach { newEventIdx ->
-            val mergeIdx = newEventIdx + 3
-            onStateChanged.addInstructionsAtControlFlowLabel(mergeIdx, "return-void")
+        onStateChanged.instructions.withIndex().forEach { (idx, insn) ->
+            val mRef = insn.getReference<MethodReference>()
+            if (insn.opcode == Opcode.INVOKE_STATIC &&
+                mRef?.parameterTypes?.map { it.toString() } == listOf("Landroid/media/AudioManager;") &&
+                mRef.returnType == "I" &&
+                onStateChanged.getInstruction(idx + 1).opcode == Opcode.MOVE_RESULT
+            ) {
+                val volReg = (onStateChanged.getInstruction(idx + 1) as OneRegisterInstruction).registerA
+                onStateChanged.replaceInstruction(idx, "nop")
+                onStateChanged.replaceInstruction(idx + 1, "const/4 v$volReg, 0x0")
+            }
+            val fRef = insn.getReference<FieldReference>()
+            if (insn.opcode == Opcode.SPUT_OBJECT && fRef?.type == "Ljava/lang/Integer;") {
+                onStateChanged.replaceInstruction(idx, "nop")
+            }
         }
 
         // 8. MainActivity startup worker (Li/d34;->doInBackground): skip FirebaseMessaging topic RPCs

@@ -36,17 +36,17 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Java 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           distribution: 'temurin'
           java-version: '21'
 
       - name: Restore cached sliced 1DM runtime jars
         id: sdk-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: /tmp/onedm-cache-sdk
           key: onedm-v20-30257-sdk-v1-${{ hashFiles('.github/onedm-cache/SliceDex.java') }}
