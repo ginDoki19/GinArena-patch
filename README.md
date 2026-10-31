@@ -18,8 +18,8 @@ github.com/ginDoki19/GinArena-patch
 ## 🩹 Patches list
 
 <!-- PATCHES_START -->
-> **[v2.5.0](https://github.com/ginDoki19/GinArena-patch/releases/tag/v2.5.0)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;13 patches total
-<details>
+> **[v2.5.1-dev.1](https://github.com/ginDoki19/GinArena-patch/releases/tag/v2.5.1-dev.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;13 patches total
+<details open>
 <summary>📦 1DM&nbsp;&nbsp;•&nbsp;&nbsp;5 patches</summary>
 <br>
 
@@ -39,7 +39,7 @@ github.com/ginDoki19/GinArena-patch
 
 </details>
 
-<details>
+<details open>
 <summary>📦 MX Player&nbsp;&nbsp;•&nbsp;&nbsp;4 patches</summary>
 <br>
 
@@ -58,7 +58,7 @@ github.com/ginDoki19/GinArena-patch
 
 </details>
 
-<details>
+<details open>
 <summary>📦 PlayZ TV&nbsp;&nbsp;•&nbsp;&nbsp;1 patch</summary>
 <br>
 
@@ -74,15 +74,15 @@ github.com/ginDoki19/GinArena-patch
 
 </details>
 
-<details>
+<details open>
 <summary>📦 CRICFy TV&nbsp;&nbsp;•&nbsp;&nbsp;1 patch</summary>
 <br>
 
 **🎯 Supported versions:**
 
-| 7.3 |
-| :---: |
-| Universal APK (arm64-v8a / armeabi-v7a / x86 / x86_64, Android 7.0+), build 53 |
+| 7.3 | 7.4 |
+| :---: | :---: |
+| Universal APK (arm64-v8a / armeabi-v7a / x86 / x86_64, Android 7.0+), build 53 | Universal APK (arm64-v8a / armeabi-v7a / x86 / x86_64, Android 7.0+), build 54 |
 
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
@@ -90,7 +90,7 @@ github.com/ginDoki19/GinArena-patch
 
 </details>
 
-<details>
+<details open>
 <summary>📦 CricZ TV&nbsp;&nbsp;•&nbsp;&nbsp;1 patch</summary>
 <br>
 
@@ -106,7 +106,7 @@ github.com/ginDoki19/GinArena-patch
 
 </details>
 
-<details>
+<details open>
 <summary>📦 SK Tech TV&nbsp;&nbsp;•&nbsp;&nbsp;1 patch</summary>
 <br>
 
