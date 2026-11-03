@@ -40,7 +40,7 @@ private fun MethodReference.toSmali() =
 @Suppress("unused")
 val optimizeColdStartAndBatteryPatch = bytecodePatch(
     name = "Optimize cold start and battery",
-    description = "Eliminates cold-start Chromium WebView initialization in Download Manager and background services, defers Browser AdBlock filter parsing until Browser launch, defers the CheckAppVersion subprocess past startup, pauses MainActivity's 1 Hz background wakeup loop when minimized, and keeps 1DM alive in Android Recents on Back press without killing background downloads.",
+    description = "Makes the app open faster, use less battery in the background, and stay in Recents when you press Back.",
     default = true
 ) {
     compatibleWith(COMPATIBILITY_ONEDM)

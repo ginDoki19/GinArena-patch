@@ -119,7 +119,7 @@ private fun MutableMethod.runRunnableAndReturn(registerName: String, invokeKindA
 @Suppress("unused")
 val removeAdsPatch = bytecodePatch(
     name = "Remove ads and promotions",
-    description = "Removes banner, interstitial, fallback, and Amazon ads, 1DM+ sale/VPN/drawer/rate promotions, sponsored browser tiles, promo FCM topics, and 17 ad/telemetry SDK initializers and native/asset payloads from free 1DM 20.0 (30257).",
+    description = "Removes banner and popup ads, upgrade offers, and sponsored shortcuts.",
     default = true
 ) {
     compatibleWith(COMPATIBILITY_ONEDM)
