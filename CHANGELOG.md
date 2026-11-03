@@ -1,3 +1,9 @@
+## [2.6.0-dev.1](https://github.com/ginDoki19/GinArena-patch/compare/v2.5.1...v2.6.0-dev.1) (2026-11-03)
+
+### ✨ New Features
+
+* **1dm:** harden cloud sync and patch resilience ([6972768](https://github.com/ginDoki19/GinArena-patch/commit/6972768877540648c3df37cdbc3b17089616ce63))
+
 ## [2.5.1](https://github.com/ginDoki19/GinArena-patch/compare/v2.5.0...v2.5.1) (2026-10-31)
 
 ### 🚀 Updated App Support
