@@ -259,6 +259,7 @@ val optimizeColdStartAndBatteryPatch = bytecodePatch(
             """
         )
 
+        onedmRefinement("pause 1 Hz UI timer while minimized") {
         // 5. Runnable/TimerTask dispatcher (Li/q6;->run):
         //    Guard MainActivity's 1-second UI/service-polling TimerTask with MainActivity's
         //    `isPaused` AtomicBoolean so 1DM performs zero 1 Hz CPU wakeups and zero
@@ -290,7 +291,9 @@ val optimizeColdStartAndBatteryPatch = bytecodePatch(
             """,
             ExternalLabel("onedm_main_foreground", foregroundResumeInsn)
         )
+        }
 
+        onedmRefinement("keep task in Recents on Back press") {
         // 6. Keep 1DM alive in Android Recents & protect background downloads on Back press:
         //    Stock `MainActivity.onBackPressed()` calls `m3524(false, false)` at its fallthrough
         //    exit branch, which broadcasts `action_main_app_stopped` to `:DownloadService`,
@@ -318,5 +321,6 @@ val optimizeColdStartAndBatteryPatch = bytecodePatch(
             selfKillExitIdx + 1,
             "invoke-virtual {p0, v$moveTaskFlagReg}, Landroid/app/Activity;->moveTaskToBack(Z)Z"
         )
+        }
     }
 }

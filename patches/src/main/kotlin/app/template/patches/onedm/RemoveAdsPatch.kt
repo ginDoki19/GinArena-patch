@@ -377,6 +377,7 @@ val removeAdsPatch = bytecodePatch(
             ExternalLabel("onedm_skip_fcm_topics", doInBackground.getInstruction(afterFcmIdx))
         )
 
+        onedmRefinement("1DM+ sale state + drawer upgrade footer") {
         // 9. Refinements in MainActivity: disable the sale state and hide the drawer upgrade footer.
         val titleBooleanFields = MainActivityTitleFingerprint.originalMethod.instructions.mapNotNull { instruction ->
             if (instruction.opcode != Opcode.IGET_BOOLEAN) return@mapNotNull null
@@ -418,7 +419,9 @@ val removeAdsPatch = bytecodePatch(
             salePut.index,
             "const/4 v$saleSourceRegister, 0x0"
         )
+        }
 
+        onedmRefinement("collapse 60dp banner container") {
         // 10. Collapse the 60dp banner container everywhere it is inflated.
         MaxHeightConstructorTwoArgsFingerprint.method.hideThisBeforeReturn()
         MaxHeightConstructorThreeArgsFingerprint.method.hideThisBeforeReturn()
@@ -431,7 +434,9 @@ val removeAdsPatch = bytecodePatch(
                 return-void
             """
         )
+        }
 
+        onedmRefinement("home promo strip + sponsored start-page tiles") {
         // 11. Downloads-home promotional strip (`offer_vpnLL`) and browser sponsored start-page tiles.
         MainActivityPromoBarFingerprint.matchAll(1..1).first().method.addInstructions(
             0,
@@ -454,5 +459,6 @@ val removeAdsPatch = bytecodePatch(
                 ${nullRegisterInstruction(secondSponsoredShortcutRegister)}
             """
         )
+        }
     }
 }
