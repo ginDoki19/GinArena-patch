@@ -18,7 +18,7 @@ github.com/ginDoki19/GinArena-patch
 ## 🩹 Patches list
 
 <!-- PATCHES_START -->
-> **[v2.6.0-dev.2](https://github.com/ginDoki19/GinArena-patch/releases/tag/v2.6.0-dev.2)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;13 patches total
+> **[v2.6.0](https://github.com/ginDoki19/GinArena-patch/releases/tag/v2.6.0)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;13 patches total
 <details>
 <summary>📦 1DM&nbsp;&nbsp;•&nbsp;&nbsp;5 patches</summary>
 <br>
