@@ -1,3 +1,9 @@
+## [2.8.0-dev.3](https://github.com/ginDoki19/GinArena-patch/compare/v2.8.0-dev.2...v2.8.0-dev.3) (2026-11-04)
+
+### 🐛 Bug Fixes
+
+* **playfy:** correct forced-update bypass branch ([d31ce97](https://github.com/ginDoki19/GinArena-patch/commit/d31ce9766e4f33ba6544e2ae231835e15642e7ec))
+
 ## [2.8.0-dev.2](https://github.com/ginDoki19/GinArena-patch/compare/v2.8.0-dev.1...v2.8.0-dev.2) (2026-11-04)
 
 ### 🐛 Bug Fixes
