@@ -143,7 +143,7 @@ object Constants {
             AppTarget(
                 version = "4.12.0",
                 versionCodes = mapOf(SupportedAbi.ARM64_V8A to 4120, SupportedAbi.ARMEABI_V7A to 4120),
-                isExperimental = true,
+                isExperimental = false,
                 minSdk = 28,
                 description = "Standalone APK (arm64-v8a / armeabi-v7a, Android 9.0+), build 4120"
             )
