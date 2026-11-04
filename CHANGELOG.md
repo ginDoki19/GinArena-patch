@@ -1,3 +1,9 @@
+## [2.8.0-dev.2](https://github.com/ginDoki19/GinArena-patch/compare/v2.8.0-dev.1...v2.8.0-dev.2) (2026-11-04)
+
+### 🐛 Bug Fixes
+
+* **playfy:** prevent Firebase Messaging startup crash ([be844c1](https://github.com/ginDoki19/GinArena-patch/commit/be844c16e60d4aef32e1b87c41fed9e33293568f))
+
 ## [2.8.0-dev.1](https://github.com/ginDoki19/GinArena-patch/compare/v2.7.1...v2.8.0-dev.1) (2026-11-04)
 
 ### ✨ New Features
