@@ -423,7 +423,9 @@ private fun be32Smali(arrayReg: String, baseReg: String, outReg: String, tmpReg:
  * be32(len) || salt || AES-256-CBC ciphertext ); the AES key/IV are the
  * first 48 bytes of HKDF-Expand(HMAC-SHA256, SHA-256(salt)); the plaintext
  * is be32(len) || bytes, each byte ROR-3-rotated then XORed with the
- * repeating signer SHA-256. Returns null on any mismatch/failure.
+ * repeating signer SHA-256. Decryption is raw CBC (NoPadding), matching
+ * the native manual CBC helper; the explicit plaintext length makes any
+ * block padding irrelevant. Returns null on any mismatch/failure.
  */
 private fun ohMyNoSmali(): String = """
     move-object/from16 v12, p0
@@ -537,7 +539,7 @@ private fun ohMyNoSmali(): String = """
     invoke-direct {v2, v14, v3}, Ljavax/crypto/spec/SecretKeySpec;-><init>([BLjava/lang/String;)V
     new-instance v14, Ljavax/crypto/spec/IvParameterSpec;
     invoke-direct {v14, v13}, Ljavax/crypto/spec/IvParameterSpec;-><init>([B)V
-    const-string v9, "AES/CBC/PKCS5Padding"
+    const-string v9, "AES/CBC/NoPadding"
     invoke-static {v9}, Ljavax/crypto/Cipher;->getInstance(Ljava/lang/String;)Ljavax/crypto/Cipher;
     move-result-object v13
     const/4 v3, 0x2
@@ -635,20 +637,51 @@ private fun fnvDeriveSmali(
     :${tag}_done
 """.trimIndent()
 
-/** Emits an AES/CBC/PKCS5Padding decrypt of v0 into v15 with key/iv regs. */
-private fun aesDecryptSmali(keyReg: String, ivReg: String): String = """
+/**
+ * Emits a raw AES/CBC/NoPadding decrypt of v0 into v15 with key/iv regs,
+ * followed by the native helper's padding handling: a valid PKCS#7 tail
+ * (last byte 1..16, repeated) is stripped, while any other tail is left
+ * untouched. The stock native code decrypts CBC manually and does not
+ * require PKCS#7 — the live content payloads are space-padded, so a
+ * PKCS5Padding cipher rejects them in doFinal even with the right key.
+ */
+private fun aesDecryptSmali(keyReg: String, ivReg: String, tag: String): String = """
     new-instance v9, Ljavax/crypto/spec/SecretKeySpec;
     const-string v4, "AES"
     invoke-direct {v9, $keyReg, v4}, Ljavax/crypto/spec/SecretKeySpec;-><init>([BLjava/lang/String;)V
     new-instance v14, Ljavax/crypto/spec/IvParameterSpec;
     invoke-direct {v14, $ivReg}, Ljavax/crypto/spec/IvParameterSpec;-><init>([B)V
-    const-string v3, "AES/CBC/PKCS5Padding"
+    const-string v3, "AES/CBC/NoPadding"
     invoke-static {v3}, Ljavax/crypto/Cipher;->getInstance(Ljava/lang/String;)Ljavax/crypto/Cipher;
     move-result-object v4
     const/4 v3, 0x2
     invoke-virtual {v4, v3, v9, v14}, Ljavax/crypto/Cipher;->init(ILjava/security/Key;Ljava/security/spec/AlgorithmParameterSpec;)V
     invoke-virtual {v4, v0}, Ljavax/crypto/Cipher;->doFinal([B)[B
     move-result-object v15
+    array-length v3, v15
+    if-lez v3, :${tag}_done
+    add-int/lit8 v4, v3, -0x1
+    aget-byte v7, v15, v4
+    shl-int/lit8 v7, v7, 0x18
+    ushr-int/lit8 v7, v7, 0x18
+    if-lez v7, :${tag}_done
+    const/16 v8, 0x10
+    if-gt v7, v8, :${tag}_done
+    if-gt v7, v3, :${tag}_done
+    sub-int v4, v3, v7
+    const/4 v8, 0x0
+    :${tag}_check
+    if-ge v8, v7, :${tag}_strip
+    add-int v9, v4, v8
+    aget-byte v10, v15, v9
+    if-ne v10, v7, :${tag}_done
+    add-int/lit8 v8, v8, 0x1
+    goto :${tag}_check
+    :${tag}_strip
+    move v3, v4
+    invoke-static {v15, v3}, Ljava/util/Arrays;->copyOf([BI)[B
+    move-result-object v15
+    :${tag}_done
 """.trimIndent()
 
 /** Emits a strict UTF-8 decode of v15 into v1; v3 receives the length. */
@@ -714,7 +747,7 @@ private fun ohMyYesSmali(): String = """
     new-array v6, v3, [B
     ${fnvDeriveSmali("k", "-0x7ee3623b", 31, 1, 13, "v5")}
     ${fnvDeriveSmali("i", "-0x7ee37cd6", 29, 3, 7, "v6")}
-    ${aesDecryptSmali("v5", "v6")}
+    ${aesDecryptSmali("v5", "v6", "p1")}
     ${strictUtf8Smali()}
     if-lez v3, :fb
     return-object v1
@@ -729,7 +762,7 @@ private fun ohMyYesSmali(): String = """
     sget-object v9, Ljava/nio/charset/StandardCharsets;->UTF_8:Ljava/nio/charset/Charset;
     invoke-virtual {v15, v9}, Ljava/lang/String;->getBytes(Ljava/nio/charset/Charset;)[B
     move-result-object v6
-    ${aesDecryptSmali("v5", "v6")}
+    ${aesDecryptSmali("v5", "v6", "p2")}
     ${strictUtf8Smali()}
     if-lez v3, :empty_out
     return-object v1
