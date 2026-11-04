@@ -1,3 +1,9 @@
+## [2.8.0-dev.4](https://github.com/ginDoki19/GinArena-patch/compare/v2.8.0-dev.3...v2.8.0-dev.4) (2026-11-04)
+
+### 🐛 Bug Fixes
+
+* **playfy:** handle space-padded content payloads ([464f8e2](https://github.com/ginDoki19/GinArena-patch/commit/464f8e27f06c4314d7fe6f92178f3afcaeaa66e0))
+
 ## [2.8.0-dev.3](https://github.com/ginDoki19/GinArena-patch/compare/v2.8.0-dev.2...v2.8.0-dev.3) (2026-11-04)
 
 ### 🐛 Bug Fixes
