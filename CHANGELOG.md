@@ -1,3 +1,9 @@
+## [2.7.1](https://github.com/ginDoki19/GinArena-patch/compare/v2.7.0...v2.7.1) (2026-11-04)
+
+### 🐛 Bug Fixes
+
+* **decompiler:** mark 4.12.0 as stable ([0c350fa](https://github.com/ginDoki19/GinArena-patch/commit/0c350fa893e47b421c1d90179c422be87c50ad62))
+
 ## [2.7.1-dev.1](https://github.com/ginDoki19/GinArena-patch/compare/v2.7.0...v2.7.1-dev.1) (2026-11-04)
 
 ### 🐛 Bug Fixes
