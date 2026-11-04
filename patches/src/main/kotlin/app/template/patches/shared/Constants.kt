@@ -31,6 +31,9 @@ object Constants {
      *  Identical to CRICZ_SIGNER_SHA256 — same developer key. */
     private const val SK_TECH_SIGNER_SHA256 = "9ff349c0c047abd68e169980484b43926b6ff2d251a430fe44e3ae3e2930e1d2"
 
+    /** SHA-256 of the official signing certificate used by Playfy TV 1.7 (8). */
+    private const val PLAYFY_TV_SIGNER_SHA256 = "38cde288f060fa8f476ab6811ff215767c35117bf6248fd8ad157cd4566898cc"
+
     val COMPATIBILITY_ONEDM = Compatibility(
         name = "1DM",
         packageName = "idm.internet.download.manager",
@@ -129,6 +132,22 @@ object Constants {
                 versionCode = 17,
                 minSdk = 23,
                 description = "Universal APK (arm64-v8a / armeabi-v7a / x86 / x86_64, Android 6.0+), build 17"
+            )
+        )
+    )
+
+    val COMPATIBILITY_PLAYFY_TV = Compatibility(
+        name = "Playfy TV",
+        packageName = "com.playfy.tv",
+        apkFileType = ApkFileType.APK,
+        appIconColor = 0x5E35B1,
+        signatures = setOf(PLAYFY_TV_SIGNER_SHA256),
+        targets = listOf(
+            AppTarget(
+                version = "1.7",
+                versionCode = 8,
+                minSdk = 21,
+                description = "Universal APK (arm64-v8a / armeabi-v7a / x86 / x86_64, Android 5.0+), build 8"
             )
         )
     )

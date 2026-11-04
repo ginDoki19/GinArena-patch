@@ -3,7 +3,7 @@
 **GinArena Patch** is a [Morphe](https://morphe.software/) patch bundle for free **1DM**
 (`idm.internet.download.manager`), **CRICFy TV** (`com.cricfytv.sports`), **CricZ TV**
 (`com.pro.cricztv`), **PlayZ TV** (`com.playz.tv`), **MX Player** (`com.mxtech.videoplayer.ad`),
-**SK Tech TV** (`com.live.sktechtv`), and **APK Decompiler** (`com.apktools.app.decompile`).
+**SK Tech TV** (`com.live.sktechtv`), **Playfy TV** (`com.playfy.tv`), and **APK Decompiler** (`com.apktools.app.decompile`).
 Morphe Manager automatically filters patches per app, so selecting an app shows only compatible patches.
 
 ### How to use these patches
@@ -390,6 +390,44 @@ Nothing else is touched: no permissions are changed and streaming behavior is le
 | APK SHA-256 | `5095235d7a77e588d570780cea99a25dd807c9cb3ee814e450af82a49423cdcd` |
 
 > **Version safety:** only **2.7 (17)** is supported. Always patch a **fresh stock** APK. Other
+> versions are refused by design until audited — do not force-patch them in Expert Mode.
+
+</details>
+
+---
+
+## 📦 Playfy TV (1.7, build 8)
+
+<details>
+<summary><b>📖 App details</b> — what it does, target version and notes (click to expand)</summary>
+
+### What it does
+
+**Remove ads, telemetry & restrictions** (on by default) makes [**Playfy TV 1.7**](https://playfytv.vip/) clean on phones, tablets, and Android TV:
+
+- **No ads** — no pre-roll video ads, banners, splash full-screen banner, or sponsor screen; streams open directly in the player.
+- **Channels keep working** after patching, and the patched app starts normally.
+- **No lockouts** — no forced updates, and the app no longer refuses to open over which other apps are installed.
+
+#### Options
+
+- **Remove push notifications** *(on)* — turns off promo push and its permission prompts.
+- **Bypass update & force-update screen** *(on)* — skips update lockouts. The app won't update itself; re-patch a newer stock version to update.
+- **Bypass sniffer-app check** *(off)* — only if the stock app refuses to run because a network-capture app is installed.
+- **Strip native & telemetry bloat** *(off)* — deletes unused libraries and tracking parts to save space.
+
+### Target app (Playfy TV)
+
+| Field | Value |
+| --- | --- |
+| Package | `com.playfy.tv` |
+| Version | **1.7** (versionCode 8), universal APK (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`) |
+| Official site | [playfytv.vip](https://playfytv.vip/) |
+| Stock download | [playfytv.vip](https://playfytv.vip/) — use the exact stock **1.7** APK and verify the APK SHA-256 below before patching |
+| Signing certificate SHA-256 | `38cde288f060fa8f476ab6811ff215767c35117bf6248fd8ad157cd4566898cc` |
+| APK SHA-256 | `2a05ce967df3eb355de8f64b3c675cbc6e97b768e80fd10c54bdb6c7ac80df51` |
+
+> **Version safety:** only **1.7 (8)** is supported. Always patch a **fresh stock** APK. Other
 > versions are refused by design until audited — do not force-patch them in Expert Mode.
 
 </details>
