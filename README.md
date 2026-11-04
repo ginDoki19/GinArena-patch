@@ -19,7 +19,7 @@ github.com/ginDoki19/GinArena-patch
 ## 🩹 Patches list
 
 <!-- PATCHES_START -->
-> **[v2.8.0](https://github.com/ginDoki19/GinArena-patch/releases/tag/v2.8.0)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;15 patches total
+> **[v2.8.1](https://github.com/ginDoki19/GinArena-patch/releases/tag/v2.8.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;15 patches total
 <details>
 <summary>📦 1DM&nbsp;&nbsp;•&nbsp;&nbsp;5 patches</summary>
 <br>
@@ -81,13 +81,13 @@ github.com/ginDoki19/GinArena-patch
 
 **🎯 Supported versions:**
 
-| 7.3 | 7.4 |
-| :---: | :---: |
-| Universal APK (arm64-v8a / armeabi-v7a / x86 / x86_64, Android 7.0+), build 53 | Universal APK (arm64-v8a / armeabi-v7a / x86 / x86_64, Android 7.0+), build 54 |
+| 7.4 |
+| :---: |
+| Universal APK (arm64-v8a / armeabi-v7a / x86 / x86_64, Android 7.0+), build 54 |
 
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
-| [Remove ads, proxy & restrictions](#remove-ads-proxy-restrictions) | Stops background bandwidth sharing and removes ads, sponsor popups, and forced updates. | • Hide promo marquee ticker<br>• Bypass update & force-update screen<br>• Block promotional push notifications<br>• Bypass clone, work-profile & sniffer checks<br>• Strip proxy & ad native libraries |
+| [Remove ads, proxy & restrictions](#remove-ads-proxy-restrictions) | Stops background bandwidth sharing, removes ads, and hides the player app logo on 7.4. | • Hide promo marquee ticker<br>• Bypass update & force-update screen<br>• Block promotional push notifications<br>• Bypass clone, work-profile & sniffer checks<br>• Strip proxy & ad native libraries |
 
 </details>
 
@@ -119,7 +119,7 @@ github.com/ginDoki19/GinArena-patch
 
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
-| [Remove ads, telemetry & restrictions](#remove-ads-telemetry-restrictions) | Removes ads, tracking, and forced updates, and keeps channels working after patching. | • Remove push notifications<br>• Bypass update & force-update screen<br>• Bypass sniffer-app check<br>• Strip native & telemetry bloat |
+| [Remove ads, telemetry & restrictions](#remove-ads-telemetry-restrictions) | Removes ads and tracking, and hides the player app logo. | • Remove push notifications<br>• Bypass update & force-update screen<br>• Bypass sniffer-app check<br>• Strip native & telemetry bloat |
 
 </details>
 
@@ -275,18 +275,19 @@ Download links and hashes live in the table above because Morphe has no field fo
 
 ---
 
-## 📦 CRICFy TV (7.4 build 54 · 7.3 build 53)
+## 📦 CRICFy TV (7.4 build 54)
 
 <details>
 <summary><b>📖 App details</b> — what it does, target version and notes (click to expand)</summary>
 
 ### What it does
 
-**Remove ads, proxy & restrictions** (on by default) makes **CRICFy TV 7.4** (7.3 also supported) clean and safe on phones, tablets, and Android TV:
+**Remove ads, proxy & restrictions** (on by default) makes **CRICFy TV 7.4** clean and safe on phones, tablets, and Android TV:
 
 - **Stops background bandwidth sharing** — the CashRaven proxy is disabled, so your internet connection is never rented out.
 - **No ads or sponsor gates** — channels open immediately, with no countdowns or browser redirects.
 - **No startup Telegram popup** — manual links in the drawer still work.
+- **No player app logo** on CRICFy TV 7.4; broadcaster logos remain unchanged.
 - **Channels keep working** after patching, including live server configs.
 
 Options (on by default): hide the promo ticker, skip forced updates, block promo push notifications. Off by default: bypass clone/sniffer checks, and strip unused libraries to save ~7.7 MB.
@@ -296,13 +297,12 @@ Options (on by default): hide the promo ticker, skip forced updates, block promo
 | Field | Value |
 | --- | --- |
 | Package | `com.cricfytv.sports` |
-| Version | **7.4** (versionCode 54) — recommended; **7.3** (versionCode 53) also supported. Universal APK (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`) |
+| Version | **7.4** (versionCode 54). Universal APK (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`) |
 | Stock download | Official [cricfyapk.io/download/](https://cricfyapk.io/download/) page or the developer's official Telegram channel |
 | Signing certificate SHA-256 | `f2cd86fcbc92461a3300cec47b6f74d20f0c89dd7162ecc333b3dd2c16e79841` |
 | APK SHA-256 (7.4) | `d37c0c70200981a9558d32abd16ffb7966ae83a2fc84157b82e6869c4e16ae6f` |
-| APK SHA-256 (7.3) | `d5b7a8cf16a9966a58d25841b1a108b7dba445fcd409ee932933b98f81d2de0d` |
 
-> **Version safety:** only **7.4 (54)** and **7.3 (53)** are supported. Other versions are refused
+> **Version safety:** only **7.4 (54)** is supported. Other versions are refused
 > by design until audited — do not force-patch them in Expert Mode.
 
 </details>
@@ -423,8 +423,11 @@ Nothing else is touched: no permissions are changed and streaming behavior is le
 
 - **No ads** — no pre-roll video ads, banners, splash full-screen banner, or sponsor screen; streams open directly in the player.
 - **No automatic Telegram popup** at startup — manual community links still work.
-- **Channels keep working** after patching, and the patched app starts normally.
+- **No player app logo** — broadcaster logos remain unchanged.
+- **Channels keep working** after patching.
 - **No lockouts** — no forced updates, and the app no longer refuses to open over which other apps are installed.
+
+> **Note:** On one tested device, Playfy remained on the splash screen. The cause is still under investigation.
 
 #### Options
 
