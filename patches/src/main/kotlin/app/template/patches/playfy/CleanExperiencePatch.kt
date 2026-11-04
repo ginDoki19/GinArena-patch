@@ -42,12 +42,13 @@ private const val FALLBACK_IV = "QC4a1NX)XXEHQ1bf"
 @Suppress("unused")
 val removeAdsTelemetryAndRestrictionsPatch = bytecodePatch(
     name = "Remove ads, telemetry & restrictions",
-    description = "Removes ads, tracking, and forced updates, and keeps channels working after patching.",
+    description = "Removes ads and tracking, and hides the player app logo.",
     default = true,
 ) {
     compatibleWith(COMPATIBILITY_PLAYFY_TV)
 
     dependsOn(manifestAndNativeDebloatPatch)
+    dependsOn(hidePlayerAppLogoPatch)
 
     // Surface all user-configurable options on this single Playfy TV patch.
     val removePushNotifications by removePushNotificationsOption()
