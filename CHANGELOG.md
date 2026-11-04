@@ -2,6 +2,13 @@
 
 ### 🐛 Bug Fixes
 
+* **playfy:** publish Playfy playback fix ([077715f](https://github.com/ginDoki19/GinArena-patch/commit/077715f3ae18bf008dcb943236455f44f543d356))
+* **playfy:** restore playback and remove Telegram popup ([a113a99](https://github.com/ginDoki19/GinArena-patch/commit/a113a99fcabc2db7bea4f4fc6bed469eaa92a36f))
+
+## [2.8.0-dev.5](https://github.com/ginDoki19/GinArena-patch/compare/v2.8.0-dev.4...v2.8.0-dev.5) (2026-11-04)
+
+### 🐛 Bug Fixes
+
 * **playfy:** restore playback and remove Telegram popup ([a113a99](https://github.com/ginDoki19/GinArena-patch/commit/a113a99fcabc2db7bea4f4fc6bed469eaa92a36f))
 
 ## [2.8.0-dev.4](https://github.com/ginDoki19/GinArena-patch/compare/v2.8.0-dev.3...v2.8.0-dev.4) (2026-11-04)
