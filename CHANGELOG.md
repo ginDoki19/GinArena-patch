@@ -1,3 +1,9 @@
+## [2.8.1](https://github.com/ginDoki19/GinArena-patch/compare/v2.8.0...v2.8.1) (2026-11-04)
+
+### 🐛 Bug Fixes
+
+* **player:** hide logos and limit CricFy to 7.4 ([9e2a949](https://github.com/ginDoki19/GinArena-patch/commit/9e2a9495f8f382336dedb19c7390bb2c2f7426c0))
+
 ## [2.8.1-dev.1](https://github.com/ginDoki19/GinArena-patch/compare/v2.8.0...v2.8.1-dev.1) (2026-11-04)
 
 ### 🐛 Bug Fixes
