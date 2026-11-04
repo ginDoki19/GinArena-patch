@@ -15,6 +15,7 @@ import com.android.tools.smali.dexlib2.Opcode
 // ============================================================================
 
 /** Class constants — single source of truth for the patch. */
+internal const val PLAYFY_APP_CLASS = "Lcom/playfy/tv/App;"
 internal const val PLAYFY_NINTYMIN_CLASS = "Lcom/playfy/tv/helpers/NintyMin;"
 internal const val PLAYFY_SPLASH_ACTIVITY_CLASS = "Lcom/playfy/tv/activities/SplashActivity;"
 internal const val PLAYFY_PLAYER_ACTIVITY_CLASS = "Lcom/playfy/tv/activities/PlayerActivity;"
@@ -187,6 +188,23 @@ internal object PlayerOnCreateFingerprint : Fingerprint(
 // ============================================================================
 // 4. Push notifications & sniffer-app check
 // ============================================================================
+
+/**
+ * Matches `App.onCreate()V`. Stock immediately requests the Firebase
+ * Messaging component here; when push removal deletes that component's
+ * registrar, this call must be skipped or the process crashes before the
+ * splash activity can start.
+ */
+internal object AppOnCreateFingerprint : Fingerprint(
+    definingClass = PLAYFY_APP_CLASS,
+    name = "onCreate",
+    returnType = "V",
+    parameters = emptyList(),
+    filters = listOf(
+        string("baseUrl"),
+        string("https://google.com"),
+    ),
+)
 
 /**
  * Matches `PushService.c(ic.r)V` (`onMessageReceived`), which displays

@@ -22,6 +22,7 @@ import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
+import com.android.tools.smali.dexlib2.iface.reference.TypeReference
 import com.android.tools.smali.dexlib2.immutable.ImmutableMethod
 
 /**
@@ -73,6 +74,7 @@ val removeAdsTelemetryAndRestrictionsPatch = bytecodePatch(
         val adsBanner = AdsBannerFingerprint.method
         val playerOnCreate = PlayerOnCreateFingerprint.method
 
+        val appOnCreate = AppOnCreateFingerprint.method
         val pushServiceClass = PushServiceMessageReceivedFingerprint.classDef
         val pushMessage = PushServiceMessageReceivedFingerprint.method
         val snifferClass = SnifferCheckFingerprint.classDef
@@ -305,6 +307,58 @@ val removeAdsTelemetryAndRestrictionsPatch = bytecodePatch(
         // 4. Push notification removal (`removePushNotifications`)
         // ====================================================================
         if (removePushNotifications == true) {
+            // `App.onCreate` unconditionally obtains an FCM token before
+            // RemoteConfig starts. The manifest patch removes the Firebase
+            // Messaging component registrar, so leaving this call in place
+            // crashes the process with "Firebase Messaging component is
+            // not present" before Splash can appear. Skip only the token
+            // request/listener registration and resume at the next,
+            // unrelated startup task.
+            run {
+                val appInsns = appOnCreate.instructions
+                val fcmStartIdx = appInsns.indices.firstOrNull { idx ->
+                    idx + 2 < appInsns.size &&
+                        appInsns[idx].opcode == Opcode.INVOKE_STATIC &&
+                        ((appInsns[idx] as ReferenceInstruction).reference as? MethodReference)?.let { ref ->
+                            ref.definingClass == "Llg/c;" &&
+                                ref.name == "j" &&
+                                ref.returnType == "Lcom/google/firebase/messaging/FirebaseMessaging;" &&
+                                ref.parameterTypes.isEmpty()
+                        } == true &&
+                        appInsns[idx + 1].opcode == Opcode.MOVE_RESULT_OBJECT &&
+                        appInsns[idx + 2].opcode == Opcode.IGET_OBJECT &&
+                        ((appInsns[idx + 2] as ReferenceInstruction).reference as? FieldReference)?.let { ref ->
+                            ref.definingClass == "Lcom/google/firebase/messaging/FirebaseMessaging;" &&
+                                ref.name == "h" &&
+                                ref.type == "Ls9/n;"
+                        } == true
+                } ?: throw PatchException("Could not find Firebase Messaging startup token request in App.onCreate")
+
+                val resumeIdx = ((fcmStartIdx + 1) until minOf(appInsns.size - 3, fcmStartIdx + 32))
+                    .firstOrNull { idx ->
+                        appInsns[idx].opcode == Opcode.NEW_INSTANCE &&
+                            ((appInsns[idx] as ReferenceInstruction).reference as? TypeReference)?.type == "Lcf/n;" &&
+                            appInsns[idx + 2].opcode == Opcode.INVOKE_DIRECT &&
+                            ((appInsns[idx + 2] as ReferenceInstruction).reference as? MethodReference)?.let { ref ->
+                                ref.definingClass == "Lcf/n;" &&
+                                    ref.name == "<init>" &&
+                                    ref.parameterTypes.map { it.toString() } ==
+                                    listOf("Ljava/lang/Object;", "I")
+                            } == true &&
+                            appInsns[idx + 3].opcode == Opcode.INVOKE_STATIC &&
+                            ((appInsns[idx + 3] as ReferenceInstruction).reference as? MethodReference)?.let { ref ->
+                                ref.definingClass == "Lbf/y;" &&
+                                    ref.name == "w" &&
+                                    ref.returnType == "V" &&
+                                    ref.parameterTypes.map { it.toString() } == listOf("Lcf/n;")
+                            } == true
+                    } ?: throw PatchException("Could not find safe post-FCM resume point in App.onCreate")
+
+                // Remove (rather than branch over) the block so no dangling
+                // `move-result-object` remains in unreachable code.
+                appOnCreate.removeInstructions(fcmStartIdx, resumeIdx - fcmStartIdx)
+            }
+
             pushMessage.replaceWithCleanBody(
                 owner = pushServiceClass,
                 registerCount = 2,
