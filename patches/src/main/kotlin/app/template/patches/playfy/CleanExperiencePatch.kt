@@ -20,8 +20,10 @@ import com.android.tools.smali.dexlib2.builder.instruction.BuilderInstruction21s
 import com.android.tools.smali.dexlib2.builder.instruction.BuilderInstruction30t
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.WideLiteralInstruction
 import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
+import com.android.tools.smali.dexlib2.iface.reference.StringReference
 import com.android.tools.smali.dexlib2.iface.reference.TypeReference
 import com.android.tools.smali.dexlib2.immutable.ImmutableMethod
 
@@ -71,8 +73,13 @@ val removeAdsTelemetryAndRestrictionsPatch = bytecodePatch(
         val adsManagerClass = AdsManagerConstructorFingerprint.classDef
         val adsManagerCtor = AdsManagerConstructorFingerprint.method
         val adsShouldShow = AdsShouldShowFingerprint.method
+        val adsCooldown = AdsCooldownFingerprint.method
         val adsBanner = AdsBannerFingerprint.method
         val playerOnCreate = PlayerOnCreateFingerprint.method
+        val mainOnCreate = MainActivityOnCreateFingerprint.method
+        val telegramDialogPrefIdx = MainActivityOnCreateFingerprint.instructionMatches[0].index
+        val telegramDialogGetBooleanIdx = MainActivityOnCreateFingerprint.instructionMatches[1].index
+        val telegramDialogResultIdx = MainActivityOnCreateFingerprint.instructionMatches[2].index
 
         val appOnCreate = AppOnCreateFingerprint.method
         val pushServiceClass = PushServiceMessageReceivedFingerprint.classDef
@@ -138,6 +145,12 @@ val removeAdsTelemetryAndRestrictionsPatch = bytecodePatch(
                 }
                 val fbIdx = impl.instructions.indexOfFirst { it.opcode == Opcode.NOP }
                 check(fbIdx > 0) { "Could not locate fallback marker in ohMyYes port." }
+                val unsignedMaskCount = impl.instructions.count {
+                    (it as? WideLiteralInstruction)?.wideLiteral == 0xffffffffL
+                }
+                check(unsignedMaskCount == 2) {
+                    "ohMyYes unsigned mask encoding regressed ($unsignedMaskCount)."
+                }
                 impl.addCatch(
                     "Ljava/lang/Throwable;",
                        impl.newLabelForIndex(0),
@@ -271,10 +284,20 @@ val removeAdsTelemetryAndRestrictionsPatch = bytecodePatch(
 
             // 3b. The sponsor player gate and splash full-banner gate both
             // ask `id.h.b(type, name)`; answering "never" opens content
-            // directly everywhere.
+            // directly everywhere. MainActivity also calls the underlying
+            // `id.h.c(...)` frequency-cap check directly for an external-
+            // link gate before the player, so stub that check too.
             adsShouldShow.replaceWithCleanBody(
                 owner = adsManagerClass,
                 registerCount = 4,
+                smaliBody = """
+                    const/4 v0, 0x0
+                    return v0
+                """,
+            )
+            adsCooldown.replaceWithCleanBody(
+                owner = adsManagerClass,
+                registerCount = 6,
                 smaliBody = """
                     const/4 v0, 0x0
                     return v0
@@ -306,7 +329,53 @@ val removeAdsTelemetryAndRestrictionsPatch = bytecodePatch(
         }
 
         // ====================================================================
-        // 4. Push notification removal (`removePushNotifications`)
+        // 4. Startup Telegram join dialog
+        // ====================================================================
+        run {
+            val mainInsns = mainOnCreate.instructions
+
+            check(
+                mainInsns[telegramDialogPrefIdx].opcode == Opcode.CONST_STRING &&
+                    ((mainInsns[telegramDialogPrefIdx] as ReferenceInstruction).reference as? StringReference)
+                        ?.string == "tgd",
+            ) { "Unexpected Telegram dialog preference anchor in MainActivity.onCreate." }
+            check(
+                telegramDialogGetBooleanIdx == telegramDialogPrefIdx + 1 &&
+                    mainInsns[telegramDialogGetBooleanIdx].opcode == Opcode.INVOKE_INTERFACE &&
+                    ((mainInsns[telegramDialogGetBooleanIdx] as ReferenceInstruction).reference as? MethodReference)
+                        ?.let { ref ->
+                            ref.definingClass == "Landroid/content/SharedPreferences;" &&
+                                ref.name == "getBoolean" &&
+                                ref.returnType == "Z" &&
+                                ref.parameterTypes.map { it.toString() } ==
+                                listOf("Ljava/lang/String;", "Z")
+                        } == true,
+            ) { "Unexpected Telegram dialog preference read in MainActivity.onCreate." }
+            check(
+                telegramDialogResultIdx == telegramDialogGetBooleanIdx + 1 &&
+                    mainInsns[telegramDialogResultIdx].opcode == Opcode.MOVE_RESULT &&
+                    mainInsns[telegramDialogResultIdx + 1].opcode == Opcode.IF_EQZ,
+            ) { "Unexpected Telegram dialog gate in MainActivity.onCreate." }
+
+            // The dialog's "don't show again" action stores `tgd=false`;
+            // stock then branches over the whole DialogTgJoinBinding block.
+            // Force that same result in-place so the automatic startup
+            // dialog is never created, without changing the preference or
+            // any manually opened Telegram links elsewhere in the app.
+            val telegramDialogResultReg =
+                (mainInsns[telegramDialogResultIdx] as OneRegisterInstruction).registerA
+            mainOnCreate.replaceInstruction(
+                telegramDialogResultIdx,
+                if (telegramDialogResultReg <= 15) {
+                    BuilderInstruction11n(Opcode.CONST_4, telegramDialogResultReg, 0)
+                } else {
+                    BuilderInstruction21s(Opcode.CONST_16, telegramDialogResultReg, 0)
+                },
+            )
+        }
+
+        // ====================================================================
+        // 5. Push notification removal (`removePushNotifications`)
         // ====================================================================
         if (removePushNotifications == true) {
             // `App.onCreate` unconditionally obtains an FCM token before
@@ -377,7 +446,7 @@ val removeAdsTelemetryAndRestrictionsPatch = bytecodePatch(
         }
 
         // ====================================================================
-        // 5. Sniffer-app lockout bypass (`bypassEnvironmentChecks`)
+        // 6. Sniffer-app lockout bypass (`bypassEnvironmentChecks`)
         // ====================================================================
         if (bypassEnvironmentChecks == true) {
             snifferCheck.replaceWithCleanBody(
@@ -584,7 +653,12 @@ private fun ohMyNoSmali(): String = """
     return-object v0
 """.trimIndent()
 
-/** Emits the FNV-1a-keyed 16-byte derivation used for `ohMyYes` key/IV. */
+/**
+ * Emits the FNV-1a-keyed 16-byte derivation used for `ohMyYes` key/IV.
+ * The unsigned mask literal must keep its `L` suffix: in smali,
+ * `const-wide 0xffffffff` encodes as -1, which leaves a negative hash
+ * negative and makes the pool index invalid on the first picked byte.
+ */
 private fun fnvDeriveSmali(
     tag: String,
     basisLiteral: String,
@@ -622,7 +696,7 @@ private fun fnvDeriveSmali(
     mul-int/lit8 v7, v7, $mult
     xor-int v7, v7, v10
     int-to-long v11, v7
-    const-wide v13, 0xffffffff
+    const-wide v13, 0xffffffffL
     and-long v11, v11, v13
     array-length v10, v1
     int-to-long v13, v10
@@ -684,8 +758,14 @@ private fun aesDecryptSmali(keyReg: String, ivReg: String, tag: String): String 
     :${tag}_done
 """.trimIndent()
 
-/** Emits a strict UTF-8 decode of v15 into v1; v3 receives the length. */
-private fun strictUtf8Smali(): String = """
+/**
+ * Emits a strict UTF-8 decode of v15 into v1; v3 receives the length.
+ * The decoded text is truncated at the first NUL character because the
+ * native decoder returns it through `NewStringUTF`, whose C-string input
+ * ends there (relevant only to zero-padded plaintext; current payloads
+ * are PKCS- or space-padded).
+ */
+private fun strictUtf8Smali(tag: String): String = """
     sget-object v3, Ljava/nio/charset/StandardCharsets;->UTF_8:Ljava/nio/charset/Charset;
     invoke-virtual {v3}, Ljava/nio/charset/Charset;->newDecoder()Ljava/nio/charset/CharsetDecoder;
     move-result-object v3
@@ -700,6 +780,14 @@ private fun strictUtf8Smali(): String = """
     move-result-object v4
     invoke-virtual {v4}, Ljava/nio/CharBuffer;->toString()Ljava/lang/String;
     move-result-object v1
+    const/4 v4, 0x0
+    invoke-virtual {v1, v4}, Ljava/lang/String;->indexOf(I)I
+    move-result v4
+    if-ltz v4, :${tag}_no_nul
+    const/4 v3, 0x0
+    invoke-virtual {v1, v3, v4}, Ljava/lang/String;->substring(II)Ljava/lang/String;
+    move-result-object v1
+    :${tag}_no_nul
     invoke-virtual {v1}, Ljava/lang/String;->length()I
     move-result v3
 """.trimIndent()
@@ -748,7 +836,7 @@ private fun ohMyYesSmali(): String = """
     ${fnvDeriveSmali("k", "-0x7ee3623b", 31, 1, 13, "v5")}
     ${fnvDeriveSmali("i", "-0x7ee37cd6", 29, 3, 7, "v6")}
     ${aesDecryptSmali("v5", "v6", "p1")}
-    ${strictUtf8Smali()}
+    ${strictUtf8Smali("p1")}
     if-lez v3, :fb
     return-object v1
     :fb
@@ -763,7 +851,7 @@ private fun ohMyYesSmali(): String = """
     invoke-virtual {v15, v9}, Ljava/lang/String;->getBytes(Ljava/nio/charset/Charset;)[B
     move-result-object v6
     ${aesDecryptSmali("v5", "v6", "p2")}
-    ${strictUtf8Smali()}
+    ${strictUtf8Smali("p2")}
     if-lez v3, :empty_out
     return-object v1
     :empty_out

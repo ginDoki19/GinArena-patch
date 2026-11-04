@@ -2,6 +2,7 @@ package app.template.patches.playfy
 
 import app.morphe.patcher.Fingerprint
 import app.morphe.patcher.InstructionLocation.MatchAfterImmediately
+import app.morphe.patcher.methodCall
 import app.morphe.patcher.opcode
 import app.morphe.patcher.string
 import com.android.tools.smali.dexlib2.Opcode
@@ -18,6 +19,7 @@ import com.android.tools.smali.dexlib2.Opcode
 internal const val PLAYFY_APP_CLASS = "Lcom/playfy/tv/App;"
 internal const val PLAYFY_NINTYMIN_CLASS = "Lcom/playfy/tv/helpers/NintyMin;"
 internal const val PLAYFY_SPLASH_ACTIVITY_CLASS = "Lcom/playfy/tv/activities/SplashActivity;"
+internal const val PLAYFY_MAIN_ACTIVITY_CLASS = "Lcom/playfy/tv/activities/MainActivity;"
 internal const val PLAYFY_PLAYER_ACTIVITY_CLASS = "Lcom/playfy/tv/activities/PlayerActivity;"
 internal const val PLAYFY_APPDATA_CLASS = "Lkd/f;"
 internal const val PLAYFY_SPLASH_CALLBACK_CLASS = "Lfd/c0;"
@@ -161,6 +163,24 @@ internal object AdsShouldShowFingerprint : Fingerprint(
 )
 
 /**
+ * Matches `id.h.c(String, I, I, Z)Z` — the per-placement frequency-cap
+ * check underneath `b`. `MainActivity` also calls it directly for the
+ * external-link gate shown before the player, so stubbing `b` alone is
+ * not enough to make playback open directly.
+ */
+internal object AdsCooldownFingerprint : Fingerprint(
+    definingClass = PLAYFY_ADS_MANAGER_CLASS,
+    name = "c",
+    returnType = "Z",
+    parameters = listOf(
+        "Ljava/lang/String;",
+        "I",
+        "I",
+        "Z",
+    ),
+)
+
+/**
  * Matches `id.h.d(LinearLayout)V` — renders the in-app banner (WebView
  * HTML banner or image banner) into the given container.
  */
@@ -183,6 +203,35 @@ internal object PlayerOnCreateFingerprint : Fingerprint(
     name = "onCreate",
     returnType = "V",
     parameters = listOf("Landroid/os/Bundle;"),
+)
+
+/**
+ * Matches `MainActivity.onCreate(Bundle)V`, anchoring the startup Telegram
+ * join dialog gate. Stock reads the `tgd` boolean preference; a false value
+ * is the state written by the dialog's "don't show again" action and skips
+ * inflating `DialogTgJoinBinding` for that launch.
+ */
+internal object MainActivityOnCreateFingerprint : Fingerprint(
+    definingClass = PLAYFY_MAIN_ACTIVITY_CLASS,
+    name = "onCreate",
+    returnType = "V",
+    parameters = listOf("Landroid/os/Bundle;"),
+    filters = listOf(
+        string("tgd"),
+        methodCall(
+            definingClass = "Landroid/content/SharedPreferences;",
+            name = "getBoolean",
+            parameters = listOf("Ljava/lang/String;", "Z"),
+            returnType = "Z",
+            location = MatchAfterImmediately(),
+        ),
+        opcode(Opcode.MOVE_RESULT, MatchAfterImmediately()),
+        opcode(Opcode.IF_EQZ, MatchAfterImmediately()),
+        methodCall(
+            definingClass = "Lcom/playfy/tv/databinding/DialogTgJoinBinding;",
+            name = "inflate",
+        ),
+    ),
 )
 
 // ============================================================================

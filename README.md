@@ -422,6 +422,7 @@ Nothing else is touched: no permissions are changed and streaming behavior is le
 **Remove ads, telemetry & restrictions** (on by default) makes [**Playfy TV 1.7**](https://playfytv.vip/) clean on phones, tablets, and Android TV:
 
 - **No ads** — no pre-roll video ads, banners, splash full-screen banner, or sponsor screen; streams open directly in the player.
+- **No automatic Telegram popup** at startup — manual community links still work.
 - **Channels keep working** after patching, and the patched app starts normally.
 - **No lockouts** — no forced updates, and the app no longer refuses to open over which other apps are installed.
 
