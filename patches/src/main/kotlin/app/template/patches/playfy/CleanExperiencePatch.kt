@@ -218,9 +218,12 @@ val removeAdsTelemetryAndRestrictionsPatch = bytecodePatch(
                 BuilderInstruction10x(Opcode.NOP),
             )
 
-            // 2c. Bypass the forced-update version comparison (remote
-            // "version" row vs installed versionCode): always take the
-            // "up to date" branch. Also stub the update installer entry
+            // 2c. Bypass the forced-update version comparison. Stock
+            // computes `remoteVersion - installedVersion`; `IF_GTZ`
+            // branches to the "New Update Available" card, while the
+            // fallthrough is the normal up-to-date path (blocked-apps
+            // check, then Main). NOP the branch so startup always uses
+            // that fallthrough. Also stub the update installer entry
             // points so no downloaded APK can ever be installed.
             if (bypassUpdateGate == true) {
                 val parseLongIdx = insns.indexOfFirst { insn ->
@@ -233,10 +236,9 @@ val removeAdsTelemetryAndRestrictionsPatch = bytecodePatch(
                 val versionCmpIdx = ((parseLongIdx + 1) until minOf(insns.size, parseLongIdx + 8))
                     .firstOrNull { insns[it].opcode == Opcode.IF_GTZ }
                     ?: throw PatchException("Could not find version if-gtz in splash callback")
-                val proceedTarget = (insns[versionCmpIdx] as BuilderOffsetInstruction).target
                 splashCallback.replaceInstruction(
                     versionCmpIdx,
-                    BuilderInstruction30t(Opcode.GOTO_32, proceedTarget),
+                    BuilderInstruction10x(Opcode.NOP),
                 )
 
                 splashInstallUpdate.replaceWithCleanBody(
