@@ -1,3 +1,9 @@
+## [2.8.0-dev.1](https://github.com/ginDoki19/GinArena-patch/compare/v2.7.1...v2.8.0-dev.1) (2026-11-04)
+
+### ✨ New Features
+
+* **playfy:** add Playfy TV 1.7 patch ([bda57f3](https://github.com/ginDoki19/GinArena-patch/commit/bda57f3f4c1d2779b6f06de667f36c1056e078a2))
+
 ## [2.7.1](https://github.com/ginDoki19/GinArena-patch/compare/v2.7.0...v2.7.1) (2026-11-04)
 
 ### 🐛 Bug Fixes
