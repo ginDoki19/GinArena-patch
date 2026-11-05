@@ -1,3 +1,9 @@
+## [2.8.2](https://github.com/ginDoki19/GinArena-patch/compare/v2.8.1...v2.8.2) (2026-11-05)
+
+### 🚀 Updated App Support
+
+* **player:** hide playback controls on open and fullscreen ([bde2729](https://github.com/ginDoki19/GinArena-patch/commit/bde272914e96fe0ea68e06d9331de35ccbe7206d))
+
 ## [2.8.2-dev.1](https://github.com/ginDoki19/GinArena-patch/compare/v2.8.1...v2.8.2-dev.1) (2026-11-05)
 
 ### 🚀 Updated App Support
