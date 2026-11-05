@@ -157,6 +157,10 @@ github.com/ginDoki19/GinArena-patch
 
 <!-- PATCHES_END -->
 
+### Hide playback controls at stream open
+
+*On by default* for CRICFy TV, CricZ TV, PlayZ TV, SK Tech TV, and Playfy TV. Hides player controls when a stream opens and when switching between fullscreen and the embedded player. Tap the video to show them.
+
 ---
 
 ## 📦 1DM (20.0, build 30257)
@@ -355,7 +359,7 @@ Options (on by default): hide the promo bar, remove push notifications, skip for
 - **No automatic Telegram popup** (manual links are untouched).
 - **Channels keep working** after patching.
 
-Nothing else is touched: no permissions are changed and streaming behavior is left alone — stability first.
+This patch does not change permissions or streaming behavior.
 
 ### Target app (PlayZ TV)
 
