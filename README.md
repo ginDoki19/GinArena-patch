@@ -19,7 +19,7 @@ github.com/ginDoki19/GinArena-patch
 ## 🩹 Patches list
 
 <!-- PATCHES_START -->
-> **[v2.8.1](https://github.com/ginDoki19/GinArena-patch/releases/tag/v2.8.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;15 patches total
+> **[v2.8.2-dev.1](https://github.com/ginDoki19/GinArena-patch/releases/tag/v2.8.2-dev.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;20 patches total
 <details>
 <summary>📦 1DM&nbsp;&nbsp;•&nbsp;&nbsp;5 patches</summary>
 <br>
@@ -60,23 +60,7 @@ github.com/ginDoki19/GinArena-patch
 </details>
 
 <details>
-<summary>📦 PlayZ TV&nbsp;&nbsp;•&nbsp;&nbsp;1 patch</summary>
-<br>
-
-**🎯 Supported versions:**
-
-| 2.3.1 |
-| :---: |
-| Universal APK (arm64-v8a / armeabi-v7a / x86 / x86_64, Android 6.0+), build 8 |
-
-| 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
-|----------|----------------|-----------|
-| [Remove ads, popups & restrictions](#remove-ads-popups-restrictions) | Removes ads and promo popups, and keeps channels working after patching. |  |
-
-</details>
-
-<details>
-<summary>📦 CRICFy TV&nbsp;&nbsp;•&nbsp;&nbsp;1 patch</summary>
+<summary>📦 CRICFy TV&nbsp;&nbsp;•&nbsp;&nbsp;2 patches</summary>
 <br>
 
 **🎯 Supported versions:**
@@ -87,12 +71,13 @@ github.com/ginDoki19/GinArena-patch
 
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
+| [Hide playback controls at stream open](#hide-playback-controls-at-stream-open) | Hides playback controls when a stream opens or switches fullscreen. Tap the video to show them. |  |
 | [Remove ads, proxy & restrictions](#remove-ads-proxy-restrictions) | Stops background bandwidth sharing, removes ads, and hides the player app logo on 7.4. | • Hide promo marquee ticker<br>• Bypass update & force-update screen<br>• Block promotional push notifications<br>• Bypass clone, work-profile & sniffer checks<br>• Strip proxy & ad native libraries |
 
 </details>
 
 <details>
-<summary>📦 CricZ TV&nbsp;&nbsp;•&nbsp;&nbsp;1 patch</summary>
+<summary>📦 CricZ TV&nbsp;&nbsp;•&nbsp;&nbsp;2 patches</summary>
 <br>
 
 **🎯 Supported versions:**
@@ -103,12 +88,13 @@ github.com/ginDoki19/GinArena-patch
 
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
+| [Hide playback controls at stream open](#hide-playback-controls-at-stream-open) | Hides playback controls when a stream opens or switches fullscreen. Tap the video to show them. |  |
 | [Remove ads, telemetry & restrictions](#remove-ads-telemetry-restrictions) | Removes ads, promo popups, and tracking, and keeps channels working after patching. | • Hide promo announcement bar<br>• Remove push notifications<br>• Bypass update & force-update screen<br>• Bypass root & sniffer checks<br>• Strip native & telemetry bloat |
 
 </details>
 
 <details>
-<summary>📦 Playfy TV&nbsp;&nbsp;•&nbsp;&nbsp;1 patch</summary>
+<summary>📦 Playfy TV&nbsp;&nbsp;•&nbsp;&nbsp;2 patches</summary>
 <br>
 
 **🎯 Supported versions:**
@@ -119,12 +105,30 @@ github.com/ginDoki19/GinArena-patch
 
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
+| [Hide playback controls at stream open](#hide-playback-controls-at-stream-open) | Hides playback controls when a stream opens or switches fullscreen. Tap the video to show them. |  |
 | [Remove ads, telemetry & restrictions](#remove-ads-telemetry-restrictions) | Removes ads and tracking, and hides the player app logo. | • Remove push notifications<br>• Bypass update & force-update screen<br>• Bypass sniffer-app check<br>• Strip native & telemetry bloat |
 
 </details>
 
 <details>
-<summary>📦 SK Tech TV&nbsp;&nbsp;•&nbsp;&nbsp;1 patch</summary>
+<summary>📦 PlayZ TV&nbsp;&nbsp;•&nbsp;&nbsp;2 patches</summary>
+<br>
+
+**🎯 Supported versions:**
+
+| 2.3.1 |
+| :---: |
+| Universal APK (arm64-v8a / armeabi-v7a / x86 / x86_64, Android 6.0+), build 8 |
+
+| 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
+|----------|----------------|-----------|
+| [Hide playback controls at stream open](#hide-playback-controls-at-stream-open) | Hides playback controls when a stream opens or switches fullscreen. Tap the video to show them. |  |
+| [Remove ads, popups & restrictions](#remove-ads-popups-restrictions) | Removes ads and promo popups, and keeps channels working after patching. |  |
+
+</details>
+
+<details>
+<summary>📦 SK Tech TV&nbsp;&nbsp;•&nbsp;&nbsp;2 patches</summary>
 <br>
 
 **🎯 Supported versions:**
@@ -135,6 +139,7 @@ github.com/ginDoki19/GinArena-patch
 
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
+| [Hide playback controls at stream open](#hide-playback-controls-at-stream-open) | Hides playback controls when a stream opens or switches fullscreen. Tap the video to show them. |  |
 | [Remove ads, telemetry & restrictions](#remove-ads-telemetry-restrictions) | Removes ads, tracking, and forced updates, and keeps channels working after patching. | • Remove push notifications<br>• Bypass update & force-update screen<br>• Bypass root & sniffer checks<br>• Strip native & telemetry bloat<br>• Disable WebActivity (potential ad surface) |
 
 </details>
