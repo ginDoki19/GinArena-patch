@@ -19,7 +19,7 @@ github.com/ginDoki19/GinArena-patch
 ## 🩹 Patches list
 
 <!-- PATCHES_START -->
-> **[v2.8.2](https://github.com/ginDoki19/GinArena-patch/releases/tag/v2.8.2)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;20 patches total
+> **[v2.9.0-dev.1](https://github.com/ginDoki19/GinArena-patch/releases/tag/v2.9.0-dev.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;22 patches total
 <details>
 <summary>📦 1DM&nbsp;&nbsp;•&nbsp;&nbsp;5 patches</summary>
 <br>
@@ -56,6 +56,23 @@ github.com/ginDoki19/GinArena-patch
 | [Custom codec](#custom-codec) | Bundles a custom codec so AC-3, E-AC-3, DTS, and TrueHD audio play out of the box. | • Custom codec file |
 | [Remove ads & bloat](#remove-ads-bloat) | Removes ads and online extras like Live TV, Tube, Shorts, and Games for a clean local player. |  |
 | [Remove bottom navigation bar](#remove-bottom-navigation-bar) | Removes the bottom navigation bar and moves Me to the top-right corner. |  |
+
+</details>
+
+<details>
+<summary>📦 CrexiFy TV&nbsp;&nbsp;•&nbsp;&nbsp;2 patches</summary>
+<br>
+
+**🎯 Supported versions:**
+
+| 4.5 |
+| :---: |
+| Universal APK (arm64-v8a / armeabi-v7a / x86 / x86_64, Android 6.0+), build 12 |
+
+| 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
+|----------|----------------|-----------|
+| [Hide playback controls at stream open](#hide-playback-controls-at-stream-open) | Hides controls when a stream opens or switches fullscreen. Tap the video to show them. |  |
+| [Remove configured startup and banner ads](#remove-configured-startup-and-banner-ads) | Suppresses configured startup/banner ads, the Telegram prompt and message ticker. |  |
 
 </details>
 
