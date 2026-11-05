@@ -2,7 +2,7 @@
 
 **GinArena Patch** is a [Morphe](https://morphe.software/) patch bundle for free **1DM**
 (`idm.internet.download.manager`), **CRICFy TV** (`com.cricfytv.sports`), **CricZ TV**
-(`com.pro.cricztv`), **PlayZ TV** (`com.playz.tv`), **MX Player** (`com.mxtech.videoplayer.ad`),
+(`com.pro.cricztv`), **CrexiFy TV** (`com.crexify.tv`), **PlayZ TV** (`com.playz.tv`), **MX Player** (`com.mxtech.videoplayer.ad`),
 **SK Tech TV** (`com.live.sktechtv`), **Playfy TV** (`com.playfy.tv`), and **APK Decompiler** (`com.apktools.app.decompile`).
 Morphe Manager automatically filters patches per app, so selecting an app shows only compatible patches.
 
@@ -19,7 +19,7 @@ github.com/ginDoki19/GinArena-patch
 ## 🩹 Patches list
 
 <!-- PATCHES_START -->
-> **[v2.8.2](https://github.com/ginDoki19/GinArena-patch/releases/tag/v2.8.2)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;20 patches total
+> **[v2.9.0-dev.1](https://github.com/ginDoki19/GinArena-patch/releases/tag/v2.9.0-dev.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;22 patches total
 <details>
 <summary>📦 1DM&nbsp;&nbsp;•&nbsp;&nbsp;5 patches</summary>
 <br>
@@ -56,6 +56,23 @@ github.com/ginDoki19/GinArena-patch
 | [Custom codec](#custom-codec) | Bundles a custom codec so AC-3, E-AC-3, DTS, and TrueHD audio play out of the box. | • Custom codec file |
 | [Remove ads & bloat](#remove-ads-bloat) | Removes ads and online extras like Live TV, Tube, Shorts, and Games for a clean local player. |  |
 | [Remove bottom navigation bar](#remove-bottom-navigation-bar) | Removes the bottom navigation bar and moves Me to the top-right corner. |  |
+
+</details>
+
+<details>
+<summary>📦 CrexiFy TV&nbsp;&nbsp;•&nbsp;&nbsp;2 patches</summary>
+<br>
+
+**🎯 Supported versions:**
+
+| 4.5 |
+| :---: |
+| Universal APK (arm64-v8a / armeabi-v7a / x86 / x86_64, Android 6.0+), build 12 |
+
+| 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
+|----------|----------------|-----------|
+| [Hide playback controls at stream open](#hide-playback-controls-at-stream-open) | Hides controls when a stream opens or switches fullscreen. Tap the video to show them. |  |
+| [Remove configured startup and banner ads](#remove-configured-startup-and-banner-ads) | Suppresses configured startup/banner ads, the Telegram prompt and message ticker. |  |
 
 </details>
 
@@ -164,7 +181,7 @@ github.com/ginDoki19/GinArena-patch
 
 ### Hide playback controls at stream open
 
-*On by default* for CRICFy TV, CricZ TV, PlayZ TV, SK Tech TV, and Playfy TV. Hides player controls when a stream opens and when switching between fullscreen and the embedded player. Tap the video to show them.
+*On by default* for CRICFy TV, CricZ TV, CrexiFy TV, PlayZ TV, SK Tech TV, and Playfy TV. Hides player controls when a stream opens and when switching between fullscreen and the embedded player. Tap the video to show them.
 
 ---
 
@@ -346,6 +363,37 @@ Options (on by default): hide the promo bar, remove push notifications, skip for
 
 > **Version safety:** only **7.3 (10)** is supported. Other versions are refused by design until
 > audited — do not force-patch them in Expert Mode.
+
+</details>
+
+---
+
+## 📦 CrexiFy TV (4.5, build 12)
+
+<details>
+<summary><b>📖 App details</b> — what it does, target version and notes (click to expand)</summary>
+
+### What it does
+
+#### Remove configured startup and banner ads
+
+*On by default.* Suppresses startup and banner ads, the automatic Telegram prompt, and the promotional message ticker. Manual links remain available. The ticker also carries other server notices, which are hidden with it.
+
+The patch adapts the signer-bound decoder for re-signed builds and disables its startup integrity self-test.
+
+**Hide playback controls at stream open** (on by default) keeps controls hidden when a stream opens or switches fullscreen. Tap the video to show them.
+
+### Target app (CrexiFy TV)
+
+| Field | Value |
+| --- | --- |
+| Package | `com.crexify.tv` |
+| Version | **4.5** (versionCode 12), universal APK (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`) |
+| Stock download | Use the exact stock **4.5** APK and verify the APK SHA-256 below before patching |
+| Signing certificate SHA-256 | `17e2ae241663794ce890f350e1e0d884c59727418bac22518a62ac2e66131062` |
+| APK SHA-256 | `76f9bac391a3b109025f465dd922b6d14555acd4806dd994e2156022c0bc76c7` |
+
+> **Version safety:** only **4.5 (12)** is supported. Other versions are refused by design — do not force-patch them in Expert Mode.
 
 </details>
 

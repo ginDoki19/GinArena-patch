@@ -1,3 +1,9 @@
+## [2.9.0-dev.1](https://github.com/ginDoki19/GinArena-patch/compare/v2.8.2...v2.9.0-dev.1) (2026-11-05)
+
+### ✨ New Features
+
+* add CrexiFy TV 4.5 patches ([518ab2e](https://github.com/ginDoki19/GinArena-patch/commit/518ab2ead18581084c50bf6f33fca4f46df02d9e))
+
 ## [2.8.2](https://github.com/ginDoki19/GinArena-patch/compare/v2.8.1...v2.8.2) (2026-11-05)
 
 ### 🚀 Updated App Support
