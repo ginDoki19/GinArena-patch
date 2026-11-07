@@ -1,6 +1,7 @@
 package app.template.patches.tvremote
 
 import app.morphe.patcher.Fingerprint
+import app.morphe.patcher.patch.BytecodePatchContext
 import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.patcher.patch.resourcePatch
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
@@ -243,7 +244,7 @@ private val playzShow=Fingerprint(definingClass="Landroidx/media3/ui/PlayerView;
 private val sktechShow=Fingerprint(definingClass="Landroidx/media3/ui/PlayerView;",name="g",returnType="V",parameters=listOf("Z"))
 private val crexifyShow=Fingerprint(definingClass="Landroidx/media3/ui/PlayerView;",name="h",returnType="V",parameters=listOf("Z"))
 
-private fun applyRemote(s: Spec, start: Fingerprint, show: Fingerprint, toggle: Fingerprint) {
+private fun BytecodePatchContext.applyRemote(s: Spec, start: Fingerprint, show: Fingerprint, toggle: Fingerprint) {
     val owner=start.classDef
     val m=start.method
     val xs=m.instructions.toList()
