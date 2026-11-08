@@ -3,7 +3,7 @@
 **GinArena Patch** is a [Morphe](https://morphe.software/) patch bundle for free **1DM**
 (`idm.internet.download.manager`), **CRICFy TV** (`com.cricfytv.sports`), **CricZ TV**
 (`com.pro.cricztv`), **CrexiFy TV** (`com.crexify.tv`), **PlayZ TV** (`com.playz.tv`), **MX Player** (`com.mxtech.videoplayer.ad`),
-**SK Tech TV** (`com.live.sktechtv`), **Playfy TV** (`com.playfy.tv`), and **APK Decompiler** (`com.apktools.app.decompile`).
+**SK Tech TV** (`com.live.sktechtv`), **Playfy TV** (`com.playfy.tv`), **APK Decompiler** (`com.apktools.app.decompile`), and **Daylio** (`net.daylio`).
 Morphe Manager automatically filters patches per app, so selecting an app shows only compatible patches.
 
 ### How to use these patches
@@ -19,7 +19,7 @@ github.com/ginDoki19/GinArena-patch
 ## 🩹 Patches list
 
 <!-- PATCHES_START -->
-> **[v2.9.1](https://github.com/ginDoki19/GinArena-patch/releases/tag/v2.9.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;22 patches total
+> **[v2.10.0-dev.1](https://github.com/ginDoki19/GinArena-patch/releases/tag/v2.10.0-dev.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;29 patches total
 <details>
 <summary>📦 1DM&nbsp;&nbsp;•&nbsp;&nbsp;5 patches</summary>
 <br>
@@ -60,7 +60,23 @@ github.com/ginDoki19/GinArena-patch
 </details>
 
 <details>
-<summary>📦 CrexiFy TV&nbsp;&nbsp;•&nbsp;&nbsp;2 patches</summary>
+<summary>📦 Daylio&nbsp;&nbsp;•&nbsp;&nbsp;1 patch</summary>
+<br>
+
+**🎯 Supported versions:**
+
+| 🧪&nbsp;1.71.1 |
+| :---: |
+| APKM (arm64-v8a / armeabi-v7a / x86 / x86_64, 480-640 dpi, Android 8.0+), build 289 |
+
+| 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
+|----------|----------------|-----------|
+| [Enable premium (experimental)](#enable-premium-experimental) | Enables local premium status in Daylio 1.71.1. Account-dependent features may not work. |  |
+
+</details>
+
+<details>
+<summary>📦 CrexiFy TV&nbsp;&nbsp;•&nbsp;&nbsp;3 patches</summary>
 <br>
 
 **🎯 Supported versions:**
@@ -72,12 +88,13 @@ github.com/ginDoki19/GinArena-patch
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
 | [Hide playback controls at stream open](#hide-playback-controls-at-stream-open) | Hides controls when a stream opens or switches fullscreen. Tap the video to show them. |  |
+| [Improve Android TV playback controls](#improve-android-tv-playback-controls) | Improves remote focus and opens playback controls with OK on Android TV. |  |
 | [Remove configured startup and banner ads](#remove-configured-startup-and-banner-ads) | Suppresses configured startup/banner ads, the Telegram prompt and message ticker. |  |
 
 </details>
 
 <details>
-<summary>📦 CRICFy TV&nbsp;&nbsp;•&nbsp;&nbsp;2 patches</summary>
+<summary>📦 CRICFy TV&nbsp;&nbsp;•&nbsp;&nbsp;3 patches</summary>
 <br>
 
 **🎯 Supported versions:**
@@ -89,12 +106,13 @@ github.com/ginDoki19/GinArena-patch
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
 | [Hide playback controls at stream open](#hide-playback-controls-at-stream-open) | Hides playback controls when a stream opens or switches fullscreen. Tap the video to show them. |  |
+| [Improve Android TV playback controls](#improve-android-tv-playback-controls) | Prefers the seekbar when playback controls open on Android TV. |  |
 | [Remove ads, proxy & restrictions](#remove-ads-proxy-restrictions) | Stops background bandwidth sharing, removes ads, and hides the player app logo on 7.4. | • Hide promo marquee ticker<br>• Bypass update & force-update screen<br>• Block promotional push notifications<br>• Bypass clone, work-profile & sniffer checks<br>• Strip proxy & ad native libraries |
 
 </details>
 
 <details>
-<summary>📦 CricZ TV&nbsp;&nbsp;•&nbsp;&nbsp;2 patches</summary>
+<summary>📦 CricZ TV&nbsp;&nbsp;•&nbsp;&nbsp;3 patches</summary>
 <br>
 
 **🎯 Supported versions:**
@@ -106,12 +124,13 @@ github.com/ginDoki19/GinArena-patch
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
 | [Hide playback controls at stream open](#hide-playback-controls-at-stream-open) | Hides playback controls when a stream opens or switches fullscreen. Tap the video to show them. |  |
+| [Improve Android TV playback controls](#improve-android-tv-playback-controls) | Improves remote focus and opens playback controls with OK on Android TV. |  |
 | [Remove ads, telemetry & restrictions](#remove-ads-telemetry-restrictions) | Removes ads, promo popups, and tracking, and keeps channels working after patching. | • Hide promo announcement bar<br>• Remove push notifications<br>• Bypass update & force-update screen<br>• Bypass root & sniffer checks<br>• Strip native & telemetry bloat |
 
 </details>
 
 <details>
-<summary>📦 Playfy TV&nbsp;&nbsp;•&nbsp;&nbsp;2 patches</summary>
+<summary>📦 Playfy TV&nbsp;&nbsp;•&nbsp;&nbsp;3 patches</summary>
 <br>
 
 **🎯 Supported versions:**
@@ -123,12 +142,13 @@ github.com/ginDoki19/GinArena-patch
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
 | [Hide playback controls at stream open](#hide-playback-controls-at-stream-open) | Hides playback controls when a stream opens or switches fullscreen. Tap the video to show them. |  |
+| [Improve Android TV playback controls](#improve-android-tv-playback-controls) | Prefers the seekbar when playback controls open on Android TV. |  |
 | [Remove ads, telemetry & restrictions](#remove-ads-telemetry-restrictions) | Removes ads and tracking, and hides the player app logo. | • Remove push notifications<br>• Bypass update & force-update screen<br>• Bypass sniffer-app check<br>• Strip native & telemetry bloat |
 
 </details>
 
 <details>
-<summary>📦 PlayZ TV&nbsp;&nbsp;•&nbsp;&nbsp;2 patches</summary>
+<summary>📦 PlayZ TV&nbsp;&nbsp;•&nbsp;&nbsp;3 patches</summary>
 <br>
 
 **🎯 Supported versions:**
@@ -140,12 +160,13 @@ github.com/ginDoki19/GinArena-patch
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
 | [Hide playback controls at stream open](#hide-playback-controls-at-stream-open) | Hides playback controls when a stream opens or switches fullscreen. Tap the video to show them. |  |
+| [Improve Android TV playback controls](#improve-android-tv-playback-controls) | Improves remote focus and opens playback controls with OK on Android TV. |  |
 | [Remove ads, popups & restrictions](#remove-ads-popups-restrictions) | Removes ads and promo popups, and keeps channels working after patching. |  |
 
 </details>
 
 <details>
-<summary>📦 SK Tech TV&nbsp;&nbsp;•&nbsp;&nbsp;2 patches</summary>
+<summary>📦 SK Tech TV&nbsp;&nbsp;•&nbsp;&nbsp;3 patches</summary>
 <br>
 
 **🎯 Supported versions:**
@@ -157,6 +178,7 @@ github.com/ginDoki19/GinArena-patch
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
 | [Hide playback controls at stream open](#hide-playback-controls-at-stream-open) | Hides playback controls when a stream opens or switches fullscreen. Tap the video to show them. |  |
+| [Improve Android TV playback controls](#improve-android-tv-playback-controls) | Improves remote focus and opens playback controls with OK on Android TV. |  |
 | [Remove ads, telemetry & restrictions](#remove-ads-telemetry-restrictions) | Removes ads, tracking, and forced updates, and keeps channels working after patching. | • Remove push notifications<br>• Bypass update & force-update screen<br>• Bypass root & sniffer checks<br>• Strip native & telemetry bloat<br>• Disable WebActivity (potential ad surface) |
 
 </details>
@@ -182,6 +204,14 @@ github.com/ginDoki19/GinArena-patch
 ### Hide playback controls at stream open
 
 *On by default* for CRICFy TV, CricZ TV, CrexiFy TV, PlayZ TV, SK Tech TV, and Playfy TV. Hides player controls when a stream opens and when switching between fullscreen and the embedded player. Tap the video to show them.
+
+### Improve Android TV playback controls
+
+*On by default* for CricZ TV 7.3, PlayZ TV 2.3.1, CrexiFy TV 4.5, and SK Tech TV 2.7. Helps the remote's OK/center button reveal the native player controls and restores player focus when switching between embedded and fullscreen. Existing player actions, channel keys and stream behavior remain in place; it does not add new seek controls or change PiP.
+
+*On by default* for CRICFy TV 7.4 and Playfy TV 1.7 as well. When controls open on Android TV, these app-specific patches prefer the existing seekbar over the play/pause button. For CRICFy Live with multiple sources, the patch also helps keep the seekbar selected when the app automatically focuses a source tab. You can still navigate to source tabs to switch streams.
+
+This patch depends on **Hide playback controls at stream open**: selecting it also selects that patch. On TV it may move focus from Share (or, in SK Tech, the message card) to the player at a player-opening or fullscreen transition; those views remain available through navigation. The first remote press may only reveal the controls; subsequent left/right uses the native seekbar when it is available. A live stream may not be seekable. The CricZ, PlayZ and CrexiFy changes were reported working on TV; the SK Tech adaptation still needs a real-device playback and remote test.
 
 ---
 
@@ -540,12 +570,36 @@ Enables local premium tools and cleans up VIP labels and buttons.
 
 ---
 
+## 📦 Daylio (1.71.1, build 289)
+
+<details>
+<summary><b>📖 App details</b> — experimental patch and target version</summary>
+
+### Enable premium (experimental)
+
+*Off by default.* Attempts to enable local premium status while preserving the app's completion callbacks. This is not a Google Play purchase; account- or server-controlled features may not work. The patch is experimental and was reported working in a local test; individual features may behave differently. Enable experimental app versions for the source and Expert mode in Morphe Manager, then select this patch explicitly.
+
+| | |
+|---|---|
+| Package | `net.daylio` |
+| Version | **1.71.1** (build 289), Android 8.0+ |
+| Tested input | APKM, four ABIs, 480–640 dpi |
+| Stock download | [APKMirror — Daylio 1.71.1](https://www.apkmirror.com/apk/habitics/daylio-diary-journal-mood-tracker/daylio-journal-mood-tracker-1-71-1-release/) — choose the exact build and verify its hash |
+| APKM SHA-256 | `25feb6336e054245e159e163b6f6d1e95be3a5395b66955884b68c5460172660` |
+| Signing certificate SHA-256 | `6afb7e4100413a77e13b6a1e4f8ac1f9e3421862b3678fb9abe6aa531e859a9d` |
+
+> **Protect your journal:** make a verified backup before testing, ideally on a spare device or profile. An existing install can update in place only when its signing key matches. Do not uninstall to resolve a signature conflict without first verifying a restorable backup; uninstalling can delete entries and attachments. Keep exports private.
+
+</details>
+
+---
+
 ## Usage (Morphe Manager)
 
 1. Add this repository as a remote patch source using the link at the top of this README.
 2. Download the stock **1DM 20.0 APKM**, **CRICFy TV 7.4 APK**, **CricZ TV 7.3 APK**,
-   **PlayZ TV 2.3.1 APK**, **SK Tech TV 2.7 APK**, **MX Player 3.4.1 or 3.4.3 APK**, or
-   **APK Decompiler 4.12.0 APK** above onto your device.
+   **PlayZ TV 2.3.1 APK**, **SK Tech TV 2.7 APK**, **MX Player 3.4.1 or 3.4.3 APK**,
+   **APK Decompiler 4.12.0 APK**, or **Daylio 1.71.1 APKM** above onto your device.
 3. Updates require a compatible signing key. If Android reports a signature conflict, stop: uninstalling the existing app can permanently erase its data. Back up what you can and your Morphe signing key first.
 4. In Morphe Manager, choose **Select from storage**, pick the downloaded stock `.apkm` / `.apk`
    file (rather than an already-patched installed app), configure options if desired (for MX
@@ -587,6 +641,7 @@ bash gradlew :patches:buildAndroid
 
 ## Credits
 
+- [Epxec/android-patches](https://github.com/Epxec/android-patches) — original Daylio premium patch for 1.69.2; the 1.71.1 adaptation is experimental.
 - [BlazeFTL/FTL-Patches](https://github.com/BlazeFTL/FTL-Patches) — inspiration for MX Player patch ideas.
 - [callMeBeyonder/morphe-patches](https://github.com/callMeBeyonder/morphe-patches) — inspiration and initial CRICFy TV patch idea.
 - [Morphe](https://morphe.software/) — Morphe Patcher and Morphe Manager.
