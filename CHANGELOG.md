@@ -1,3 +1,9 @@
+## [2.10.0-dev.1](https://github.com/ginDoki19/GinArena-patch/compare/v2.9.2-dev.2...v2.10.0-dev.1) (2026-11-08)
+
+### ✨ New Features
+
+* **daylio:** add experimental Daylio 1.71.1 support ([899ee03](https://github.com/ginDoki19/GinArena-patch/commit/899ee038c7a38cee1543fcfa70c395a3a94a5ac4))
+
 ## [2.9.2-dev.2](https://github.com/ginDoki19/GinArena-patch/compare/v2.9.2-dev.1...v2.9.2-dev.2) (2026-11-08)
 
 ### 🐛 Bug Fixes
