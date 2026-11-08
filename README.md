@@ -191,7 +191,9 @@ github.com/ginDoki19/GinArena-patch
 
 *On by default* for CricZ TV 7.3, PlayZ TV 2.3.1, CrexiFy TV 4.5, and SK Tech TV 2.7. Helps the remote's OK/center button reveal the native player controls and restores player focus when switching between embedded and fullscreen. Existing player actions, channel keys and stream behavior remain in place; it does not add new seek controls or change PiP.
 
-This patch depends on **Hide playback controls at stream open**: selecting it also selects that patch. On TV it may move focus from Share (or, in SK Tech, the message card) to the player at a player-opening or fullscreen transition; those views remain available through navigation. A live stream may not be seekable. The CricZ, PlayZ and CrexiFy changes were reported working on TV; the SK Tech adaptation still needs a real-device playback and remote test.
+*On by default* for CRICFy TV 7.4 and Playfy TV 1.7 as well. When controls open on Android TV, these app-specific patches prefer the existing seekbar over the play/pause button. For CRICFy Live with multiple sources, the patch also helps keep the seekbar selected when the app automatically focuses a source tab. You can still navigate to source tabs to switch streams.
+
+This patch depends on **Hide playback controls at stream open**: selecting it also selects that patch. On TV it may move focus from Share (or, in SK Tech, the message card) to the player at a player-opening or fullscreen transition; those views remain available through navigation. The first remote press may only reveal the controls; subsequent left/right uses the native seekbar when it is available. A live stream may not be seekable. The CricZ, PlayZ and CrexiFy changes were reported working on TV; the SK Tech adaptation still needs a real-device playback and remote test.
 
 ---
 
