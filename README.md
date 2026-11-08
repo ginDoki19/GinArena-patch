@@ -19,7 +19,7 @@ github.com/ginDoki19/GinArena-patch
 ## 🩹 Patches list
 
 <!-- PATCHES_START -->
-> **[v2.9.2-dev.1](https://github.com/ginDoki19/GinArena-patch/releases/tag/v2.9.2-dev.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;26 patches total
+> **[v2.9.2-dev.2](https://github.com/ginDoki19/GinArena-patch/releases/tag/v2.9.2-dev.2)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;28 patches total
 <details>
 <summary>📦 1DM&nbsp;&nbsp;•&nbsp;&nbsp;5 patches</summary>
 <br>
@@ -78,7 +78,7 @@ github.com/ginDoki19/GinArena-patch
 </details>
 
 <details>
-<summary>📦 CRICFy TV&nbsp;&nbsp;•&nbsp;&nbsp;2 patches</summary>
+<summary>📦 CRICFy TV&nbsp;&nbsp;•&nbsp;&nbsp;3 patches</summary>
 <br>
 
 **🎯 Supported versions:**
@@ -90,6 +90,7 @@ github.com/ginDoki19/GinArena-patch
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
 | [Hide playback controls at stream open](#hide-playback-controls-at-stream-open) | Hides playback controls when a stream opens or switches fullscreen. Tap the video to show them. |  |
+| [Improve Android TV playback controls](#improve-android-tv-playback-controls) | Prefers the seekbar when playback controls open on Android TV. |  |
 | [Remove ads, proxy & restrictions](#remove-ads-proxy-restrictions) | Stops background bandwidth sharing, removes ads, and hides the player app logo on 7.4. | • Hide promo marquee ticker<br>• Bypass update & force-update screen<br>• Block promotional push notifications<br>• Bypass clone, work-profile & sniffer checks<br>• Strip proxy & ad native libraries |
 
 </details>
@@ -113,7 +114,7 @@ github.com/ginDoki19/GinArena-patch
 </details>
 
 <details>
-<summary>📦 Playfy TV&nbsp;&nbsp;•&nbsp;&nbsp;2 patches</summary>
+<summary>📦 Playfy TV&nbsp;&nbsp;•&nbsp;&nbsp;3 patches</summary>
 <br>
 
 **🎯 Supported versions:**
@@ -125,6 +126,7 @@ github.com/ginDoki19/GinArena-patch
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
 | [Hide playback controls at stream open](#hide-playback-controls-at-stream-open) | Hides playback controls when a stream opens or switches fullscreen. Tap the video to show them. |  |
+| [Improve Android TV playback controls](#improve-android-tv-playback-controls) | Prefers the seekbar when playback controls open on Android TV. |  |
 | [Remove ads, telemetry & restrictions](#remove-ads-telemetry-restrictions) | Removes ads and tracking, and hides the player app logo. | • Remove push notifications<br>• Bypass update & force-update screen<br>• Bypass sniffer-app check<br>• Strip native & telemetry bloat |
 
 </details>

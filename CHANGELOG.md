@@ -1,3 +1,9 @@
+## [2.9.2-dev.2](https://github.com/ginDoki19/GinArena-patch/compare/v2.9.2-dev.1...v2.9.2-dev.2) (2026-11-08)
+
+### 🐛 Bug Fixes
+
+* **player:** improve CricFy and PlayFy TV seekbar focus ([8267a2d](https://github.com/ginDoki19/GinArena-patch/commit/8267a2dfb1f0c35390bc1bc89d944526e5c726bc))
+
 ## [2.9.2-dev.1](https://github.com/ginDoki19/GinArena-patch/compare/v2.9.1...v2.9.2-dev.1) (2026-11-07)
 
 ### 🐛 Bug Fixes
