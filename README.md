@@ -3,7 +3,7 @@
 **GinArena Patch** is a [Morphe](https://morphe.software/) patch bundle for free **1DM**
 (`idm.internet.download.manager`), **CRICFy TV** (`com.cricfytv.sports`), **CricZ TV**
 (`com.pro.cricztv`), **CrexiFy TV** (`com.crexify.tv`), **PlayZ TV** (`com.playz.tv`), **MX Player** (`com.mxtech.videoplayer.ad`),
-**SK Tech TV** (`com.live.sktechtv`), **Playfy TV** (`com.playfy.tv`), and **APK Decompiler** (`com.apktools.app.decompile`).
+**SK Tech TV** (`com.live.sktechtv`), **Playfy TV** (`com.playfy.tv`), **APK Decompiler** (`com.apktools.app.decompile`), and **Daylio** (`net.daylio`).
 Morphe Manager automatically filters patches per app, so selecting an app shows only compatible patches.
 
 ### How to use these patches
@@ -554,12 +554,36 @@ Enables local premium tools and cleans up VIP labels and buttons.
 
 ---
 
+## 📦 Daylio (1.71.1, build 289)
+
+<details>
+<summary><b>📖 App details</b> — experimental patch and target version</summary>
+
+### Enable premium (experimental)
+
+*Off by default.* Attempts to enable local premium status while preserving the app's completion callbacks. This is not a Google Play purchase; account- or server-controlled features may not work. The patch is experimental and was reported working in a local test; individual features may behave differently. Enable experimental app versions for the source and Expert mode in Morphe Manager, then select this patch explicitly.
+
+| | |
+|---|---|
+| Package | `net.daylio` |
+| Version | **1.71.1** (build 289), Android 8.0+ |
+| Tested input | APKM, four ABIs, 480–640 dpi |
+| Stock download | [APKMirror — Daylio 1.71.1](https://www.apkmirror.com/apk/habitics/daylio-diary-journal-mood-tracker/daylio-journal-mood-tracker-1-71-1-release/) — choose the exact build and verify its hash |
+| APKM SHA-256 | `25feb6336e054245e159e163b6f6d1e95be3a5395b66955884b68c5460172660` |
+| Signing certificate SHA-256 | `6afb7e4100413a77e13b6a1e4f8ac1f9e3421862b3678fb9abe6aa531e859a9d` |
+
+> **Protect your journal:** make a verified backup before testing, ideally on a spare device or profile. An existing install can update in place only when its signing key matches. Do not uninstall to resolve a signature conflict without first verifying a restorable backup; uninstalling can delete entries and attachments. Keep exports private.
+
+</details>
+
+---
+
 ## Usage (Morphe Manager)
 
 1. Add this repository as a remote patch source using the link at the top of this README.
 2. Download the stock **1DM 20.0 APKM**, **CRICFy TV 7.4 APK**, **CricZ TV 7.3 APK**,
-   **PlayZ TV 2.3.1 APK**, **SK Tech TV 2.7 APK**, **MX Player 3.4.1 or 3.4.3 APK**, or
-   **APK Decompiler 4.12.0 APK** above onto your device.
+   **PlayZ TV 2.3.1 APK**, **SK Tech TV 2.7 APK**, **MX Player 3.4.1 or 3.4.3 APK**,
+   **APK Decompiler 4.12.0 APK**, or **Daylio 1.71.1 APKM** above onto your device.
 3. Updates require a compatible signing key. If Android reports a signature conflict, stop: uninstalling the existing app can permanently erase its data. Back up what you can and your Morphe signing key first.
 4. In Morphe Manager, choose **Select from storage**, pick the downloaded stock `.apkm` / `.apk`
    file (rather than an already-patched installed app), configure options if desired (for MX
@@ -601,6 +625,7 @@ bash gradlew :patches:buildAndroid
 
 ## Credits
 
+- [Epxec/android-patches](https://github.com/Epxec/android-patches) — original Daylio premium patch for 1.69.2; the 1.71.1 adaptation is experimental.
 - [BlazeFTL/FTL-Patches](https://github.com/BlazeFTL/FTL-Patches) — inspiration for MX Player patch ideas.
 - [callMeBeyonder/morphe-patches](https://github.com/callMeBeyonder/morphe-patches) — inspiration and initial CRICFy TV patch idea.
 - [Morphe](https://morphe.software/) — Morphe Patcher and Morphe Manager.
