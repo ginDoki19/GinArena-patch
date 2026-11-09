@@ -1,3 +1,9 @@
+## [2.10.1-dev.1](https://github.com/ginDoki19/GinArena-patch/compare/v2.10.0...v2.10.1-dev.1) (2026-11-09)
+
+### 🐛 Bug Fixes
+
+* **cricfy:** improve search and playback patch details ([4853980](https://github.com/ginDoki19/GinArena-patch/commit/485398033e916b9267e3f17734021eea6137cc56))
+
 ## [2.10.0](https://github.com/ginDoki19/GinArena-patch/compare/v2.9.1...v2.10.0) (2026-11-08)
 
 ### 🐛 Bug Fixes
