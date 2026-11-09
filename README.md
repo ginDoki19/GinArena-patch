@@ -18,6 +18,8 @@ github.com/ginDoki19/GinArena-patch
 
 ## 🩹 Patches list
 
+The table below reflects the last published release and is refreshed automatically by the release workflow.
+
 <!-- PATCHES_START -->
 > **[v2.10.0](https://github.com/ginDoki19/GinArena-patch/releases/tag/v2.10.0)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;29 patches total
 <details>
@@ -203,7 +205,7 @@ github.com/ginDoki19/GinArena-patch
 
 ### Hide playback controls at stream open
 
-*On by default* for CRICFy TV, CricZ TV, CrexiFy TV, PlayZ TV, SK Tech TV, and Playfy TV. Hides player controls when a stream opens and when switching between fullscreen and the embedded player. Tap the video to show them.
+*On by default* for CRICFy TV, CricZ TV, CrexiFy TV, PlayZ TV, SK Tech TV, and Playfy TV. Keeps player controls hidden when a stream opens or switches between embedded and fullscreen. The native controls remain available through the usual touch or remote interaction.
 
 ### Improve Android TV playback controls
 
@@ -212,6 +214,10 @@ github.com/ginDoki19/GinArena-patch
 *On by default* for CRICFy TV 7.4 and Playfy TV 1.7 as well. When controls open on Android TV, these app-specific patches prefer the existing seekbar over the play/pause button. For CRICFy Live with multiple sources, the patch also helps keep the seekbar selected when the app automatically focuses a source tab. You can still navigate to source tabs to switch streams.
 
 This patch depends on **Hide playback controls at stream open**: selecting it also selects that patch. On TV it may move focus from Share (or, in SK Tech, the message card) to the player at a player-opening or fullscreen transition; those views remain available through navigation. The first remote press may only reveal the controls; subsequent left/right uses the native seekbar when it is available. A live stream may not be seekable. The CricZ, PlayZ and CrexiFy changes were reported working on TV; the SK Tech adaptation still needs a real-device playback and remote test.
+
+### Fix search keyboard focus
+
+*On by default* for CRICFy TV 7.4 (build 54). Helps open search on Android TV and prevent category labels from disrupting keyboard input on TVs and phones. On TV, the shared search is cleared when the app reports a navigation destination or the search bar is explicitly closed; hiding only the keyboard preserves the query. Repeated destination callbacks or restoration may also clear the query. This does not clear the keyboard's own suggestion history.
 
 ---
 
@@ -412,7 +418,7 @@ Options (on by default): hide the promo bar, remove push notifications, skip for
 
 The patch adapts the signer-bound decoder for re-signed builds and disables its startup integrity self-test.
 
-**Hide playback controls at stream open** (on by default) keeps controls hidden when a stream opens or switches fullscreen. Tap the video to show them.
+**Hide playback controls at stream open** (on by default) keeps controls hidden when a stream opens or switches between embedded and fullscreen. Native controls remain available.
 
 ### Target app (CrexiFy TV)
 
@@ -573,11 +579,11 @@ Enables local premium tools and cleans up VIP labels and buttons.
 ## 📦 Daylio (1.71.1, build 289)
 
 <details>
-<summary><b>📖 App details</b> — experimental patch and target version</summary>
+<summary><b>📖 App details</b> — patch and target version</summary>
 
-### Enable premium (experimental)
+### Enable premium
 
-*Off by default.* Attempts to enable local premium status while preserving the app's completion callbacks. This is not a Google Play purchase; account- or server-controlled features may not work. The patch is experimental and was reported working in a local test; individual features may behave differently. Enable experimental app versions for the source and Expert mode in Morphe Manager, then select this patch explicitly.
+*On by default.* Enables local premium status while preserving the app's completion callbacks. This is not a Google Play purchase; account- or server-controlled features may not work. It was reported working in a local test, but individual features may behave differently.
 
 | | |
 |---|---|
@@ -641,7 +647,7 @@ bash gradlew :patches:buildAndroid
 
 ## Credits
 
-- [Epxec/android-patches](https://github.com/Epxec/android-patches) — original Daylio premium patch for 1.69.2; the 1.71.1 adaptation is experimental.
+- [Epxec/android-patches](https://github.com/Epxec/android-patches) — original Daylio premium patch for 1.69.2; adapted for 1.71.1.
 - [BlazeFTL/FTL-Patches](https://github.com/BlazeFTL/FTL-Patches) — inspiration for MX Player patch ideas.
 - [callMeBeyonder/morphe-patches](https://github.com/callMeBeyonder/morphe-patches) — inspiration and initial CRICFy TV patch idea.
 - [Morphe](https://morphe.software/) — Morphe Patcher and Morphe Manager.

@@ -58,9 +58,9 @@ private fun BytecodePatchContext.replaceBody(target: MutableMethod, body: String
 
 @Suppress("unused")
 val enableDaylioPremium = bytecodePatch(
-    name = "Enable premium (experimental)",
-    description = "Enables local premium status in Daylio 1.71.1. Account-dependent features may not work.",
-    default = false,
+    name = "Enable premium",
+    description = "Enables local premium status in Daylio 1.71.1. Account- or server-dependent features may not work; this is not a purchase.",
+    default = true,
 ) {
     compatibleWith(COMPATIBILITY_DAYLIO)
     execute {

@@ -285,7 +285,7 @@ private fun BytecodePatchContext.applyCricfyLiveFocus() {
 
 @Suppress("unused") val cricfyIssue42TvTest = bytecodePatch(
     name="Improve Android TV playback controls",
-    description="Prefers the seekbar when playback controls open on Android TV.", default=true
+    description="On Android TV, prefers the seekbar when controls open and helps retain focus when live-source tabs auto-focus. Seeking depends on the stream.", default=true
 ) {
     compatibleWith(COMPATIBILITY_CRICFY_TV)
     dependsOn(hidePlaybackControlsPatch)
@@ -296,7 +296,7 @@ private fun BytecodePatchContext.applyCricfyLiveFocus() {
 }
 @Suppress("unused") val playfyIssue42TvTest = bytecodePatch(
     name="Improve Android TV playback controls",
-    description="Prefers the seekbar when playback controls open on Android TV.", default=true
+    description="On Android TV, prefers the seekbar over play/pause when controls open. Seeking depends on the stream.", default=true
 ) {
     compatibleWith(COMPATIBILITY_PLAYFY_TV)
     dependsOn(playfyHide)

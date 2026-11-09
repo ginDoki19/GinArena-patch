@@ -275,20 +275,20 @@ private fun BytecodePatchContext.applyRemote(s: Spec, start: Fingerprint, show: 
     sm.addInstructions(fi,"invoke-static {v$controllerReg}, ${s.activity}->ginTvControllerFocus(Landroid/view/View;)V")
 }
 
-@Suppress("unused") val criczTvRemote=bytecodePatch(name="Improve Android TV playback controls",description="Improves remote focus and opens playback controls with OK on Android TV.",default=true) {
+@Suppress("unused") val criczTvRemote=bytecodePatch(name="Improve Android TV playback controls",description="Helps the Android TV remote reveal native playback controls and focus the seekbar when available. Live streams may not be seekable.",default=true) {
     compatibleWith(COMPATIBILITY_CRICZ_TV); dependsOn(criczRes,criczHide)
     execute { check(packageMetadata.packageName==cricz.pkg && packageMetadata.versionName==cricz.ver && packageMetadata.versionCode==cricz.code); applyRemote(cricz,criczStart,criczShow,criczToggle) }
 }
-@Suppress("unused") val playzTvRemote=bytecodePatch(name="Improve Android TV playback controls",description="Improves remote focus and opens playback controls with OK on Android TV.",default=true) {
+@Suppress("unused") val playzTvRemote=bytecodePatch(name="Improve Android TV playback controls",description="Helps the Android TV remote reveal native playback controls and focus the seekbar when available. Live streams may not be seekable.",default=true) {
     compatibleWith(COMPATIBILITY_PLAYZ_TV); dependsOn(playzRes,playzHide)
     execute { check(packageMetadata.packageName==playz.pkg && packageMetadata.versionName==playz.ver && packageMetadata.versionCode==playz.code); applyRemote(playz,playzStart,playzShow,playzToggle) }
 }
-@Suppress("unused") val crexifyTvRemote=bytecodePatch(name="Improve Android TV playback controls",description="Improves remote focus and opens playback controls with OK on Android TV.",default=true) {
+@Suppress("unused") val crexifyTvRemote=bytecodePatch(name="Improve Android TV playback controls",description="Helps the Android TV remote reveal native playback controls and focus the seekbar when available. Live streams may not be seekable.",default=true) {
     compatibleWith(COMPATIBILITY_CREXIFY_TV); dependsOn(crexifyRes,crexifyHide)
     execute { check(packageMetadata.packageName==crexify.pkg && packageMetadata.versionName==crexify.ver && packageMetadata.versionCode==crexify.code); applyRemote(crexify,crexifyStart,crexifyShow,crexifyToggle) }
 }
 
-@Suppress("unused") val sktechTvRemote=bytecodePatch(name="Improve Android TV playback controls",description="Improves remote focus and opens playback controls with OK on Android TV.",default=true) {
+@Suppress("unused") val sktechTvRemote=bytecodePatch(name="Improve Android TV playback controls",description="Helps the Android TV remote reveal native playback controls and focus the seekbar when available. Live streams may not be seekable.",default=true) {
     compatibleWith(COMPATIBILITY_SK_TECH_TV); dependsOn(sktechRes,sktechHide)
     execute { check(packageMetadata.packageName==sktech.pkg && packageMetadata.versionName==sktech.ver && packageMetadata.versionCode==sktech.code); applyRemote(sktech,sktechStart,sktechShow,sktechToggle) }
 }
