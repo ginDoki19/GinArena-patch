@@ -21,7 +21,7 @@ github.com/ginDoki19/GinArena-patch
 The table below reflects the last published release and is refreshed automatically by the release workflow.
 
 <!-- PATCHES_START -->
-> **[v2.10.0](https://github.com/ginDoki19/GinArena-patch/releases/tag/v2.10.0)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;29 patches total
+> **[v2.10.1-dev.1](https://github.com/ginDoki19/GinArena-patch/releases/tag/v2.10.1-dev.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;30 patches total
 <details>
 <summary>📦 1DM&nbsp;&nbsp;•&nbsp;&nbsp;5 patches</summary>
 <br>
@@ -67,13 +67,32 @@ The table below reflects the last published release and is refreshed automatical
 
 **🎯 Supported versions:**
 
-| 🧪&nbsp;1.71.1 |
+| 1.71.1 |
 | :---: |
 | APKM (arm64-v8a / armeabi-v7a / x86 / x86_64, 480-640 dpi, Android 8.0+), build 289 |
 
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
-| [Enable premium (experimental)](#enable-premium-experimental) | Enables local premium status in Daylio 1.71.1. Account-dependent features may not work. |  |
+| [Enable premium](#enable-premium) | Enables local premium status in Daylio 1.71.1. Account- or server-dependent features may not work; this is not a purchase. |  |
+
+</details>
+
+<details>
+<summary>📦 CRICFy TV&nbsp;&nbsp;•&nbsp;&nbsp;4 patches</summary>
+<br>
+
+**🎯 Supported versions:**
+
+| 7.4 |
+| :---: |
+| Universal APK (arm64-v8a / armeabi-v7a / x86 / x86_64, Android 7.0+), build 54 |
+
+| 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
+|----------|----------------|-----------|
+| [Fix search keyboard focus](#fix-search-keyboard-focus) | Opens search on Android TV and helps keep the keyboard connected during category searches on TV and phones. Clears TV search on navigation or close. |  |
+| [Hide playback controls at stream open](#hide-playback-controls-at-stream-open) | Keeps playback controls hidden when a stream opens or the player switches between embedded and fullscreen. The controls remain available. |  |
+| [Improve Android TV playback controls](#improve-android-tv-playback-controls) | On Android TV, prefers the seekbar when controls open and helps retain focus when live-source tabs auto-focus. Seeking depends on the stream. |  |
+| [Remove ads, proxy & restrictions](#remove-ads-proxy-restrictions) | Stops background bandwidth sharing, removes ads, and hides the player app logo on 7.4. | • Hide promo marquee ticker<br>• Bypass update & force-update screen<br>• Block promotional push notifications<br>• Bypass clone, work-profile & sniffer checks<br>• Strip proxy & ad native libraries |
 
 </details>
 
@@ -89,27 +108,9 @@ The table below reflects the last published release and is refreshed automatical
 
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
-| [Hide playback controls at stream open](#hide-playback-controls-at-stream-open) | Hides controls when a stream opens or switches fullscreen. Tap the video to show them. |  |
-| [Improve Android TV playback controls](#improve-android-tv-playback-controls) | Improves remote focus and opens playback controls with OK on Android TV. |  |
+| [Hide playback controls at stream open](#hide-playback-controls-at-stream-open) | Keeps playback controls hidden when a stream opens or the player switches between embedded and fullscreen. The controls remain available. |  |
+| [Improve Android TV playback controls](#improve-android-tv-playback-controls) | Helps the Android TV remote reveal native playback controls and focus the seekbar when available. Live streams may not be seekable. |  |
 | [Remove configured startup and banner ads](#remove-configured-startup-and-banner-ads) | Suppresses configured startup/banner ads, the Telegram prompt and message ticker. |  |
-
-</details>
-
-<details>
-<summary>📦 CRICFy TV&nbsp;&nbsp;•&nbsp;&nbsp;3 patches</summary>
-<br>
-
-**🎯 Supported versions:**
-
-| 7.4 |
-| :---: |
-| Universal APK (arm64-v8a / armeabi-v7a / x86 / x86_64, Android 7.0+), build 54 |
-
-| 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
-|----------|----------------|-----------|
-| [Hide playback controls at stream open](#hide-playback-controls-at-stream-open) | Hides playback controls when a stream opens or switches fullscreen. Tap the video to show them. |  |
-| [Improve Android TV playback controls](#improve-android-tv-playback-controls) | Prefers the seekbar when playback controls open on Android TV. |  |
-| [Remove ads, proxy & restrictions](#remove-ads-proxy-restrictions) | Stops background bandwidth sharing, removes ads, and hides the player app logo on 7.4. | • Hide promo marquee ticker<br>• Bypass update & force-update screen<br>• Block promotional push notifications<br>• Bypass clone, work-profile & sniffer checks<br>• Strip proxy & ad native libraries |
 
 </details>
 
@@ -125,8 +126,8 @@ The table below reflects the last published release and is refreshed automatical
 
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
-| [Hide playback controls at stream open](#hide-playback-controls-at-stream-open) | Hides playback controls when a stream opens or switches fullscreen. Tap the video to show them. |  |
-| [Improve Android TV playback controls](#improve-android-tv-playback-controls) | Improves remote focus and opens playback controls with OK on Android TV. |  |
+| [Hide playback controls at stream open](#hide-playback-controls-at-stream-open) | Keeps playback controls hidden when a stream opens or the player switches between embedded and fullscreen. The controls remain available. |  |
+| [Improve Android TV playback controls](#improve-android-tv-playback-controls) | Helps the Android TV remote reveal native playback controls and focus the seekbar when available. Live streams may not be seekable. |  |
 | [Remove ads, telemetry & restrictions](#remove-ads-telemetry-restrictions) | Removes ads, promo popups, and tracking, and keeps channels working after patching. | • Hide promo announcement bar<br>• Remove push notifications<br>• Bypass update & force-update screen<br>• Bypass root & sniffer checks<br>• Strip native & telemetry bloat |
 
 </details>
@@ -143,8 +144,8 @@ The table below reflects the last published release and is refreshed automatical
 
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
-| [Hide playback controls at stream open](#hide-playback-controls-at-stream-open) | Hides playback controls when a stream opens or switches fullscreen. Tap the video to show them. |  |
-| [Improve Android TV playback controls](#improve-android-tv-playback-controls) | Prefers the seekbar when playback controls open on Android TV. |  |
+| [Hide playback controls at stream open](#hide-playback-controls-at-stream-open) | Keeps playback controls hidden when a stream opens or the player switches between embedded and fullscreen. The controls remain available. |  |
+| [Improve Android TV playback controls](#improve-android-tv-playback-controls) | On Android TV, prefers the seekbar over play/pause when controls open. Seeking depends on the stream. |  |
 | [Remove ads, telemetry & restrictions](#remove-ads-telemetry-restrictions) | Removes ads and tracking, and hides the player app logo. | • Remove push notifications<br>• Bypass update & force-update screen<br>• Bypass sniffer-app check<br>• Strip native & telemetry bloat |
 
 </details>
@@ -161,8 +162,8 @@ The table below reflects the last published release and is refreshed automatical
 
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
-| [Hide playback controls at stream open](#hide-playback-controls-at-stream-open) | Hides playback controls when a stream opens or switches fullscreen. Tap the video to show them. |  |
-| [Improve Android TV playback controls](#improve-android-tv-playback-controls) | Improves remote focus and opens playback controls with OK on Android TV. |  |
+| [Hide playback controls at stream open](#hide-playback-controls-at-stream-open) | Keeps playback controls hidden when a stream opens or the player switches between embedded and fullscreen. The controls remain available. |  |
+| [Improve Android TV playback controls](#improve-android-tv-playback-controls) | Helps the Android TV remote reveal native playback controls and focus the seekbar when available. Live streams may not be seekable. |  |
 | [Remove ads, popups & restrictions](#remove-ads-popups-restrictions) | Removes ads and promo popups, and keeps channels working after patching. |  |
 
 </details>
@@ -179,8 +180,8 @@ The table below reflects the last published release and is refreshed automatical
 
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
-| [Hide playback controls at stream open](#hide-playback-controls-at-stream-open) | Hides playback controls when a stream opens or switches fullscreen. Tap the video to show them. |  |
-| [Improve Android TV playback controls](#improve-android-tv-playback-controls) | Improves remote focus and opens playback controls with OK on Android TV. |  |
+| [Hide playback controls at stream open](#hide-playback-controls-at-stream-open) | Keeps playback controls hidden when a stream opens or the player switches between embedded and fullscreen. The controls remain available. |  |
+| [Improve Android TV playback controls](#improve-android-tv-playback-controls) | Helps the Android TV remote reveal native playback controls and focus the seekbar when available. Live streams may not be seekable. |  |
 | [Remove ads, telemetry & restrictions](#remove-ads-telemetry-restrictions) | Removes ads, tracking, and forced updates, and keeps channels working after patching. | • Remove push notifications<br>• Bypass update & force-update screen<br>• Bypass root & sniffer checks<br>• Strip native & telemetry bloat<br>• Disable WebActivity (potential ad surface) |
 
 </details>
