@@ -3,7 +3,7 @@
 **GinArena Patch** is a [Morphe](https://morphe.software/) patch bundle for free **1DM**
 (`idm.internet.download.manager`), **CRICFy TV** (`com.cricfytv.sports`), **CricZ TV**
 (`com.pro.cricztv`), **CrexiFy TV** (`com.crexify.tv`), **PlayZ TV** (`com.playz.tv`), **MX Player** (`com.mxtech.videoplayer.ad`),
-**SK Tech TV** (`com.live.sktechtv`), **Playfy TV** (`com.playfy.tv`), **APK Decompiler** (`com.apktools.app.decompile`), and **Daylio** (`net.daylio`).
+**SK Tech TV** (`com.live.sktechtv`), **Playfy TV** (`com.playfy.tv`), **APK Decompiler** (`com.apktools.app.decompile`), **Daylio** (`net.daylio`), and **WPS Office** (`cn.wps.moffice_eng`).
 Morphe Manager automatically filters patches per app, so selecting an app shows only compatible patches.
 
 ### How to use these patches
@@ -601,12 +601,95 @@ Enables local premium tools and cleans up VIP labels and buttons.
 
 ---
 
+## 📦 WPS Office (26.11.0, build 1650)
+
+<details>
+<summary><b>📖 App details</b> - what it does, target version and notes (click to expand)</summary>
+
+### What it does
+
+Opens the gates WPS checks **on the device**. Every change is a separate switch - turn them all off
+and you get a stock-equivalent build.
+
+#### Unlock premium features
+
+| Option | Default | What it does |
+|---|:---:|---|
+| **Unlock PDF and export tools** | **on** | Answers the app's payment check with success. This is what opens image-to-PDF, PDF export and printing. |
+| Show a Pro account | on | Shows your account as Premium, so upgrade banners and price cards go away. |
+| Open Pro menus | on | Tells the app you have a Pro membership, which opens the menu entries locked behind it. |
+| Pass ownership checks | on | Answers "do I own this?" with yes, so premium fonts, templates and PDF tools open. |
+| Remove ads | on | Tells the app you are ad-free, so banner and full-screen ads are never requested. |
+| Hide the "already a member" popup | on | Stops the popup that says you are already a WPS Premium user. |
+| Pass background checks | **off** | Also answers the checks that run in the background. Stronger, but it can invent usage counters. |
+| Report the stock signature | **off** | Only analytics reads this. It does not affect premium, ads or sign-in. |
+| Skip the ad pre-check | **off** | Tells the app ads are off before it contacts the server, so those requests never start. |
+| Turn AI features off | **off** | Answers every AI request as not owned. Use it only if an AI tool keeps loading forever. |
+
+#### Google sign-in via MicroG RE
+
+> **This patch is off by default - tick it when you patch.** It only applies if MicroG RE is your
+> Play services provider; on a device with real Google Play Services, leave it off.
+
+Re-signing an app changes its identity, and Google's OAuth backend matches apps on
+**(package name, signing certificate)**. MicroG RE solves this by presenting WPS's *original* identity,
+read from the two meta-data entries this patch adds. The values are constants, so sign-in keeps
+working under **any** package name.
+
+| Option | Default | What it does |
+|---|:---:|---|
+| Sign in as the original app | on | Tells MicroG the app's original name and signature, which is what makes Google accept the sign-in. |
+| Send Google calls to MicroG | on | Points WPS's Play services calls at MicroG instead of Google. |
+| Report Play services as available | on | MicroG fails Google's signature check, so this answers the availability check with yes. |
+| Route notifications through MicroG | on | Sends push notifications through MicroG so they keep arriving. |
+| Let the app find Google and MicroG | on | Makes both Play services packages visible on Android 11+, so sign-in can reach MicroG. WPS declares neither, so nothing else changes. |
+
+### What works, and what still needs the server
+
+**On-device, works:** PDF toolkit (split/merge/compress), image-to-PDF export, printing, export to
+image, watermark-free saves, OCR text extraction, premium fonts/templates that ship with the app.
+
+**Authorised by Kingsoft when it runs - no client-side patch can provide these:** cloud AI actions,
+cloud conversion, cloud OCR upload, cloud storage space, and premium downloads that are not in the
+APK. These fail with a server response rather than a paywall.
+
+Two gates sit outside the app entirely and cannot be patched:
+
+* a **server-pushed feature switch** (`func_switch` via the remote-config manager), and
+* the **`/auth_query` call** that authorises AI per device and account.
+
+### Known behaviour
+
+* **First launch after a fresh install** may open a Google One Tap window that does not complete; back
+  out of it and the normal login screen is underneath, where signing in with MicroG works. WPS fires
+  this by itself from its own A/B flag; a toggle to suppress it is planned.
+* **Sign in first.** Stock reports no membership at all while signed out - the privilege cache is
+  only populated for a logged-in account. The patch answers questions; it does not invent an account.
+
+### Target app (WPS Office)
+
+| | |
+|---|---|
+| Package | `cn.wps.moffice_eng` |
+| Version | **26.11.0** (versionCode 1650), XAPK bundle (base + config splits, `arm64-v8a`, Android 10+) |
+| Stock download | [APKPure - WPS Office](https://apkpure.com/wps-office-pdf-doc-editor/cn.wps.moffice_eng) - choose **26.11.0**, XAPK, and verify the hash below |
+| Signing certificate SHA-256 | `643990878d3ca83952a5be5f3e58d9f8bb6cdc57bf0f228700212071c68db3d7` |
+| XAPK SHA-256 | `bd3b27b7f08a548a0b7fcb00934c75b78a51fd405abe0d3a667ef0bfa09d9ea9` |
+
+> **Before you patch:** patching changes the signature, so the stock app has to be uninstalled
+> first. Back up anything saved only inside WPS. Point Morphe at the **XAPK as downloaded** - it
+> merges the base and its config splits itself; do not pre-merge or pre-sign it.
+
+</details>
+
+---
+
 ## Usage (Morphe Manager)
 
 1. Add this repository as a remote patch source using the link at the top of this README.
 2. Download the stock **1DM 20.0 APKM**, **CRICFy TV 7.4 APK**, **CricZ TV 7.3 APK**,
    **PlayZ TV 2.3.1 APK**, **SK Tech TV 2.7 APK**, **MX Player 3.4.1 or 3.4.3 APK**,
-   **APK Decompiler 4.12.0 APK**, or **Daylio 1.71.1 APKM** above onto your device.
+   **APK Decompiler 4.12.0 APK**, **Daylio 1.71.1 APKM**, or **WPS Office 26.11.0 XAPK** above onto your device.
 3. Updates require a compatible signing key. If Android reports a signature conflict, stop: uninstalling the existing app can permanently erase its data. Back up what you can and your Morphe signing key first.
 4. In Morphe Manager, choose **Select from storage**, pick the downloaded stock `.apkm` / `.apk`
    file (rather than an already-patched installed app), configure options if desired (for MX
@@ -650,6 +733,7 @@ bash gradlew :patches:buildAndroid
 
 - [Epxec/android-patches](https://github.com/Epxec/android-patches) — original Daylio premium patch for 1.69.2; adapted for 1.71.1.
 - [BlazeFTL/FTL-Patches](https://github.com/BlazeFTL/FTL-Patches) — inspiration for MX Player patch ideas.
+- [hoo-dles/morphe-patches](https://github.com/hoo-dles/morphe-patches) — the earlier WPS Office "Enable Pro" idea; its anti-tamper dependency no longer exists in 26.11.0, so the WPS patch here is written from scratch against the current privilege layer.
 - [callMeBeyonder/morphe-patches](https://github.com/callMeBeyonder/morphe-patches) — inspiration and initial CRICFy TV patch idea.
 - [Morphe](https://morphe.software/) — Morphe Patcher and Morphe Manager.
 

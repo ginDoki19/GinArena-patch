@@ -34,6 +34,9 @@ object Constants {
     /** SHA-256 of the official signing certificate used by Playfy TV 1.7 (8). */
     private const val PLAYFY_TV_SIGNER_SHA256 = "38cde288f060fa8f476ab6811ff215767c35117bf6248fd8ad157cd4566898cc"
 
+    /** SHA-256 of the official WPS Office signing certificate (CN "KSO Agent", Zhuhai Kingsoft). */
+    private const val WPS_OFFICE_SIGNER_SHA256 = "643990878d3ca83952a5be5f3e58d9f8bb6cdc57bf0f228700212071c68db3d7"
+
     val COMPATIBILITY_ONEDM = Compatibility(
         name = "1DM",
         packageName = "idm.internet.download.manager",
@@ -182,6 +185,22 @@ object Constants {
                 isExperimental = false,
                 minSdk = 28,
                 description = "Standalone APK (arm64-v8a / armeabi-v7a, Android 9.0+), build 4120"
+            )
+        )
+    )
+
+    val COMPATIBILITY_WPS_OFFICE = Compatibility(
+        name = "WPS Office",
+        packageName = "cn.wps.moffice_eng",
+        apkFileType = ApkFileType.XAPK,
+        appIconColor = 0xE64A19,
+        signatures = setOf(WPS_OFFICE_SIGNER_SHA256),
+        targets = listOf(
+            AppTarget(
+                version = "26.11.0",
+                versionCode = 1650,
+                minSdk = 29,
+                description = "XAPK bundle (base + config splits, arm64-v8a, Android 10+), build 1650"
             )
         )
     )
