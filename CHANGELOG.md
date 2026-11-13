@@ -1,3 +1,9 @@
+## [2.11.0-dev.1](https://github.com/ginDoki19/GinArena-patch/compare/v2.10.1...v2.11.0-dev.1) (2026-11-13)
+
+### ✨ New Features
+
+* **wps:** add WPS Office 26.11.0 premium and MicroG sign-in patches ([37de91d](https://github.com/ginDoki19/GinArena-patch/commit/37de91d10ef10f7d1e6e871e31cd54abda256635))
+
 ## [2.10.1](https://github.com/ginDoki19/GinArena-patch/compare/v2.10.0...v2.10.1) (2026-11-09)
 
 ### 🐛 Bug Fixes

@@ -21,7 +21,7 @@ github.com/ginDoki19/GinArena-patch
 The table below reflects the last published release and is refreshed automatically by the release workflow.
 
 <!-- PATCHES_START -->
-> **[v2.10.1](https://github.com/ginDoki19/GinArena-patch/releases/tag/v2.10.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;30 patches total
+> **[v2.11.0-dev.1](https://github.com/ginDoki19/GinArena-patch/releases/tag/v2.11.0-dev.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;32 patches total
 <details>
 <summary>📦 1DM&nbsp;&nbsp;•&nbsp;&nbsp;5 patches</summary>
 <br>
@@ -93,6 +93,23 @@ The table below reflects the last published release and is refreshed automatical
 | [Hide playback controls at stream open](#hide-playback-controls-at-stream-open) | Keeps playback controls hidden when a stream opens or the player switches between embedded and fullscreen. The controls remain available. |  |
 | [Improve Android TV playback controls](#improve-android-tv-playback-controls) | On Android TV, prefers the seekbar when controls open and helps retain focus when live-source tabs auto-focus. Seeking depends on the stream. |  |
 | [Remove ads, proxy & restrictions](#remove-ads-proxy-restrictions) | Stops background bandwidth sharing, removes ads, and hides the player app logo on 7.4. | • Hide promo marquee ticker<br>• Bypass update & force-update screen<br>• Block promotional push notifications<br>• Bypass clone, work-profile & sniffer checks<br>• Strip proxy & ad native libraries |
+
+</details>
+
+<details>
+<summary>📦 WPS Office&nbsp;&nbsp;•&nbsp;&nbsp;2 patches</summary>
+<br>
+
+**🎯 Supported versions:**
+
+| 26.11.0 |
+| :---: |
+| XAPK bundle (base + config splits, arm64-v8a, Android 10+), build 1650 |
+
+| 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
+|----------|----------------|-----------|
+| [Google sign-in via MicroG RE](#google-sign-in-via-microg-re) | Makes Google sign-in work on a re-signed WPS by signing in as the original app. Needs MicroG RE installed with a Google account added. WPS account login is unaffected. | • Sign in as the original app<br>• Send Google calls to MicroG<br>• Report Play services as available<br>• Route notifications through MicroG<br>• Let the app find Google and MicroG |
+| [Unlock premium features](#unlock-premium-features) | Opens the Pro PDF, export and editing tools and removes ads. Every change has its own switch, so you choose what is unlocked. Sign in first: signed out, WPS reports no membership at all. | • Show a Pro account<br>• Open Pro menus<br>• Pass ownership checks<br>• Turn AI features off<br>• Remove ads<br>• Pass background checks<br>• Report the stock signature<br>• Unlock PDF and export tools<br>• Hide the "already a member" popup<br>• Skip the ad pre-check |
 
 </details>
 
