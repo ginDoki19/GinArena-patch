@@ -1,3 +1,9 @@
+## [2.11.1](https://github.com/ginDoki19/GinArena-patch/compare/v2.11.0...v2.11.1) (2026-11-14)
+
+### 🐛 Bug Fixes
+
+* **wps:** make the master switch the first card and name it clearly ([1bf6aea](https://github.com/ginDoki19/GinArena-patch/commit/1bf6aeaf249b06584ad9d063b4ce587041b8321e))
+
 ## [2.11.1-dev.1](https://github.com/ginDoki19/GinArena-patch/compare/v2.11.0...v2.11.1-dev.1) (2026-11-14)
 
 ### 🐛 Bug Fixes
