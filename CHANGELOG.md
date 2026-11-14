@@ -9,6 +9,17 @@
 * **adguard:** add AdGuard 4.15.2 premium unlock patch ([7aea27c](https://github.com/ginDoki19/GinArena-patch/commit/7aea27cf345fad07dfcbd3c96c02f1558708967e))
 * **wps:** add WPS Office 26.11.0 premium and MicroG sign-in patches ([37de91d](https://github.com/ginDoki19/GinArena-patch/commit/37de91d10ef10f7d1e6e871e31cd54abda256635))
 
+## [2.11.0](https://github.com/ginDoki19/GinArena-patch/compare/v2.10.1...v2.11.0) (2026-11-14)
+
+### 🐛 Bug Fixes
+
+* **adguard:** rename patch so README anchors are unique ([2931863](https://github.com/ginDoki19/GinArena-patch/commit/2931863d663c9b97b373eb556d018378e32cb0be))
+
+### ✨ New Features
+
+* **adguard:** add AdGuard 4.15.2 premium unlock patch ([7aea27c](https://github.com/ginDoki19/GinArena-patch/commit/7aea27cf345fad07dfcbd3c96c02f1558708967e))
+* **wps:** add WPS Office 26.11.0 premium and MicroG sign-in patches ([37de91d](https://github.com/ginDoki19/GinArena-patch/commit/37de91d10ef10f7d1e6e871e31cd54abda256635))
+
 ## [2.11.0-dev.3](https://github.com/ginDoki19/GinArena-patch/compare/v2.11.0-dev.2...v2.11.0-dev.3) (2026-11-14)
 
 ### 🐛 Bug Fixes
