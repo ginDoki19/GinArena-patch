@@ -3,7 +3,7 @@
 **GinArena Patch** is a [Morphe](https://morphe.software/) patch bundle for free **1DM**
 (`idm.internet.download.manager`), **CRICFy TV** (`com.cricfytv.sports`), **CricZ TV**
 (`com.pro.cricztv`), **CrexiFy TV** (`com.crexify.tv`), **PlayZ TV** (`com.playz.tv`), **MX Player** (`com.mxtech.videoplayer.ad`),
-**SK Tech TV** (`com.live.sktechtv`), **Playfy TV** (`com.playfy.tv`), **APK Decompiler** (`com.apktools.app.decompile`), **Daylio** (`net.daylio`), and **WPS Office** (`cn.wps.moffice_eng`).
+**SK Tech TV** (`com.live.sktechtv`), **Playfy TV** (`com.playfy.tv`), **APK Decompiler** (`com.apktools.app.decompile`), **Daylio** (`net.daylio`), **WPS Office** (`cn.wps.moffice_eng`), and **AdGuard** (`com.adguard.android`).
 Morphe Manager automatically filters patches per app, so selecting an app shows only compatible patches.
 
 ### How to use these patches
@@ -701,12 +701,74 @@ Two gates sit outside the app entirely and cannot be patched:
 
 ---
 
+## 📦 AdGuard (4.15.2, build 42321001)
+
+<details>
+<summary><b>📖 App details</b> — what it does, target version and notes (click to expand)</summary>
+
+### What it does
+
+AdGuard keeps its licence state in a single place, and every screen reads it from there. This patch
+replaces that state with a lifetime family licence, so the paid features open and the purchase prompts
+stop appearing.
+
+There is no on/off switch, because there is nothing to choose between: one licence state drives
+everything. Remove the patch and the app is stock again.
+
+| What opens | What you will see |
+|---|---|
+| **Ad blocking, DNS filtering, HTTPS filtering** | The protection switches work without a purchase prompt |
+| **Firewall and per-app rules** | Available instead of showing the upgrade banner |
+| **Licence screen** | Shows a lifetime family licence; the Upgrade button is gone |
+| **Promo / "check licence" dialogs** | No longer appear |
+
+### Why it needs no extra switches
+
+AdGuard has no separate check for HTTPS filtering — it reads the same licence state as everything
+else. That was verified in 4.15.2: the HTTPS filtering state model contains no reference to the
+licence at all, and neither does the VPN service. So one patch covers every paid feature.
+
+The app also does **not** verify its own signature, contains no PairIP or Play Integrity guard, and
+uses no Play Billing — it sells through its own backend. That means re-signing it does not break
+anything, and there is no second gate to work around.
+
+### Known behaviour
+
+* **The backend cannot overwrite the licence.** A server reply of "free" would normally be saved over
+  the cached state; the patch discards that reply before it is written, so the paid state stays.
+* **Activating a licence key** is skipped. Stock only reaches that code with a real key stored, which a
+  patched build never has.
+* **Nothing is blocked or redirected at runtime.** No ads are injected, no telemetry is added, no code
+  from any third-party mod is used.
+* **TV build not covered.** This targets the phone APK (`adguard-4.15.2.apk`). The separate
+  `adguard-tv-4.15.2.apk` is a different app UI and has not been audited.
+
+### Target app (AdGuard)
+
+| | |
+|---|---|
+| Package | `com.adguard.android` |
+| Version | **4.15.2** (versionCode 42321001), single universal APK, Android 9+ |
+| ABIs | `arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64` |
+| Stock download | [GitHub releases — AdGuard 4.15.2](https://github.com/AdguardTeam/AdguardForAndroid/releases/tag/v4.15.2) — `adguard-4.15.2.apk` |
+| Signing certificate SHA-256 | `bdcc3c69c26d4627773ae6d7e7e5b2c89e94ed8dc02261525ff80ac4c9412db7` |
+| APK SHA-256 | `29c99a8ca2563be68a41f91cb68b624bfe5434157d59a0f7f96c344ee3c58546` |
+
+> **Before you patch:** patching changes the signature, so the stock AdGuard has to be uninstalled
+> first. Export your custom filter lists and settings beforehand — uninstalling removes them. Point
+> Morphe at the APK exactly as downloaded; do not pre-sign or re-zip it.
+
+</details>
+
+---
+
 ## Usage (Morphe Manager)
 
 1. Add this repository as a remote patch source using the link at the top of this README.
 2. Download the stock **1DM 20.0 APKM**, **CRICFy TV 7.4 APK**, **CricZ TV 7.3 APK**,
    **PlayZ TV 2.3.1 APK**, **SK Tech TV 2.7 APK**, **MX Player 3.4.1 or 3.4.3 APK**,
-   **APK Decompiler 4.12.0 APK**, **Daylio 1.71.1 APKM**, or **WPS Office 26.11.0 XAPK** above onto your device.
+   **APK Decompiler 4.12.0 APK**, **Daylio 1.71.1 APKM**, **WPS Office 26.11.0 XAPK**, or
+   **AdGuard 4.15.2 APK** above onto your device.
 3. Updates require a compatible signing key. If Android reports a signature conflict, stop: uninstalling the existing app can permanently erase its data. Back up what you can and your Morphe signing key first.
 4. In Morphe Manager, choose **Select from storage**, pick the downloaded stock `.apkm` / `.apk`
    file (rather than an already-patched installed app), configure options if desired (for MX
@@ -752,6 +814,7 @@ bash gradlew :patches:buildAndroid
 - [BlazeFTL/FTL-Patches](https://github.com/BlazeFTL/FTL-Patches) — inspiration for MX Player patch ideas.
 - [hoo-dles/morphe-patches](https://github.com/hoo-dles/morphe-patches) — the earlier WPS Office "Enable Pro" idea; its anti-tamper dependency no longer exists in 26.11.0, so the WPS patch here is written from scratch against the current privilege layer.
 - [callMeBeyonder/morphe-patches](https://github.com/callMeBeyonder/morphe-patches) — inspiration and initial CRICFy TV patch idea.
+- [rushiranpise/morphe-patches](https://github.com/rushiranpise/morphe-patches) and [hoo-dles/morphe-patches](https://github.com/hoo-dles/morphe-patches) — earlier AdGuard premium patches. Both target older builds; the AdGuard patch here is written against 4.15.2, with an idempotency guard and a stricter fetch fingerprint.
 - [Morphe](https://morphe.software/) — Morphe Patcher and Morphe Manager.
 
 ## Notes

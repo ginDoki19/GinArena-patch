@@ -219,4 +219,24 @@ object Constants {
         )
     )
 
+
+    /** SHA-256 of the official AdGuard signing certificate (C=RU, ST=Moscow, O=Adguard). */
+    private const val ADGUARD_SIGNER_SHA256 = "bdcc3c69c26d4627773ae6d7e7e5b2c89e94ed8dc02261525ff80ac4c9412db7"
+
+    /** AdGuard for Android. Single universal APK, no splits. */
+    val COMPATIBILITY_ADGUARD = Compatibility(
+        name = "AdGuard",
+        packageName = "com.adguard.android",
+        apkFileType = ApkFileType.APK,
+        appIconColor = 0x67B346,
+        signatures = setOf(ADGUARD_SIGNER_SHA256),
+        targets = listOf(
+            AppTarget(
+                version = "4.15.2",
+                versionCode = 42321001,
+                minSdk = 28,
+                description = "Universal APK (arm64-v8a, armeabi-v7a, x86, x86_64), Android 9+"
+            )
+        )
+    )
 }
