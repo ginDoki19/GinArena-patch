@@ -724,6 +724,8 @@ Two gates sit outside the app entirely and cannot be patched:
 
 ### What it does
 
+#### Unlock AdGuard Premium
+
 AdGuard keeps its licence state in a single place, and every screen reads it from there. This patch
 replaces that state with a lifetime family licence, so the paid features open and the purchase prompts
 stop appearing.

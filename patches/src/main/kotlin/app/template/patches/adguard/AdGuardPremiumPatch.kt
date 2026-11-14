@@ -29,7 +29,7 @@ private const val HELPER_NAME = "getPaidLicense"
  */
 @Suppress("unused")
 val adGuardPremiumPatch = bytecodePatch(
-    name = "Unlock premium features",
+    name = "Unlock AdGuard Premium",
     description = "Opens the paid features and removes the license prompts. " +
         "The app then reports a lifetime family license, so no purchase screen appears.",
     default = true,
