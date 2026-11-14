@@ -1,3 +1,9 @@
+## [2.11.0-dev.2](https://github.com/ginDoki19/GinArena-patch/compare/v2.11.0-dev.1...v2.11.0-dev.2) (2026-11-14)
+
+### ✨ New Features
+
+* **adguard:** add AdGuard 4.15.2 premium unlock patch ([7aea27c](https://github.com/ginDoki19/GinArena-patch/commit/7aea27cf345fad07dfcbd3c96c02f1558708967e))
+
 ## [2.11.0-dev.1](https://github.com/ginDoki19/GinArena-patch/compare/v2.10.1...v2.11.0-dev.1) (2026-11-13)
 
 ### ✨ New Features
