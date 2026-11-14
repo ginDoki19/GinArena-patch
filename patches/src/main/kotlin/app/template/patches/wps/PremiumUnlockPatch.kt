@@ -44,6 +44,25 @@ import com.android.tools.smali.dexlib2.immutable.ImmutableMethod
 //                      upsell back on a feature that works when granted.
 // ============================================================================
 
+// ----------------------------------------------------------------------------
+// ORDER MATTERS FOR THE USER, NOT FOR THE PATCH.
+//
+// These are declared master-switch-first, then the switches that default to ON,
+// then the ones that default to OFF. Morphe Manager and the generated README
+// both list options in declaration order, so this is the order a first-time
+// user reads. Keep it: everything above the line is on, everything below is off.
+// ----------------------------------------------------------------------------
+
+// == ON by default ===========================================================
+
+internal val bypassPrivilegeInterceptorOption = booleanOption(
+    key = "bypassPrivilegeInterceptor",
+    default = true,
+    title = "Unlock premium tools (main switch)",
+    description = "Answers every premium check with \"yes\". This is the switch that actually unlocks the app - " +
+        "the options below it only tidy up what it produces.",
+)
+
 internal val unlockPremiumIdentityOption = booleanOption(
     key = "unlockPremiumIdentity",
     default = true,
@@ -65,39 +84,11 @@ internal val unlockPrivilegeChecksOption = booleanOption(
     description = "Answers \"do I own this?\" with yes, so premium fonts, templates and PDF tools open.",
 )
 
-internal val denyAiPrivilegesOption = booleanOption(
-    key = "denyAiPrivileges",
-    default = false,
-    title = "Turn AI features off",
-    description = "Answers every AI request as not owned. Use it only if an AI tool keeps loading forever.",
-)
-
 internal val removeAdsOption = booleanOption(
     key = "removeAds",
     default = true,
     title = "Remove ads",
     description = "Tells the app you are ad-free, so banner and full-screen ads are never requested.",
-)
-
-internal val bypassAsyncPrivilegeChecksOption = booleanOption(
-    key = "bypassAsyncPrivilegeChecks",
-    default = false,
-    title = "Pass background checks",
-    description = "Also answers the checks that run in the background. Stronger, but it can invent usage counters.",
-)
-
-internal val passSignatureCheckOption = booleanOption(
-    key = "passSignatureCheck",
-    default = false,
-    title = "Report the stock signature",
-    description = "Only analytics reads this. It does not affect premium, ads or sign-in.",
-)
-
-internal val bypassPrivilegeInterceptorOption = booleanOption(
-    key = "bypassPrivilegeInterceptor",
-    default = true,
-    title = "Unlock PDF and export tools",
-    description = "Answers the app's payment check with success. This is what opens image-to-PDF, PDF export and printing.",
 )
 
 internal val hideOwnedPrivilegeDialogOption = booleanOption(
@@ -107,11 +98,35 @@ internal val hideOwnedPrivilegeDialogOption = booleanOption(
     description = "Stops the popup that says you are already a WPS Premium user.",
 )
 
+// == OFF by default ==========================================================
+
+internal val bypassAsyncPrivilegeChecksOption = booleanOption(
+    key = "bypassAsyncPrivilegeChecks",
+    default = false,
+    title = "Hide the upgrade banner on tool pages",
+    description = "Removes the \"Upgrade to WPS Membership\" banner shown above the tool pages. " +
+        "It can invent usage counters, so it stays off until you want it.",
+)
+
+internal val denyAiPrivilegesOption = booleanOption(
+    key = "denyAiPrivileges",
+    default = false,
+    title = "Turn AI features off",
+    description = "Answers every AI request as not owned. Use it only if an AI tool keeps loading forever.",
+)
+
 internal val reportAdGateOfflineOption = booleanOption(
     key = "reportAdGateOffline",
     default = false,
     title = "Skip the ad pre-check",
     description = "Tells the app ads are off before it contacts the server, so those requests never start.",
+)
+
+internal val passSignatureCheckOption = booleanOption(
+    key = "passSignatureCheck",
+    default = false,
+    title = "Report the stock signature",
+    description = "Only analytics reads this. It does not affect premium, ads or sign-in.",
 )
 
 // ============================================================================
@@ -121,22 +136,23 @@ internal val reportAdGateOfflineOption = booleanOption(
 @Suppress("unused")
 val wpsPremiumPatch = bytecodePatch(
     name = "Unlock premium features",
-    description = "Opens the Pro PDF, export and editing tools and removes ads. Every change has its own switch, " +
-        "so you choose what is unlocked. Sign in first: signed out, WPS reports no membership at all.",
+    description = "Opens the paid tools - PDF, export, editing, fonts and templates - by answering the app's " +
+        "payment checks. Every part has its own switch, so you choose what is unlocked. " +
+        "Sign in first: signed out, WPS reports no membership at all.",
     default = true,
 ) {
     compatibleWith(COMPATIBILITY_WPS_OFFICE)
 
+    val bypassPrivilegeInterceptor by bypassPrivilegeInterceptorOption()
     val unlockPremiumIdentity by unlockPremiumIdentityOption()
     val unlockMemberLevel by unlockMemberLevelOption()
     val unlockPrivilegeChecks by unlockPrivilegeChecksOption()
-    val denyAiPrivileges by denyAiPrivilegesOption()
     val removeAds by removeAdsOption()
-    val bypassAsyncPrivilegeChecks by bypassAsyncPrivilegeChecksOption()
-    val passSignatureCheck by passSignatureCheckOption()
-    val bypassPrivilegeInterceptor by bypassPrivilegeInterceptorOption()
     val hideOwnedPrivilegeDialog by hideOwnedPrivilegeDialogOption()
+    val bypassAsyncPrivilegeChecks by bypassAsyncPrivilegeChecksOption()
+    val denyAiPrivileges by denyAiPrivilegesOption()
     val reportAdGateOffline by reportAdGateOfflineOption()
+    val passSignatureCheck by passSignatureCheckOption()
 
     execute {
         // --------------------------------------------------------------------
