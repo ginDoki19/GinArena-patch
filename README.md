@@ -21,7 +21,7 @@ github.com/ginDoki19/GinArena-patch
 The table below reflects the last published release and is refreshed automatically by the release workflow.
 
 <!-- PATCHES_START -->
-> **[v2.11.0](https://github.com/ginDoki19/GinArena-patch/releases/tag/v2.11.0)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;33 patches total
+> **[v2.11.1-dev.1](https://github.com/ginDoki19/GinArena-patch/releases/tag/v2.11.1-dev.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;33 patches total
 <details>
 <summary>📦 1DM&nbsp;&nbsp;•&nbsp;&nbsp;5 patches</summary>
 <br>
@@ -109,7 +109,7 @@ The table below reflects the last published release and is refreshed automatical
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
 | [Google sign-in via MicroG RE](#google-sign-in-via-microg-re) | Makes Google sign-in work on a re-signed WPS by signing in as the original app. Needs MicroG RE installed with a Google account added. WPS account login is unaffected. | • Sign in as the original app<br>• Send Google calls to MicroG<br>• Report Play services as available<br>• Route notifications through MicroG<br>• Let the app find Google and MicroG |
-| [Unlock premium features](#unlock-premium-features) | Opens the Pro PDF, export and editing tools and removes ads. Every change has its own switch, so you choose what is unlocked. Sign in first: signed out, WPS reports no membership at all. | • Show a Pro account<br>• Open Pro menus<br>• Pass ownership checks<br>• Turn AI features off<br>• Remove ads<br>• Pass background checks<br>• Report the stock signature<br>• Unlock PDF and export tools<br>• Hide the "already a member" popup<br>• Skip the ad pre-check |
+| [Unlock premium features](#unlock-premium-features) | Opens the paid tools - PDF, export, editing, fonts and templates - by answering the app's payment checks. Every part has its own switch, so you choose what is unlocked. Sign in first: signed out, WPS reports no membership at all. | • Unlock premium tools (main switch)<br>• Show a Pro account<br>• Open Pro menus<br>• Pass ownership checks<br>• Remove ads<br>• Hide the "already a member" popup<br>• Hide the upgrade banner on tool pages<br>• Turn AI features off<br>• Skip the ad pre-check<br>• Report the stock signature |
 
 </details>
 
@@ -648,16 +648,16 @@ and you get a stock-equivalent build.
 
 | Option | Default | What it does |
 |---|:---:|---|
-| **Unlock PDF and export tools** | **on** | Answers the app's payment check with success. This is what opens image-to-PDF, PDF export and printing. |
+| **Unlock premium tools (main switch)** | **on** | Answers every premium check with "yes". This is the switch that actually unlocks the app - the options below it only tidy up what it produces. |
 | Show a Pro account | on | Shows your account as Premium, so upgrade banners and price cards go away. |
 | Open Pro menus | on | Tells the app you have a Pro membership, which opens the menu entries locked behind it. |
 | Pass ownership checks | on | Answers "do I own this?" with yes, so premium fonts, templates and PDF tools open. |
 | Remove ads | on | Tells the app you are ad-free, so banner and full-screen ads are never requested. |
 | Hide the "already a member" popup | on | Stops the popup that says you are already a WPS Premium user. |
-| Pass background checks | **off** | Also answers the checks that run in the background. Stronger, but it can invent usage counters. |
-| Report the stock signature | **off** | Only analytics reads this. It does not affect premium, ads or sign-in. |
-| Skip the ad pre-check | **off** | Tells the app ads are off before it contacts the server, so those requests never start. |
+| Hide the upgrade banner on tool pages | **off** | Removes the "Upgrade to WPS Membership" banner shown above the tool pages. It can invent usage counters, so it stays off until you want it. |
 | Turn AI features off | **off** | Answers every AI request as not owned. Use it only if an AI tool keeps loading forever. |
+| Skip the ad pre-check | **off** | Tells the app ads are off before it contacts the server, so those requests never start. |
+| Report the stock signature | **off** | Only analytics reads this. It does not affect premium, ads or sign-in. |
 
 #### Google sign-in via MicroG RE
 
