@@ -648,16 +648,16 @@ and you get a stock-equivalent build.
 
 | Option | Default | What it does |
 |---|:---:|---|
-| **Unlock PDF and export tools** | **on** | Answers the app's payment check with success. This is what opens image-to-PDF, PDF export and printing. |
+| **Unlock premium tools (main switch)** | **on** | Answers every premium check with "yes". This is the switch that actually unlocks the app - the options below it only tidy up what it produces. |
 | Show a Pro account | on | Shows your account as Premium, so upgrade banners and price cards go away. |
 | Open Pro menus | on | Tells the app you have a Pro membership, which opens the menu entries locked behind it. |
 | Pass ownership checks | on | Answers "do I own this?" with yes, so premium fonts, templates and PDF tools open. |
 | Remove ads | on | Tells the app you are ad-free, so banner and full-screen ads are never requested. |
 | Hide the "already a member" popup | on | Stops the popup that says you are already a WPS Premium user. |
-| Pass background checks | **off** | Also answers the checks that run in the background. Stronger, but it can invent usage counters. |
-| Report the stock signature | **off** | Only analytics reads this. It does not affect premium, ads or sign-in. |
-| Skip the ad pre-check | **off** | Tells the app ads are off before it contacts the server, so those requests never start. |
+| Hide the upgrade banner on tool pages | **off** | Removes the "Upgrade to WPS Membership" banner shown above the tool pages. It can invent usage counters, so it stays off until you want it. |
 | Turn AI features off | **off** | Answers every AI request as not owned. Use it only if an AI tool keeps loading forever. |
+| Skip the ad pre-check | **off** | Tells the app ads are off before it contacts the server, so those requests never start. |
+| Report the stock signature | **off** | Only analytics reads this. It does not affect premium, ads or sign-in. |
 
 #### Google sign-in via MicroG RE
 
