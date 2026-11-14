@@ -1,3 +1,9 @@
+## [2.11.0-dev.3](https://github.com/ginDoki19/GinArena-patch/compare/v2.11.0-dev.2...v2.11.0-dev.3) (2026-11-14)
+
+### 🐛 Bug Fixes
+
+* **adguard:** rename patch so README anchors are unique ([2931863](https://github.com/ginDoki19/GinArena-patch/commit/2931863d663c9b97b373eb556d018378e32cb0be))
+
 ## [2.11.0-dev.2](https://github.com/ginDoki19/GinArena-patch/compare/v2.11.0-dev.1...v2.11.0-dev.2) (2026-11-14)
 
 ### ✨ New Features

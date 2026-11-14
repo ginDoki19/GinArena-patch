@@ -1,6 +1,6 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "2.11.0-dev.2",
+  "version": "2.11.0-dev.3",
   "patches": [
     {
       "name": "AdBlocker turbo & userscript bundle",
@@ -1385,39 +1385,7 @@
       "options": []
     },
     {
-      "name": "Unlock premium",
-      "description": "Unlocks local premium tools and cleans up VIP labels.",
-      "default": true,
-      "category": null,
-      "compatiblePackages": [
-        {
-          "packageName": "com.apktools.app.decompile",
-          "name": "APK Decompiler",
-          "description": null,
-          "apkFileType": "APK",
-          "appIconColor": "#456BDB",
-          "signatures": [
-            "80c8e7990b68af1301f76057e7eabe63de4240e3ca74da46c36a9c8084c68386"
-          ],
-          "formFactor": "MOBILE",
-          "targets": [
-            {
-              "version": "4.12.0",
-              "versionCodes": {
-                "ARM64_V8A": 4120,
-                "ARMEABI_V7A": 4120
-              },
-              "isExperimental": false,
-              "minSdk": 28,
-              "description": "Standalone APK (arm64-v8a / armeabi-v7a, Android 9.0+), build 4120"
-            }
-          ]
-        }
-      ],
-      "options": []
-    },
-    {
-      "name": "Unlock premium features",
+      "name": "Unlock AdGuard Premium",
       "description": "Opens the paid features and removes the license prompts. The app then reports a lifetime family license, so no purchase screen appears.",
       "default": true,
       "category": null,
@@ -1444,6 +1412,38 @@
               "isExperimental": false,
               "minSdk": 28,
               "description": "Universal APK (arm64-v8a, armeabi-v7a, x86, x86_64), Android 9+"
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "Unlock premium",
+      "description": "Unlocks local premium tools and cleans up VIP labels.",
+      "default": true,
+      "category": null,
+      "compatiblePackages": [
+        {
+          "packageName": "com.apktools.app.decompile",
+          "name": "APK Decompiler",
+          "description": null,
+          "apkFileType": "APK",
+          "appIconColor": "#456BDB",
+          "signatures": [
+            "80c8e7990b68af1301f76057e7eabe63de4240e3ca74da46c36a9c8084c68386"
+          ],
+          "formFactor": "MOBILE",
+          "targets": [
+            {
+              "version": "4.12.0",
+              "versionCodes": {
+                "ARM64_V8A": 4120,
+                "ARMEABI_V7A": 4120
+              },
+              "isExperimental": false,
+              "minSdk": 28,
+              "description": "Standalone APK (arm64-v8a / armeabi-v7a, Android 9.0+), build 4120"
             }
           ]
         }

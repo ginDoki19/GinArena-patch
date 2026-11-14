@@ -21,7 +21,7 @@ github.com/ginDoki19/GinArena-patch
 The table below reflects the last published release and is refreshed automatically by the release workflow.
 
 <!-- PATCHES_START -->
-> **[v2.11.0-dev.2](https://github.com/ginDoki19/GinArena-patch/releases/tag/v2.11.0-dev.2)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;33 patches total
+> **[v2.11.0-dev.3](https://github.com/ginDoki19/GinArena-patch/releases/tag/v2.11.0-dev.3)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;33 patches total
 <details>
 <summary>📦 1DM&nbsp;&nbsp;•&nbsp;&nbsp;5 patches</summary>
 <br>
@@ -204,6 +204,22 @@ The table below reflects the last published release and is refreshed automatical
 </details>
 
 <details>
+<summary>📦 AdGuard&nbsp;&nbsp;•&nbsp;&nbsp;1 patch</summary>
+<br>
+
+**🎯 Supported versions:**
+
+| 4.15.2 |
+| :---: |
+| Universal APK (arm64-v8a, armeabi-v7a, x86, x86_64), Android 9+ |
+
+| 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
+|----------|----------------|-----------|
+| [Unlock AdGuard Premium](#unlock-adguard-premium) | Opens the paid features and removes the license prompts. The app then reports a lifetime family license, so no purchase screen appears. |  |
+
+</details>
+
+<details>
 <summary>📦 APK Decompiler&nbsp;&nbsp;•&nbsp;&nbsp;1 patch</summary>
 <br>
 
@@ -216,22 +232,6 @@ The table below reflects the last published release and is refreshed automatical
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
 | [Unlock premium](#unlock-premium) | Unlocks local premium tools and cleans up VIP labels. |  |
-
-</details>
-
-<details>
-<summary>📦 AdGuard&nbsp;&nbsp;•&nbsp;&nbsp;1 patch</summary>
-<br>
-
-**🎯 Supported versions:**
-
-| 4.15.2 |
-| :---: |
-| Universal APK (arm64-v8a, armeabi-v7a, x86, x86_64), Android 9+ |
-
-| 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
-|----------|----------------|-----------|
-| [Unlock premium features](#unlock-premium-features) | Opens the paid features and removes the license prompts. The app then reports a lifetime family license, so no purchase screen appears. |  |
 
 </details>
 
