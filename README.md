@@ -21,7 +21,7 @@ github.com/ginDoki19/GinArena-patch
 The table below reflects the last published release and is refreshed automatically by the release workflow.
 
 <!-- PATCHES_START -->
-> **[v2.11.1](https://github.com/ginDoki19/GinArena-patch/releases/tag/v2.11.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;33 patches total
+> **[v2.11.1](https://github.com/ginDoki19/GinArena-patch/releases/tag/v2.11.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;33 patches total&nbsp;&nbsp;•&nbsp;&nbsp;**[⬇️ Download patches-2.11.1.mpp](https://github.com/ginDoki19/GinArena-patch/releases/download/v2.11.1/patches-2.11.1.mpp)**
 <details>
 <summary>📦 1DM&nbsp;&nbsp;•&nbsp;&nbsp;5 patches</summary>
 <br>
@@ -34,7 +34,7 @@ The table below reflects the last published release and is refreshed automatical
 
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
-| [AdBlocker turbo & userscript bundle](#adblocker-turbo-userscript-bundle) | Updates the built-in ad blocker automatically in seconds instead of minutes, and can add a shortlink bypass userscript. | • AdBlocker engine mode<br>• Bundle Bypass All Shortlinks userscript |
+| [AdBlocker turbo & userscript bundle](#adblocker-turbo--userscript-bundle) | Updates the built-in ad blocker automatically in seconds instead of minutes, and can add a shortlink bypass userscript. | • AdBlocker engine mode<br>• Bundle Bypass All Shortlinks userscript |
 | [Browser setup prompts only once](#browser-setup-prompts-only-once) | Shows the one-time browser setup prompts only once, even if you close the browser early. |  |
 | [Optimize cold start and battery](#optimize-cold-start-and-battery) | Makes the app open faster, use less battery in the background, and stay in Recents when you press Back. |  |
 | [Preset browser settings](#preset-browser-settings) | Sets Brave as the default search engine on fresh installs. You can change it anytime in 1DM. | • Search engine<br>• Search suggestions<br>• Search by image |
@@ -56,7 +56,7 @@ The table below reflects the last published release and is refreshed automatical
 |----------|----------------|-----------|
 | [Clean Me page](#clean-me-page) | Removes Status Saver, Legal, and Help from the Me page. |  |
 | [Custom codec](#custom-codec) | Bundles an MX Player custom codec; official v3.1.0_r1 codecs are verified. | • Custom codec file<br>• Allow unverified codecs |
-| [Remove ads & bloat](#remove-ads-bloat) | Removes ads and online extras like Live TV, Tube, Shorts, and Games for a clean local player. |  |
+| [Remove ads & bloat](#remove-ads--bloat) | Removes ads and online extras like Live TV, Tube, Shorts, and Games for a clean local player. |  |
 | [Remove bottom navigation bar](#remove-bottom-navigation-bar) | Removes the bottom navigation bar and moves Me to the top-right corner. |  |
 
 </details>
@@ -92,7 +92,7 @@ The table below reflects the last published release and is refreshed automatical
 | [Fix search keyboard focus](#fix-search-keyboard-focus) | Opens search on Android TV and helps keep the keyboard connected during category searches on TV and phones. Clears TV search on navigation or close. |  |
 | [Hide playback controls at stream open](#hide-playback-controls-at-stream-open) | Keeps playback controls hidden when a stream opens or the player switches between embedded and fullscreen. The controls remain available. |  |
 | [Improve Android TV playback controls](#improve-android-tv-playback-controls) | On Android TV, prefers the seekbar when controls open and helps retain focus when live-source tabs auto-focus. Seeking depends on the stream. |  |
-| [Remove ads, proxy & restrictions](#remove-ads-proxy-restrictions) | Stops background bandwidth sharing, removes ads, and hides the player app logo on 7.4. | • Hide promo marquee ticker<br>• Bypass update & force-update screen<br>• Block promotional push notifications<br>• Bypass clone, work-profile & sniffer checks<br>• Strip proxy & ad native libraries |
+| [Remove ads, proxy & restrictions](#remove-ads-proxy--restrictions) | Stops background bandwidth sharing, removes ads, and hides the player app logo on 7.4. | • Hide promo marquee ticker<br>• Bypass update & force-update screen<br>• Block promotional push notifications<br>• Bypass clone, work-profile & sniffer checks<br>• Strip proxy & ad native libraries |
 
 </details>
 
@@ -145,7 +145,7 @@ The table below reflects the last published release and is refreshed automatical
 |----------|----------------|-----------|
 | [Hide playback controls at stream open](#hide-playback-controls-at-stream-open) | Keeps playback controls hidden when a stream opens or the player switches between embedded and fullscreen. The controls remain available. |  |
 | [Improve Android TV playback controls](#improve-android-tv-playback-controls) | Helps the Android TV remote reveal native playback controls and focus the seekbar when available. Live streams may not be seekable. |  |
-| [Remove ads, telemetry & restrictions](#remove-ads-telemetry-restrictions) | Removes ads, promo popups, and tracking, and keeps channels working after patching. | • Hide promo announcement bar<br>• Remove push notifications<br>• Bypass update & force-update screen<br>• Bypass root & sniffer checks<br>• Strip native & telemetry bloat |
+| [Remove ads, telemetry & restrictions](#remove-ads-telemetry--restrictions) | Removes ads, promo popups, and tracking, and keeps channels working after patching. | • Hide promo announcement bar<br>• Remove push notifications<br>• Bypass update & force-update screen<br>• Bypass root & sniffer checks<br>• Strip native & telemetry bloat |
 
 </details>
 
@@ -163,7 +163,7 @@ The table below reflects the last published release and is refreshed automatical
 |----------|----------------|-----------|
 | [Hide playback controls at stream open](#hide-playback-controls-at-stream-open) | Keeps playback controls hidden when a stream opens or the player switches between embedded and fullscreen. The controls remain available. |  |
 | [Improve Android TV playback controls](#improve-android-tv-playback-controls) | On Android TV, prefers the seekbar over play/pause when controls open. Seeking depends on the stream. |  |
-| [Remove ads, telemetry & restrictions](#remove-ads-telemetry-restrictions) | Removes ads and tracking, and hides the player app logo. | • Remove push notifications<br>• Bypass update & force-update screen<br>• Bypass sniffer-app check<br>• Strip native & telemetry bloat |
+| [Remove ads, telemetry & restrictions](#remove-ads-telemetry--restrictions) | Removes ads and tracking, and hides the player app logo. | • Remove push notifications<br>• Bypass update & force-update screen<br>• Bypass sniffer-app check<br>• Strip native & telemetry bloat |
 
 </details>
 
@@ -181,7 +181,7 @@ The table below reflects the last published release and is refreshed automatical
 |----------|----------------|-----------|
 | [Hide playback controls at stream open](#hide-playback-controls-at-stream-open) | Keeps playback controls hidden when a stream opens or the player switches between embedded and fullscreen. The controls remain available. |  |
 | [Improve Android TV playback controls](#improve-android-tv-playback-controls) | Helps the Android TV remote reveal native playback controls and focus the seekbar when available. Live streams may not be seekable. |  |
-| [Remove ads, popups & restrictions](#remove-ads-popups-restrictions) | Removes ads and promo popups, and keeps channels working after patching. |  |
+| [Remove ads, popups & restrictions](#remove-ads-popups--restrictions) | Removes ads and promo popups, and keeps channels working after patching. |  |
 
 </details>
 
@@ -199,7 +199,7 @@ The table below reflects the last published release and is refreshed automatical
 |----------|----------------|-----------|
 | [Hide playback controls at stream open](#hide-playback-controls-at-stream-open) | Keeps playback controls hidden when a stream opens or the player switches between embedded and fullscreen. The controls remain available. |  |
 | [Improve Android TV playback controls](#improve-android-tv-playback-controls) | Helps the Android TV remote reveal native playback controls and focus the seekbar when available. Live streams may not be seekable. |  |
-| [Remove ads, telemetry & restrictions](#remove-ads-telemetry-restrictions) | Removes ads, tracking, and forced updates, and keeps channels working after patching. | • Remove push notifications<br>• Bypass update & force-update screen<br>• Bypass root & sniffer checks<br>• Strip native & telemetry bloat<br>• Disable WebActivity (potential ad surface) |
+| [Remove ads, telemetry & restrictions](#remove-ads-telemetry--restrictions) | Removes ads, tracking, and forced updates, and keeps channels working after patching. | • Remove push notifications<br>• Bypass update & force-update screen<br>• Bypass root & sniffer checks<br>• Strip native & telemetry bloat<br>• Disable WebActivity (potential ad surface) |
 
 </details>
 
@@ -252,6 +252,32 @@ This patch depends on **Hide playback controls at stream open**: selecting it al
 ### Fix search keyboard focus
 
 *On by default* for CRICFy TV 7.4 (build 54). Helps open search on Android TV and prevent category labels from disrupting keyboard input on TVs and phones. On TV, the shared search is cleared when the app reports a navigation destination or the search bar is explicitly closed; hiding only the keyboard preserves the query. Repeated destination callbacks or restoration may also clear the query. This does not clear the keyboard's own suggestion history.
+
+### Remove ads, telemetry & restrictions
+
+*On by default* for **CricZ TV 7.3**, **SK Tech TV 2.7**, and **Playfy TV 1.7**. One patch
+name, three app-specific builds: each one removes that app's ads and promo popups, blocks
+push notifications and telemetry, and keeps the channels working after patching. The exact
+switch set differs slightly per app:
+
+| Option | CricZ TV | SK Tech TV | Playfy TV |
+|---|:---:|:---:|:---:|
+| Hide promo announcement bar | **on** | — | — |
+| Remove push notifications | on | on | on |
+| Bypass update & force-update screen | on | on | on |
+| Bypass root & sniffer checks | off | off | — |
+| Bypass sniffer-app check | — | — | off |
+| Strip native & telemetry bloat | off | off | off |
+| Disable WebActivity (potential ad surface) | — | off | — |
+
+Two switches are worth knowing about before you turn them on:
+
+* **Bypass root & sniffer checks** only exists for devices where the stock app refuses to run.
+  Leave it off otherwise.
+* **Disable WebActivity** closes the in-app web view so ad landing pages cannot open — but
+  pages that legitimately use it, such as score pages, will close too.
+
+What each app looks like afterwards is described in its own section below.
 
 ---
 
@@ -379,7 +405,9 @@ Download links and hashes live in the table above because Morphe has no field fo
 
 ### What it does
 
-**Remove ads, proxy & restrictions** (on by default) makes **CRICFy TV 7.4** clean and safe on phones, tablets, and Android TV:
+#### Remove ads, proxy & restrictions
+
+*On by default.* Makes **CRICFy TV 7.4** clean and safe on phones, tablets, and Android TV:
 
 - **Stops background bandwidth sharing** — the CashRaven proxy is disabled, so your internet connection is never rented out.
 - **No ads or sponsor gates** — channels open immediately, with no countdowns or browser redirects.
@@ -477,7 +505,9 @@ The patch adapts the signer-bound decoder for re-signed builds and disables its 
 
 ### What it does
 
-**Remove ads, popups & restrictions** (on by default) makes **PlayZ TV 2.3.1** clean and fast on phones, tablets, and Android TV:
+#### Remove ads, popups & restrictions
+
+*On by default.* Makes **PlayZ TV 2.3.1** clean and fast on phones, tablets, and Android TV:
 
 - **No ads or popups**, including timed popunder pages.
 - **No automatic Telegram popup** (manual links are untouched).
@@ -775,6 +805,46 @@ anything, and there is no second gate to work around.
 > **Before you patch:** patching changes the signature, so the stock AdGuard has to be uninstalled
 > first. Export your custom filter lists and settings beforehand — uninstalling removes them. Point
 > Morphe at the APK exactly as downloaded; do not pre-sign or re-zip it.
+
+### Certificate & HTTPS filtering
+
+AdGuard asks you to install a certificate when you turn on **HTTPS filtering**. That surprises
+people, so here is exactly what it is.
+
+**This patch does not create, replace or weaken that certificate.** Applying it changes 3 of
+29,311 classes and leaves every one of AdGuard's 32 native libraries byte-identical, so the
+certificate comes from the same code as stock AdGuard.
+
+| | |
+|---|---|
+| What it is | "Adguard Personal CA" — the certificate that lets AdGuard decrypt HTTPS so it can filter inside encrypted pages |
+| Where it comes from | **Made on your own device by AdGuard**, the first time HTTPS filtering needs it |
+| Where it is kept | The app's private storage, as `cert_key_pair_in_pem` |
+| Shared with anyone? | **No.** No copy leaves your device, and the patch cannot change that |
+| Does patching affect it? | No. The code that generates it is untouched |
+
+**Switching from stock AdGuard loses it.** Uninstalling deletes the app's private storage,
+including that key, so the patched app generates a **new** certificate. A saved copy of the old
+one cannot be installed — it has no matching private key any more, so AdGuard keeps asking.
+
+To get past that, once:
+
+1. Uninstall stock AdGuard (export anything you want to keep first).
+2. Remove the old **"Adguard Personal CA"** from *Settings → Security → Encryption &
+   credentials → User credentials*, if it is still listed.
+3. Install the patched build and turn on HTTPS filtering.
+4. Install the certificate **the patched app offers you**. It sticks.
+
+Updating the patch bundle later does not repeat this: the signing key stays the same, so the
+certificate and its trust stay too.
+
+**If you would rather not install it at all**, leave HTTPS filtering off and use DNS filtering
+plus filter lists. Nothing is decrypted, and the premium unlock is unaffected — these are
+independent settings.
+
+> There is no patch that makes the app reuse the original certificate, and there should not be:
+> the only way to do that would be to hardcode one private key into the bundle, which would let
+> anyone holding it read HTTPS traffic from any device running it.
 
 </details>
 
