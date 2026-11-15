@@ -1,3 +1,9 @@
+## [2.11.2-dev.2](https://github.com/ginDoki19/GinArena-patch/compare/v2.11.2-dev.1...v2.11.2-dev.2) (2026-11-15)
+
+### 🐛 Bug Fixes
+
+* **playfy:** stop leaving the splash spinner up on Android 13+ ([92382d6](https://github.com/ginDoki19/GinArena-patch/commit/92382d6409f905787f63bc4b724dd9e83395ea14))
+
 ## [2.11.2-dev.1](https://github.com/ginDoki19/GinArena-patch/compare/v2.11.1...v2.11.2-dev.1) (2026-11-15)
 
 ### 🐛 Bug Fixes
