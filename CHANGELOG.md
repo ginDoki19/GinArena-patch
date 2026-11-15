@@ -1,3 +1,9 @@
+## [2.11.2-dev.1](https://github.com/ginDoki19/GinArena-patch/compare/v2.11.1...v2.11.2-dev.1) (2026-11-15)
+
+### 🐛 Bug Fixes
+
+* **readme:** verify every anchor against GitHub's own renderer ([8665d37](https://github.com/ginDoki19/GinArena-patch/commit/8665d3786f3101f29b817cd45e3bbbc3bccbdc73))
+
 ## [2.11.1](https://github.com/ginDoki19/GinArena-patch/compare/v2.11.0...v2.11.1) (2026-11-14)
 
 ### 🐛 Bug Fixes
