@@ -1,3 +1,9 @@
+## [2.12.0-dev.3](https://github.com/ginDoki19/GinArena-patch/compare/v2.12.0-dev.2...v2.12.0-dev.3) (2026-11-17)
+
+### ✨ New Features
+
+* **cricfy:** suppress the CashRaven consent prompt ([79c5ad1](https://github.com/ginDoki19/GinArena-patch/commit/79c5ad1a71545d304440be978978beb18b4e6e5d))
+
 ## [2.12.0-dev.2](https://github.com/ginDoki19/GinArena-patch/compare/v2.12.0-dev.1...v2.12.0-dev.2) (2026-11-17)
 
 ### ✨ New Features

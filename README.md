@@ -21,7 +21,7 @@ github.com/ginDoki19/GinArena-patch
 The table below reflects the last published release and is refreshed automatically by the release workflow.
 
 <!-- PATCHES_START -->
-> **[v2.12.0-dev.2](https://github.com/ginDoki19/GinArena-patch/releases/tag/v2.12.0-dev.2)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;36 patches total&nbsp;&nbsp;•&nbsp;&nbsp;**[⬇️ Download patches-2.12.0-dev.2.mpp](https://github.com/ginDoki19/GinArena-patch/releases/download/v2.12.0-dev.2/patches-2.12.0-dev.2.mpp)**
+> **[v2.12.0-dev.3](https://github.com/ginDoki19/GinArena-patch/releases/tag/v2.12.0-dev.3)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;36 patches total&nbsp;&nbsp;•&nbsp;&nbsp;**[⬇️ Download patches-2.12.0-dev.3.mpp](https://github.com/ginDoki19/GinArena-patch/releases/download/v2.12.0-dev.3/patches-2.12.0-dev.3.mpp)**
 <details>
 <summary>📦 1DM&nbsp;&nbsp;•&nbsp;&nbsp;5 patches</summary>
 <br>
