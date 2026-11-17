@@ -413,6 +413,7 @@ Download links and hashes live in the table above because Morphe has no field fo
 *On by default.* Makes **CRICFy TV 7.5** clean and safe on phones, tablets, and Android TV:
 
 - **Stops background bandwidth sharing** — the CashRaven proxy is disabled, so your internet connection is never rented out.
+- **No consent prompt** — the "allow bandwidth sharing" dialog that stock 7.5 shows on launch, including a clean install, is suppressed. Nothing is stored and no preference is faked; the app simply never gets to ask.
 - **No ads or sponsor gates** — channels open immediately, with no countdowns or browser redirects.
 - **No startup Telegram popup** — manual links in the drawer still work.
 - **No player app logo** on CRICFy TV 7.5; broadcaster logos remain unchanged.

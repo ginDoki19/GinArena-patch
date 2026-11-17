@@ -466,3 +466,58 @@ internal object PushNotificationBaseFingerprint : Fingerprint(
         opcode(Opcode.RETURN_VOID),
     ),
 )
+
+// ============================================================================
+// 4. CashRaven Consent Prompt (startup bandwidth-sharing dialog)
+// ============================================================================
+
+/**
+ * Matches `App.d`, the coroutine body `Splash` runs at startup that both delivers the update-check
+ * result and asks the user for CashRaven bandwidth-sharing consent.
+ *
+ * Why this needs an explicit patch at all: on 7.5 a fresh install takes the "no decision yet" path
+ * and calls `CashRaven.requestConsent(...)`, which puts the *I agree / Not now* dialog on screen
+ * before the user has seen the app. The consent copy is not even bundled — it is fetched from
+ * `edge.cashraven.io`. Meanwhile every CashRaven entry point is already stubbed by
+ * `CleanExperiencePatch` (`App.e`, `CashRavenService.onStartCommand`, `CrBootReceiver`), so the
+ * dialog asks for permission to do something the patched build cannot do. Asking is worse than not
+ * asking.
+ *
+ * The anchors are deliberately structural, because `cashraven_enabled` appears in eight different
+ * methods — matching on that string alone would hit the bootstrap, the service helper, `onCreate`
+ * and the drawer handler as well:
+ *
+ *   - the only method in the APK that builds the SDK instance (`App.a()`),
+ *   - the only method in the APK that calls `requestConsent`,
+ *   - and a reference to the dismissed-result constant that guards the early return.
+ *
+ * It also matches an **already-patched** APK: when `CleanExperiencePatch` has run before, the
+ * comparison at the head of the method is a `GOTO_32` instead of an `IF_NEZ`, and the second filter
+ * accepts either. `CleanExperiencePatch` checks the opcode before replacing, so re-patching is a
+ * no-op rather than an error.
+ */
+internal object ConsentPromptFingerprint : Fingerprint(
+    definingClass = "/App;",
+    // App.d is PUBLIC STATIC (verified on the stock 7.5 dex: flags=0x9). Its siblings in the same
+    // class are PUBLIC FINAL, which is what makes a FINAL requirement look right here - it is not,
+    // and a wrong access flag fails the match silently.
+    accessFlags = listOf(AccessFlags.PUBLIC, AccessFlags.STATIC),
+    returnType = "V",
+    // Anchors, in bytecode order and all verified against the stock method:
+    //   15  const-string "cashraven_enabled"
+    //   18  if-nez vX -> (dismissed return)
+    //   42  invoke-virtual CashRaven->requestConsent(...)
+    // The preference key alone is ambiguous - it appears in eight methods - but paired with the
+    // consent call it is unique to this one. The branch is checked by opcode rather than by
+    // position, so the patch can verify the target it is jumping to instead of trusting an index.
+    filters = listOf(
+        string("cashraven_enabled"),
+        anyInstruction(
+            opcode(Opcode.IF_NEZ),
+            opcode(Opcode.GOTO_32),
+        ),
+        methodCall(
+            name = "requestConsent",
+        ),
+    ),
+)
