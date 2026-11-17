@@ -1,3 +1,9 @@
+## [2.12.0-dev.2](https://github.com/ginDoki19/GinArena-patch/compare/v2.12.0-dev.1...v2.12.0-dev.2) (2026-11-17)
+
+### ✨ New Features
+
+* **cricfy:** support 7.5 and drop 7.4 ([29d781b](https://github.com/ginDoki19/GinArena-patch/commit/29d781b8d4f7696772c2a1509f865b7aeee1b809))
+
 ## [2.12.0-dev.1](https://github.com/ginDoki19/GinArena-patch/compare/v2.11.2-dev.2...v2.12.0-dev.1) (2026-11-17)
 
 ### ✨ New Features
