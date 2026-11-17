@@ -1,3 +1,9 @@
+## [2.12.0-dev.1](https://github.com/ginDoki19/GinArena-patch/compare/v2.11.2-dev.2...v2.12.0-dev.1) (2026-11-17)
+
+### ✨ New Features
+
+* **daylio:** support 1.72.0 with promo, tracking and MicroG patches ([a4b8c8f](https://github.com/ginDoki19/GinArena-patch/commit/a4b8c8f80612568ab815a03faa08f1a3a98082d9))
+
 ## [2.11.2-dev.2](https://github.com/ginDoki19/GinArena-patch/compare/v2.11.2-dev.1...v2.11.2-dev.2) (2026-11-15)
 
 ### 🐛 Bug Fixes
