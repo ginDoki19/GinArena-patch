@@ -21,7 +21,7 @@ github.com/ginDoki19/GinArena-patch
 The table below reflects the last published release and is refreshed automatically by the release workflow.
 
 <!-- PATCHES_START -->
-> **[v2.11.2-dev.2](https://github.com/ginDoki19/GinArena-patch/releases/tag/v2.11.2-dev.2)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;33 patches total&nbsp;&nbsp;•&nbsp;&nbsp;**[⬇️ Download patches-2.11.2-dev.2.mpp](https://github.com/ginDoki19/GinArena-patch/releases/download/v2.11.2-dev.2/patches-2.11.2-dev.2.mpp)**
+> **[v2.11.2-dev.2](https://github.com/ginDoki19/GinArena-patch/releases/tag/v2.11.2-dev.2)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;36 patches total&nbsp;&nbsp;•&nbsp;&nbsp;**[⬇️ Download patches-2.11.2-dev.2.mpp](https://github.com/ginDoki19/GinArena-patch/releases/download/v2.11.2-dev.2/patches-2.11.2-dev.2.mpp)**
 <details>
 <summary>📦 1DM&nbsp;&nbsp;•&nbsp;&nbsp;5 patches</summary>
 <br>
@@ -62,18 +62,21 @@ The table below reflects the last published release and is refreshed automatical
 </details>
 
 <details>
-<summary>📦 Daylio&nbsp;&nbsp;•&nbsp;&nbsp;1 patch</summary>
+<summary>📦 Daylio&nbsp;&nbsp;•&nbsp;&nbsp;4 patches</summary>
 <br>
 
 **🎯 Supported versions:**
 
-| 1.71.1 |
+| 1.72.0 |
 | :---: |
-| APKM (arm64-v8a / armeabi-v7a / x86 / x86_64, 480-640 dpi, Android 8.0+), build 289 |
+| APKM (arm64-v8a / armeabi-v7a / x86 / x86_64, 480-640 dpi, Android 8.0+), build 291 |
 
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
-| [Enable premium](#enable-premium) | Enables local premium status in Daylio 1.71.1. Account- or server-dependent features may not work; this is not a purchase. |  |
+| [Enable premium](#enable-premium) | Unlocks Daylio's local premium state. Account- or server-dependent features (restore purchase, cloud entitlements) still behave as they do on a free account; this is not a purchase. |  |
+| [Google Drive backup via MicroG RE](#google-drive-backup-via-microg-re) | Makes the Google Drive backup sign-in work on a re-signed Daylio by signing in as the original app, and stops the "won't run without Google Play services" dialog. Needs MicroG RE installed with a Google account added. Daylio's local journal and every other feature are unaffected. | • Sign in as the original app<br>• Send Google calls to MicroG<br>• Let the app find Google and MicroG |
+| [Remove promos & partner ads](#remove-promos--partner-ads) | Removes Daylio's built-in advertising: the BetterHelp partner offer, the cross-promotion cards for the developer's other apps, and the "More Great Apps" row that opens a screen of their app catalogue. Daylio has no ad network; the journal, statistics and backups are untouched. | • Hide the BetterHelp partner banner<br>• Hide the "try our other app" cards |
+| [Remove tracking & marketing](#remove-tracking--marketing) | Daylio ships no ad SDK - this build has none to block. It does ship Firebase Analytics, Tag Manager, Crashlytics and the advertising-ID permissions; this turns those off. Every part is switchable. | • Turn off analytics<br>• Turn off crash reporting<br>• Remove advertising-ID and install-referrer access<br>• Remove discount notifications |
 
 </details>
 
@@ -640,23 +643,71 @@ Enables local premium tools and cleans up VIP labels and buttons.
 
 ---
 
-## 📦 Daylio (1.71.1, build 289)
+## 📦 Daylio (1.72.0, build 291)
 
 <details>
-<summary><b>📖 App details</b> — patch and target version</summary>
+<summary><b>📖 App details</b> — what each patch does, target version and notes</summary>
 
 ### Enable premium
 
-*On by default.* Enables local premium status while preserving the app's completion callbacks. This is not a Google Play purchase; account- or server-controlled features may not work. It was reported working in a local test, but individual features may behave differently.
+*On by default.* Unlocks the app's **local** premium state. Daylio decides premium from two values it
+reads from its own preferences; this patch answers "purchased" to the first and "not expired" to the
+second, at the single reader and the single writer the whole app goes through. Nothing is sent
+anywhere and no purchase is faked. Restore-purchase and cloud-entitlement features still behave
+exactly as they do on a free account, because those answers come from Google, not from the device.
+
+### Google Drive backup via MicroG RE
+
+**Off by default — tick it when you patch.** Makes the Google Drive backup work on a re-signed
+Daylio by signing in as the *original* app, and stops the *"Daylio won't run without Google Play
+services"* dialog. Needs **MicroG RE 7.3.1** installed as `app.revanced.android.gms`, with a Google
+account added. On a device with real Play Services, leave it off.
+
+| Option | Default | What it does |
+|---|:---:|---|
+| Sign in as the original app | **on** | Tells MicroG Daylio's original package name and signing-certificate SHA-1, which is what makes Google accept the sign-in on a re-signed APK. |
+| Send Google calls to MicroG | **on** | Points Daylio's Play-services sign-in and account lookups at MicroG. **This switch also carries the two answers that remove the "won't run without Google Play services" dialog** — the signature check and the availability check. Turn it off and Daylio goes back to talking to whatever Play services the device has, which is correct on a phone with real Play Services and brings the dialog back on a MicroG-only one. |
+| Let the app find Google and MicroG | **on** | Makes both Play-services packages visible on Android 11+. Stock Daylio declares neither. |
+
+> Leave all three on. They are not three independent features: routing is what patches the two
+> Play-services answers, and the visibility entry is what lets the app find MicroG at all.
+
+### Remove promos & partner ads
+
+*On by default.* Daylio gets on fine without this — it is cosmetics, so both halves are switchable.
+
+| Option | Default | What it does |
+|---|:---:|---|
+| Hide the BetterHelp partner banner | **on** | Removes the BetterHelp icon from the main screen's top bar and makes the partner offer screen behind it unreachable. |
+| Hide the "try our other app" cards | **on** | Removes the cross-promotion cards for the developer's other apps from the More screen, and hides the "More Great Apps" row that opens their catalogue. |
+
+### Remove tracking & marketing
+
+*On by default.* Daylio has **no ad SDK** in this build — there is nothing to block. What it does
+ship is Firebase Analytics, Tag Manager, Crashlytics and the advertising-ID permissions.
+
+| Option | Default | What it does |
+|---|:---:|---|
+| Turn off analytics | **on** | Firebase Analytics and Tag Manager never start. |
+| Turn off crash reporting | **on** | Crashlytics never starts. |
+| Remove advertising-ID and install-referrer access | **on** | Drops the AD_ID, ad-services and install-referrer permissions, so the app cannot read your advertising ID or the attribution that came with it. |
+| Remove discount notifications | **off** | Removes the three receivers that schedule Daylio's discount / special-offer notifications. Off by default because you can see the difference: you stop being notified when a discount is running. |
+
+> **Nothing here is an advertisement blocker for the journal itself.** Every switch above changes
+> only measurement and promotion; entries, statistics, reminders and local backups are untouched.
 
 | | |
 |---|---|
 | Package | `net.daylio` |
-| Version | **1.71.1** (build 289), Android 8.0+ |
+| Version | **1.72.0** (build 291), Android 8.0+ |
 | Tested input | APKM, four ABIs, 480–640 dpi |
-| Stock download | [APKMirror — Daylio 1.71.1](https://www.apkmirror.com/apk/habitics/daylio-diary-journal-mood-tracker/daylio-journal-mood-tracker-1-71-1-release/) — choose the exact build and verify its hash |
-| APKM SHA-256 | `25feb6336e054245e159e163b6f6d1e95be3a5395b66955884b68c5460172660` |
+| Stock download | [APKMirror — Daylio 1.72.0](https://www.apkmirror.com/apk/habitics/daylio-diary-journal-mood-tracker/daylio-journal-mood-tracker-1-72-0-release/) — choose the exact build and verify its hash |
+| APKM SHA-256 | `65dfbb7892e7cd7e1fef76e05fd036c7d1327d61402e3b573af3762d3b879074` |
 | Signing certificate SHA-256 | `6afb7e4100413a77e13b6a1e4f8ac1f9e3421862b3678fb9abe6aa531e859a9d` |
+
+> **Only 1.72.0 is supported.** The fingerprints were re-derived from this build; 1.71.1 shifted the
+> obfuscated names (`Lt38;` → `Lq48;` for preferences, `Ls38;` → `Lp48;` for the keys) and everything
+> here would fail its structural check against it. An older version is refused, not half-patched.
 
 > **Protect your journal:** make a verified backup before testing, ideally on a spare device or profile. An existing install can update in place only when its signing key matches. Do not uninstall to resolve a signature conflict without first verifying a restorable backup; uninstalling can delete entries and attachments. Keep exports private.
 
@@ -855,7 +906,7 @@ independent settings.
 1. Add this repository as a remote patch source using the link at the top of this README.
 2. Download the stock **1DM 20.0 APKM**, **CRICFy TV 7.4 APK**, **CricZ TV 7.3 APK**,
    **PlayZ TV 2.3.1 APK**, **SK Tech TV 2.7 APK**, **MX Player 3.4.1 or 3.4.3 APK**,
-   **APK Decompiler 4.12.0 APK**, **Daylio 1.71.1 APKM**, **WPS Office 26.11.0 XAPK**, or
+   **APK Decompiler 4.12.0 APK**, **Daylio 1.72.0 APKM**, **WPS Office 26.11.0 XAPK**, or
    **AdGuard 4.15.2 APK** above onto your device.
 3. Updates require a compatible signing key. If Android reports a signature conflict, stop: uninstalling the existing app can permanently erase its data. Back up what you can and your Morphe signing key first.
 4. In Morphe Manager, choose **Select from storage**, pick the downloaded stock `.apkm` / `.apk`
@@ -898,7 +949,7 @@ bash gradlew :patches:buildAndroid
 
 ## Credits
 
-- [Epxec/android-patches](https://github.com/Epxec/android-patches) — original Daylio premium patch for 1.69.2; adapted for 1.71.1.
+- [Epxec/android-patches](https://github.com/Epxec/android-patches) — original Daylio premium patch for 1.69.2; re-derived for 1.71.1 and again for 1.72.0.
 - [BlazeFTL/FTL-Patches](https://github.com/BlazeFTL/FTL-Patches) — inspiration for MX Player patch ideas.
 - [hoo-dles/morphe-patches](https://github.com/hoo-dles/morphe-patches) — the earlier WPS Office "Enable Pro" idea; its anti-tamper dependency no longer exists in 26.11.0, so the WPS patch here is written from scratch against the current privilege layer.
 - [callMeBeyonder/morphe-patches](https://github.com/callMeBeyonder/morphe-patches) — inspiration and initial CRICFy TV patch idea.
