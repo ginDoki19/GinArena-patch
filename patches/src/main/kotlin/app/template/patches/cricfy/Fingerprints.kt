@@ -4,6 +4,7 @@ import app.morphe.patcher.Fingerprint
 import app.morphe.patcher.InstructionLocation.MatchAfterImmediately
 import app.morphe.patcher.anyInstruction
 import app.morphe.patcher.checkCast
+import app.morphe.patcher.fieldAccess
 import app.morphe.patcher.literal
 import app.morphe.patcher.methodCall
 import app.morphe.patcher.opcode
@@ -63,13 +64,18 @@ internal object AppOnCreateBaseFingerprint : Fingerprint(
 )
 
 /**
- * Matches the extracted CashRaven bootstrap helper (`App.a()V` in v7.4). In 7.4 the developer
- * moved the whole bootstrap out of onCreate into this no-arg helper guarded by the
+ * Matches the extracted CashRaven bootstrap helper — `App.a()V` in v7.4, `App.e(Context)V` in v7.5.
+ * The developer moved the whole bootstrap out of onCreate into this helper guarded by the
  * `cashraven_enabled` preference: it reads `android_id`, builds the SDK instance via
  * `CashRaven.Companion.createManaged`, force-opts-in and configures the foreground service.
  * Stubbing this one method disables CashRaven completely; every consumer of the stored instance
  * null-checks the lateinit backing field first (verified in 7.4), so nothing can crash on the
  * missing instance.
+ *
+ * `parameters` is deliberately left unset: an empty list means "no signature constraint", which is
+ * why 7.5 could change the helper from `()V` to `(Context)V` without breaking the anchor. Do not
+ * "tidy" this into `emptyList()`-as-zero-arguments — the two are not the same thing here, and
+ * pinning the descriptor would have cost this patch its CashRaven removal on 7.5.
  */
 internal object AppCashRavenBootstrapFingerprint : Fingerprint(
     definingClass = "/App;",
@@ -403,12 +409,22 @@ internal object SplashOnCreateBaseFingerprint : Fingerprint(
 /**
  * Matches the `Splash` startup observer lambda (`y.invoke(Object)Object` in v7.3) on both
  * unpatched (`IF_LE`) and already-patched (`GOTO_32`) APKs.
+ *
+ * The first anchor changed shape in 7.5. Up to 7.4 the observer was a synthetic lambda that
+ * received the value as `Object` and `check-cast` it to `Splash`; in 7.5 the compiled lambda keeps
+ * the Splash instance in a captured field instead (`iget-object v9, v9 Lgxx;->q:L.../Splash;`) and
+ * never casts, so a `checkCast`-only filter no longer matches and the whole patch aborts. Accepting
+ * either anchor keeps one entry in `filters`, which matters: CleanExperiencePatch refers to the
+ * comparison and the proceed-call by position (`instructionMatches[1]`, `[3]`).
  */
 internal object UpdateGateObserverFingerprint : Fingerprint(
     returnType = "Ljava/lang/Object;",
     parameters = listOf("Ljava/lang/Object;"),
     filters = listOf(
-        checkCast("/Splash;"),
+        anyInstruction(
+            checkCast("/Splash;"),
+            fieldAccess(type = "/Splash;"),
+        ),
         anyInstruction(
             opcode(Opcode.IF_LE),
             opcode(Opcode.GOTO_32),

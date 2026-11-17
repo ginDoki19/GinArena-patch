@@ -1,6 +1,6 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "2.12.0-dev.1",
+  "version": "2.12.0-dev.2",
   "patches": [
     {
       "name": "AdBlocker turbo & userscript bundle",
@@ -252,16 +252,16 @@
           "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "7.4",
+              "version": "7.5",
               "versionCodes": {
-                "ARM64_V8A": 54,
-                "ARMEABI_V7A": 54,
-                "X86_64": 54,
-                "X86": 54
+                "ARM64_V8A": 55,
+                "ARMEABI_V7A": 55,
+                "X86_64": 55,
+                "X86": 55
               },
               "isExperimental": false,
               "minSdk": 24,
-              "description": "Universal APK (arm64-v8a / armeabi-v7a / x86 / x86_64, Android 7.0+), build 54"
+              "description": "Universal APK (arm64-v8a / armeabi-v7a / x86 / x86_64, Android 7.0+), build 55"
             }
           ]
         }
@@ -462,16 +462,16 @@
           "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "7.4",
+              "version": "7.5",
               "versionCodes": {
-                "ARM64_V8A": 54,
-                "ARMEABI_V7A": 54,
-                "X86_64": 54,
-                "X86": 54
+                "ARM64_V8A": 55,
+                "ARMEABI_V7A": 55,
+                "X86_64": 55,
+                "X86": 55
               },
               "isExperimental": false,
               "minSdk": 24,
-              "description": "Universal APK (arm64-v8a / armeabi-v7a / x86 / x86_64, Android 7.0+), build 54"
+              "description": "Universal APK (arm64-v8a / armeabi-v7a / x86 / x86_64, Android 7.0+), build 55"
             }
           ]
         }
@@ -632,16 +632,16 @@
           "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "7.4",
+              "version": "7.5",
               "versionCodes": {
-                "ARM64_V8A": 54,
-                "ARMEABI_V7A": 54,
-                "X86_64": 54,
-                "X86": 54
+                "ARM64_V8A": 55,
+                "ARMEABI_V7A": 55,
+                "X86_64": 55,
+                "X86": 55
               },
               "isExperimental": false,
               "minSdk": 24,
-              "description": "Universal APK (arm64-v8a / armeabi-v7a / x86 / x86_64, Android 7.0+), build 54"
+              "description": "Universal APK (arm64-v8a / armeabi-v7a / x86 / x86_64, Android 7.0+), build 55"
             }
           ]
         }
@@ -1059,7 +1059,7 @@
     },
     {
       "name": "Remove ads, proxy & restrictions",
-      "description": "Stops background bandwidth sharing, removes ads, and hides the player app logo on 7.4.",
+      "description": "Stops background bandwidth sharing, removes ads, and hides the player app logo on 7.5.",
       "default": true,
       "category": null,
       "compatiblePackages": [
@@ -1075,16 +1075,16 @@
           "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "7.4",
+              "version": "7.5",
               "versionCodes": {
-                "ARM64_V8A": 54,
-                "ARMEABI_V7A": 54,
-                "X86_64": 54,
-                "X86": 54
+                "ARM64_V8A": 55,
+                "ARMEABI_V7A": 55,
+                "X86_64": 55,
+                "X86": 55
               },
               "isExperimental": false,
               "minSdk": 24,
-              "description": "Universal APK (arm64-v8a / armeabi-v7a / x86 / x86_64, Android 7.0+), build 54"
+              "description": "Universal APK (arm64-v8a / armeabi-v7a / x86 / x86_64, Android 7.0+), build 55"
             }
           ]
         }

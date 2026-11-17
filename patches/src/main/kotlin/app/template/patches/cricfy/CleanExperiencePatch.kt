@@ -21,7 +21,7 @@ import com.android.tools.smali.dexlib2.iface.reference.StringReference
 @Suppress("unused")
 val removeAdsProxyAndRestrictionsPatch = bytecodePatch(
     name = "Remove ads, proxy & restrictions",
-    description = "Stops background bandwidth sharing, removes ads, and hides the player app logo on 7.4.",
+    description = "Stops background bandwidth sharing, removes ads, and hides the player app logo on 7.5.",
     default = true,
 ) {
     compatibleWith(COMPATIBILITY_CRICFY_TV)
@@ -69,7 +69,7 @@ val removeAdsProxyAndRestrictionsPatch = bytecodePatch(
         // 7.3 layout: strip the inline bootstrap span (init + forced optIn() + lifecycle hook)
         // from App.onCreate() while keeping Koin DI, Firebase Messaging, and Firebase
         // RemoteConfig ("cric_api2") intact.
-        // 7.4 layout: the bootstrap lives in its own no-arg App helper — stub it wholesale so
+        // 7.4+ layout: the bootstrap lives in its own App helper (7.4: a()V, 7.5: e(Context)V) — stub it so
         // the SDK instance is never created (all consumers null-check it before use).
         // Also supports idempotent re-patching if the input APK already had CashRaven removed.
         run {
@@ -130,7 +130,7 @@ val removeAdsProxyAndRestrictionsPatch = bytecodePatch(
         if (AppStartServicesFingerprint.matchOrNull() != null) {
             replaceMethodBody(AppStartServicesFingerprint.repairedMethod, "return-void")
         } else {
-            // 7.4 layout: no start-services helper exists. The service start is driven by an
+            // 7.4+ layout: no start-services helper exists. The service start is driven by an
             // activity-lifecycle callback that first checks the (now never-created) SDK instance
             // exists and is opted in, so it stays inert; the CashRavenService.onStartCommand
             // stub below kills any direct start regardless. Fail loudly if some future build

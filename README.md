@@ -21,7 +21,7 @@ github.com/ginDoki19/GinArena-patch
 The table below reflects the last published release and is refreshed automatically by the release workflow.
 
 <!-- PATCHES_START -->
-> **[v2.12.0-dev.1](https://github.com/ginDoki19/GinArena-patch/releases/tag/v2.12.0-dev.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;36 patches total&nbsp;&nbsp;•&nbsp;&nbsp;**[⬇️ Download patches-2.12.0-dev.1.mpp](https://github.com/ginDoki19/GinArena-patch/releases/download/v2.12.0-dev.1/patches-2.12.0-dev.1.mpp)**
+> **[v2.12.0-dev.2](https://github.com/ginDoki19/GinArena-patch/releases/tag/v2.12.0-dev.2)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;36 patches total&nbsp;&nbsp;•&nbsp;&nbsp;**[⬇️ Download patches-2.12.0-dev.2.mpp](https://github.com/ginDoki19/GinArena-patch/releases/download/v2.12.0-dev.2/patches-2.12.0-dev.2.mpp)**
 <details>
 <summary>📦 1DM&nbsp;&nbsp;•&nbsp;&nbsp;5 patches</summary>
 <br>
@@ -86,16 +86,16 @@ The table below reflects the last published release and is refreshed automatical
 
 **🎯 Supported versions:**
 
-| 7.4 |
+| 7.5 |
 | :---: |
-| Universal APK (arm64-v8a / armeabi-v7a / x86 / x86_64, Android 7.0+), build 54 |
+| Universal APK (arm64-v8a / armeabi-v7a / x86 / x86_64, Android 7.0+), build 55 |
 
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
 | [Fix search keyboard focus](#fix-search-keyboard-focus) | Opens search on Android TV and helps keep the keyboard connected during category searches on TV and phones. Clears TV search on navigation or close. |  |
 | [Hide playback controls at stream open](#hide-playback-controls-at-stream-open) | Keeps playback controls hidden when a stream opens or the player switches between embedded and fullscreen. The controls remain available. |  |
 | [Improve Android TV playback controls](#improve-android-tv-playback-controls) | On Android TV, prefers the seekbar when controls open and helps retain focus when live-source tabs auto-focus. Seeking depends on the stream. |  |
-| [Remove ads, proxy & restrictions](#remove-ads-proxy--restrictions) | Stops background bandwidth sharing, removes ads, and hides the player app logo on 7.4. | • Hide promo marquee ticker<br>• Bypass update & force-update screen<br>• Block promotional push notifications<br>• Bypass clone, work-profile & sniffer checks<br>• Strip proxy & ad native libraries |
+| [Remove ads, proxy & restrictions](#remove-ads-proxy--restrictions) | Stops background bandwidth sharing, removes ads, and hides the player app logo on 7.5. | • Hide promo marquee ticker<br>• Bypass update & force-update screen<br>• Block promotional push notifications<br>• Bypass clone, work-profile & sniffer checks<br>• Strip proxy & ad native libraries |
 
 </details>
 
@@ -248,13 +248,13 @@ The table below reflects the last published release and is refreshed automatical
 
 *On by default* for CricZ TV 7.3, PlayZ TV 2.3.1, CrexiFy TV 4.5, and SK Tech TV 2.7. Helps the remote's OK/center button reveal the native player controls and restores player focus when switching between embedded and fullscreen. Existing player actions, channel keys and stream behavior remain in place; it does not add new seek controls or change PiP.
 
-*On by default* for CRICFy TV 7.4 and Playfy TV 1.7 as well. When controls open on Android TV, these app-specific patches prefer the existing seekbar over the play/pause button. For CRICFy Live with multiple sources, the patch also helps keep the seekbar selected when the app automatically focuses a source tab. You can still navigate to source tabs to switch streams.
+*On by default* for CRICFy TV 7.5 and Playfy TV 1.7 as well. When controls open on Android TV, these app-specific patches prefer the existing seekbar over the play/pause button. For CRICFy Live with multiple sources, the patch also helps keep the seekbar selected when the app automatically focuses a source tab. You can still navigate to source tabs to switch streams.
 
 This patch depends on **Hide playback controls at stream open**: selecting it also selects that patch. On TV it may move focus from Share (or, in SK Tech, the message card) to the player at a player-opening or fullscreen transition; those views remain available through navigation. The first remote press may only reveal the controls; subsequent left/right uses the native seekbar when it is available. A live stream may not be seekable. The CricZ, PlayZ and CrexiFy changes were reported working on TV; the SK Tech adaptation still needs a real-device playback and remote test.
 
 ### Fix search keyboard focus
 
-*On by default* for CRICFy TV 7.4 (build 54). Helps open search on Android TV and prevent category labels from disrupting keyboard input on TVs and phones. On TV, the shared search is cleared when the app reports a navigation destination or the search bar is explicitly closed; hiding only the keyboard preserves the query. Repeated destination callbacks or restoration may also clear the query. This does not clear the keyboard's own suggestion history.
+*On by default* for CRICFy TV 7.5 (build 55). Helps open search on Android TV and prevent category labels from disrupting keyboard input on TVs and phones. On TV, the shared search is cleared when the app reports a navigation destination or the search bar is explicitly closed; hiding only the keyboard preserves the query. Repeated destination callbacks or restoration may also clear the query. This does not clear the keyboard's own suggestion history.
 
 ### Remove ads, telemetry & restrictions
 
@@ -401,7 +401,7 @@ Download links and hashes live in the table above because Morphe has no field fo
 
 ---
 
-## 📦 CRICFy TV (7.4 build 54)
+## 📦 CRICFy TV (7.5 build 55)
 
 <details>
 <summary><b>📖 App details</b> — what it does, target version and notes (click to expand)</summary>
@@ -410,12 +410,12 @@ Download links and hashes live in the table above because Morphe has no field fo
 
 #### Remove ads, proxy & restrictions
 
-*On by default.* Makes **CRICFy TV 7.4** clean and safe on phones, tablets, and Android TV:
+*On by default.* Makes **CRICFy TV 7.5** clean and safe on phones, tablets, and Android TV:
 
 - **Stops background bandwidth sharing** — the CashRaven proxy is disabled, so your internet connection is never rented out.
 - **No ads or sponsor gates** — channels open immediately, with no countdowns or browser redirects.
 - **No startup Telegram popup** — manual links in the drawer still work.
-- **No player app logo** on CRICFy TV 7.4; broadcaster logos remain unchanged.
+- **No player app logo** on CRICFy TV 7.5; broadcaster logos remain unchanged.
 - **Channels keep working** after patching, including live server configs.
 
 Options (on by default): hide the promo ticker, skip forced updates, block promo push notifications. Off by default: bypass clone/sniffer checks, and strip unused libraries to save ~7.7 MB.
@@ -425,12 +425,12 @@ Options (on by default): hide the promo ticker, skip forced updates, block promo
 | Field | Value |
 | --- | --- |
 | Package | `com.cricfytv.sports` |
-| Version | **7.4** (versionCode 54). Universal APK (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`) |
+| Version | **7.5** (versionCode 55). Universal APK (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`) |
 | Stock download | Official [cricfyapk.io/download/](https://cricfyapk.io/download/) page or the developer's official Telegram channel |
 | Signing certificate SHA-256 | `f2cd86fcbc92461a3300cec47b6f74d20f0c89dd7162ecc333b3dd2c16e79841` |
-| APK SHA-256 (7.4) | `d37c0c70200981a9558d32abd16ffb7966ae83a2fc84157b82e6869c4e16ae6f` |
+| APK SHA-256 (7.5) | `a6c12f1c5bdc1eff9da78788b27560c9c6fed7527b32e267f207eb746f0a23b7` |
 
-> **Version safety:** only **7.4 (54)** is supported. Other versions are refused
+> **Version safety:** only **7.5 (55)** is supported. Other versions are refused
 > by design until audited — do not force-patch them in Expert Mode.
 
 </details>
@@ -904,7 +904,7 @@ independent settings.
 ## Usage (Morphe Manager)
 
 1. Add this repository as a remote patch source using the link at the top of this README.
-2. Download the stock **1DM 20.0 APKM**, **CRICFy TV 7.4 APK**, **CricZ TV 7.3 APK**,
+2. Download the stock **1DM 20.0 APKM**, **CRICFy TV 7.5 APK**, **CricZ TV 7.3 APK**,
    **PlayZ TV 2.3.1 APK**, **SK Tech TV 2.7 APK**, **MX Player 3.4.1 or 3.4.3 APK**,
    **APK Decompiler 4.12.0 APK**, **Daylio 1.72.0 APKM**, **WPS Office 26.11.0 XAPK**, or
    **AdGuard 4.15.2 APK** above onto your device.
