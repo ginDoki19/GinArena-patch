@@ -27,19 +27,11 @@ import app.morphe.patcher.Fingerprint
 internal const val WPS_PRIVILEGE_ASSEMBLY =
     "Lcn/wpsx/module/communication/vas/service/impl/PrivilegeAssembly;"
 
-/** Anonymous `IPrivilegeAssembly$ListCallback` adapter that turns a map into `ConsumePrivilege`s. */
-internal const val WPS_PRIVILEGE_ASSEMBLY_CALLBACK =
-    "Lcn/wpsx/module/communication/vas/service/impl/PrivilegeAssembly\$2;"
-
 internal const val WPS_ENVAS_PRIVILEGE_UTIL = "Lcn/wps/moffice/privilege/EnVasPrivilegeUtil;"
 
 internal const val WPS_KENVAS_ASSEMBLY = "Lcn/wps/moffice/KEnVasAssembly;"
 
 internal const val WPS_MOFFICE_DELEGATE_IMPL = "Lcn/wps/moffice/MofficeDelegateImpl;"
-
-/** Continuation body of the newer VAS interceptor; holds the deny path for `PrivilegeEngine`. */
-internal const val WPS_PRIVILEGE_INTERCEPT_CONTINUATION =
-    "Lcn/wps/moffice/vas/privilege/biz/interceptor/PrivilegeInterceptor\$intercept\$2\$1;"
 
 internal const val WPS_SIGNATURE_UTILS = "Lcn/wps/moffice/firebase/SignatureUtils;"
 
@@ -64,21 +56,6 @@ internal object WpsCheckFromCacheFingerprint : Fingerprint(
     name = "checkFromCache",
     returnType = "Z",
     parameters = listOf("Ljava/lang/String;"),
-)
-
-/**
- * `PrivilegeAssembly$2.b(Object)V`
- *
- * The asynchronous dispatcher: receives the privilege map from `KPrivilege`,
- * converts entries into `ConsumePrivilege` and calls
- * `IPrivilegeAssembly$ListCallback.b(HashMap)`. Every `noHasPrivilege(-99999)`
- * decision for the ~1,760 `check()` call sites is made here.
- */
-internal object WpsPrivilegeDispatchFingerprint : Fingerprint(
-    definingClass = WPS_PRIVILEGE_ASSEMBLY_CALLBACK,
-    name = "b",
-    returnType = "V",
-    parameters = listOf("Ljava/lang/Object;"),
 )
 
 /** `PrivilegeAssembly.getAllMemberList()Ljava/util/ArrayList;` - SKU list behind every member badge. */
@@ -176,19 +153,6 @@ internal object WpsAdPrivilegeFingerprint : Fingerprint(
     name = "isAdPrivilege",
     returnType = "Z",
     parameters = emptyList(),
-)
-
-/**
- * `PrivilegeInterceptor$intercept$2$1.noHasPrivilege(I)V`
- *
- * Deny path of the newer `PrivilegeEngine`: code `10007/10011/10012/10013/10015`
- * are silent, anything else pops a toast and resumes with a `FailResponse`.
- */
-internal object WpsAsyncDenialFingerprint : Fingerprint(
-    definingClass = WPS_PRIVILEGE_INTERCEPT_CONTINUATION,
-    name = "noHasPrivilege",
-    returnType = "V",
-    parameters = listOf("I"),
 )
 
 /**
