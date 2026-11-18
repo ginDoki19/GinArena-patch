@@ -3,10 +3,10 @@ package app.template.patches.wps
 import app.morphe.patcher.Fingerprint
 
 // ============================================================================
-// WPS Office 26.11.0 (b1650) - privilege gate targets
+// WPS Office 26.11.1 (b1651) - privilege gate targets
 //
 // WPS is *not* obfuscated in this area: the class and method names below are
-// stable, readable symbols taken from the stock 26.11.0 bundle. They are pinned
+// stable, readable symbols taken from the stock 26.11.1 bundle. They are pinned
 // by `COMPATIBILITY_WPS_OFFICE`, so exact-name fingerprints are correct here -
 // a fuzzy match would be less safe, not more.
 //
@@ -231,7 +231,7 @@ internal object WpsPrivilegeInterceptorFingerprint : Fingerprint(
 
 /**
  * The `run()` body that builds the PDF shop's "already owned" dialog. The
- * class is obfuscated (`Ls74;` in 26.11.0), so it is matched by the analytics
+ * class is obfuscated, so it is matched by the analytics
  * label it logs right after showing the dialog rather than by name.
  */
 internal object WpsOwnedPrivilegeDialogFingerprint : Fingerprint(
@@ -252,4 +252,41 @@ internal object WpsAdOnlineGateFingerprint : Fingerprint(
     name = "l",
     returnType = "Z",
     parameters = emptyList(),
+)
+
+// ============================================================================
+// The tool-page upsell banner ("Upgrade to WPS Membership" / storage & export
+// limit banners).
+//
+// This is NOT a premium gate and it is NOT what bypassAsyncPrivilegeChecks was
+// trying to reach. Read from stock 26.11.1:
+//
+//   UpgradeOrExpandTipsBarProcessor.e(Bundle, CheckShowCallback)  225 units
+//     -> UpgradeOrExpandTipsBarMatcher.a(UpgradeType, String)Z    (called once,
+//        from this method only)
+//          -> FileOutLimitUpgradeTipBarStrategy / SpaceUpgradeTipBarStrategy
+//             = cloud-commerce upsells driven by export-size limits and
+//               server-configured storage thresholds.
+//
+// Nothing on that path consults a privilege id, a VIP flag or a member level,
+// which is why no amount of premium patching ever removed the banner.
+//
+// The method already has the exact "do not show this" path we want: when the
+// account check fails it calls CheckShowCallback.onResult(false) and returns.
+// Replacing the body with that same early return removes the banner, keeps the
+// callback contract intact, touches no coroutine and leaves the upsell logic
+// untouched for every other caller.
+// ============================================================================
+
+internal const val WPS_UPGRADE_TIPS_BAR_PROCESSOR =
+    "Lcn/wps/moffice/common/upgradetipsbar/UpgradeOrExpandTipsBarProcessor;"
+
+internal object WpsUpgradeTipsBarFingerprint : Fingerprint(
+    definingClass = WPS_UPGRADE_TIPS_BAR_PROCESSOR,
+    name = "e",
+    returnType = "V",
+    parameters = listOf(
+        "Landroid/os/Bundle;",
+        "Lcn/wps/moffice/common/tooltip/CheckShowCallback;",
+    ),
 )
