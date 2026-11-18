@@ -419,7 +419,7 @@ Download links and hashes live in the table above because Morphe has no field fo
 - **No player app logo** on CRICFy TV 7.5; broadcaster logos remain unchanged.
 - **Channels keep working** after patching, including live server configs.
 
-Options (on by default): hide the promo ticker, skip forced updates, block promo push notifications. Off by default: bypass clone/sniffer checks, and strip unused libraries to save ~7.7 MB.
+Options (on by default): hide the promo ticker, skip forced updates, block promo push notifications. Off by default: bypass clone/sniffer checks, and strip unused Unity ad libraries to save about 2 MB.
 
 ### Target app (CRICFy TV)
 
