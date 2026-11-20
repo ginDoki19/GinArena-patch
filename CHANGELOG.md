@@ -1,3 +1,9 @@
+## [2.13.0-dev.3](https://github.com/ginDoki19/GinArena-patch/compare/v2.13.0-dev.2...v2.13.0-dev.3) (2026-11-20)
+
+### 🐛 Bug Fixes
+
+* **sktech,crexify:** pin rows reorder without a refresh ([2617f5d](https://github.com/ginDoki19/GinArena-patch/commit/2617f5da12cde82e346328ef94d314e104281ed6))
+
 ## [2.13.0-dev.2](https://github.com/ginDoki19/GinArena-patch/compare/v2.13.0-dev.1...v2.13.0-dev.2) (2026-11-20)
 
 ### 🐛 Bug Fixes
