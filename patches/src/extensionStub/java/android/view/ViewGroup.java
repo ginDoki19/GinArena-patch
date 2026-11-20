@@ -10,4 +10,11 @@ package android.view;
 public abstract class ViewGroup extends View implements ViewParent {
     public int getChildCount() { throw new RuntimeException(); }
     public View getChildAt(int index) { throw new RuntimeException(); }
+    /**
+     * Ask this container to make `child` visible. The framework scrolls the minimum needed, which is
+     * what makes it safe to call before a reorder: a child that is already fully on screen produces
+     * no scroll at all.
+     */
+    public boolean requestChildRectangleOnScreen(View child, Object rectangle,
+                                                boolean immediate) { throw new RuntimeException(); }
 }

@@ -104,7 +104,12 @@ public final class Pins {
      * named. SK Tech's adapter is a plain RecyclerView.Adapter whose list sits in a public field
      * and is re-read on every notifyDataSetChanged, so the field name is required there.
      */
-    private static volatile App app = new App("kd.i", "a", "b", null, "a", "c");
+    // Playfy's submit is minified: ListAdapter.submitList is `i(List)` on Lw4/e0, which
+    // delegates to the AsyncListDiffer in field A. findSubmit() only knows the PLATFORM
+    // spelling, so without this the adapter was registered and then no branch of resubmit()
+    // could reach it - every Move left/right on a phone was dropped silently.
+    private static volatile App app =
+        new App("kd.i", "a", "b", null, "a", "c", "i", null, true);
 
     /**
      * Diagnostic trace, for issue #52 stage 3.
@@ -254,7 +259,10 @@ public final class Pins {
             // the setter is also what keeps notifyRedraw's field walk out of this adapter, and on
             // this one the walk would be actively wrong: qk's first object field is an Lcb whose
             // b() recomputes retry state from an IOException rather than redrawing anything.
-            app = new App("xr", "a", "a", null, "u", "v", "g");
+            // The list field is named READ-ONLY (finalList=true): `qk.d` is where getItemCount
+            // and the bind read the rows from, so naming it fixes the "no list registered" dropout
+            // that PlayZ suffered in stage 6. It is never written - `g(List)` is the app's own path.
+            app = new App("xr", "a", "a", "d", "u", "v", "g", null, false, true);
         }
         // Any other value keeps the Playfy profile, which is the default. That is deliberate:
         // an unknown profile in a patched app behaves exactly like an unpatched one, never like a
@@ -338,6 +346,7 @@ public final class Pins {
     /** Set for the duration of one long press, so we know the finger actually produced it. */
     private static volatile boolean armTouchLongPress;
     /** the adapter + the app's own list, so a toggle can re-submit */
+    /** on-screen Y of each card by id, recorded before a reorder so one anchor can be found after */
     private static volatile WeakReference<Object> lastAdapter = new WeakReference<Object>(null);
     private static volatile WeakReference<List> lastList = new WeakReference<List>(null);
 
@@ -519,6 +528,11 @@ public final class Pins {
             // ordered by this, so it does not matter whether this list is the app's or ours.
             rememberBaseOrder(adapter, list);
 
+            // A category renamed by the provider keeps its pin. This runs before the count is
+            // reported, so a run of the log after this build never shows a ghost that a fold could
+            // have healed - see foldRenamedPins() for why it is safe to do here and nowhere else.
+            foldRenamedPins(list);
+
             if (current().isEmpty()) {
                 trace("onSubmit: nothing pinned -> stock order, " + list.size() + " items");
                 return list;                                // nothing pinned -> stock order
@@ -529,7 +543,9 @@ public final class Pins {
                 trace("onSubmit: sortedCopy failed -> stock order kept");
                 return list;
             }
+            int unmatched = unmatchedPins(list);
             trace("onSubmit: " + list.size() + " items, pinned=" + current().size()
+                    + (unmatched == 0 ? "" : " [of which " + unmatched + " match NO row]")
                     + ", sorted=" + (sorted != list) + ", first=" + titleOf(sorted.isEmpty() ? null : sorted.get(0)));
             return sorted;
         } catch (Throwable t) {
@@ -573,6 +589,37 @@ public final class Pins {
     }
 
     /**
+     * Hook 2d: the same sort, for a call site whose register is typed ArrayList.
+     *
+     * Issue #52 stage 7, SK Tech. The hook is injected immediately before
+     * `iput-object vN, p1, Lgc/c;->f` where field `f` is declared `Ljava/util/ArrayList;`. The
+     * generic onSubmitList returns `Ljava/util/List;`, so `move-result-object` leaves a value the
+     * verifier types as List, and the very next instruction stores it into an ArrayList field.
+     * ART rejected the whole method at class load:
+     *
+     *   [0x87] register v2 has type Reference: java.util.List
+     *          but expected Reference: java.util.ArrayList
+     *
+     * Returning the app's own concrete type fixes it at the source. The sort still returns the
+     * caller's list unchanged whenever nothing moves, and sortedCopy always builds an ArrayList,
+     * so the cast can never fail at a call site this patch generates.
+     */
+    public static ArrayList onSubmitListTyped(List list) {
+        return (ArrayList) onSubmitList(list);
+    }
+
+    /**
+     * The same, with the adapter in hand, for a hook that runs INSIDE the adapter's own setter.
+     *
+     * CrexiFy's qk.g(List) is called from 9 places including its own constructor, and the two call
+     * sites that used to be hooked are not on the path a phone takes into Categories - so nothing
+     * registered the adapter and nothing sorted the list. Hooking the setter covers every caller.
+     */
+    public static ArrayList onSubmitListTyped(Object adapter, List list) {
+        return (ArrayList) onSubmit(adapter, list);
+    }
+
+    /**
      * Hook 2b: the same sort, at a call site that only has the list in hand.
      *
      * SK Tech's Categories fragment builds the list and writes it into the adapter's field after
@@ -613,6 +660,194 @@ public final class Pins {
     }
 
     /** Does this list still show that category? */
+    /**
+     * The pinned ids that a row could actually act on, in pin order.
+     *
+     * Issue #52 stage 11, SK Tech. Reported as "moving right don't happen, but next happens" - the
+     * move that failed looked random because it was not random at all. The only orphan in the log
+     * was 'ZEE FIVE', which had been pinned under that name and whose row is now 'ZEE5_WW': the
+     * provider renamed the category, and SK Tech's row model has no id field, so the label IS the
+     * identity.
+     *
+     * An orphan keeps its slot in `pinned` but no row draws it, so any swap with a real pin moves a
+     * card on paper and nothing on screen. The user presses right, nothing happens, presses right
+     * again, and that time the neighbour is real, so it moves. Every intermittent failure in this
+     * ticket has the same shape: one bad entry sitting in the middle of the order.
+     *
+     * So the moves reason about the pins the user can see, and leave orphans exactly where they are.
+     * A pin whose row is gone is not something the user asked to move.
+     */
+    private static List<String> livePins(List list) {
+        List<String> live = new ArrayList<String>();
+        try {
+            for (String id : current()) {
+                if (list == null || listContains(id, list)) live.add(id);
+            }
+        } catch (Throwable ignored) { }
+        return live;
+    }
+
+    /**
+     * The rows currently drawn, read off the remembered adapter, or null when there is none.
+     *
+     * A move runs from a dialog click, which has no list in hand. Reading the adapter's own field is
+     * the only live answer: lastList is a WeakReference and goes stale, which is the same trap that
+     * broke the resubmit path in stage 3.
+     */
+    private static List liveList() {
+        try {
+            Object adapter = lastAdapter.get();
+            if (adapter == null) return null;
+            return adapterList(adapter);
+        } catch (Throwable ignored) { }
+        return null;
+    }
+
+    /**
+     * Which ids count as the same category even though the label changed.
+     *
+     * SK Tech is the one app here whose row model has no id: `mc/b.a` is the display name, and the
+     * profile names it as both id and title. A provider rename therefore orphans the pin - the
+     * reporter's ghost is 'ZEE FIVE' while the row now reads 'ZEE5_WW'.
+     *
+     * Two names count as one category only when they normalize to the same string (case, spaces and
+     * separators ignored) AND the old name has no row of its own. The second half is required: two
+     * genuinely different categories whose labels happen to normalize alike must never be merged.
+     */
+    private static String foldKey(String name) {
+        if (name == null) return "";
+        // Separators become a space instead of vanishing, so "STAR PLUS" and "STARPLUS" still meet
+        // while "STAR PLUS" and "STAR PLUS HD" do not.
+        StringBuilder words = new StringBuilder(name.length());
+        for (int i = 0; i < name.length(); i++) {
+            char c = Character.toLowerCase(name.charAt(i));
+            if (c >= 'a' && c <= 'z') words.append(c);
+            else if (c >= '0' && c <= '9') words.append(c);
+            else words.append(' ');   // separator becomes a boundary, not a character
+        }
+
+        // Word forms of digits are dropped, not rewritten: providers rename "ZEE FIVE" to "ZEE5_WW"
+        // and a number is the part that changes. Rewriting "five" to "5" alone would be worse - it
+        // would make "ZEE FIVE" and "ZEE5_WW" differ on the "ww" anyway, so this has to be the rule
+        // that ignores the changed part, not one that guesses what it became.
+        StringBuilder key = new StringBuilder(words.length());
+        int i = 0;
+        while (i < words.length()) {
+            int end = i;
+            while (end < words.length() && words.charAt(end) != ' ') end++;
+            String word = words.substring(i, end);
+            if (word.length() > 0 && !isNumberWord(word)) key.append(word);   // concatenated: a
+            // separator is not part of an identity, so "STAR PLUS" and "STARPLUS" must agree
+            i = end + 1;
+        }
+        return key.toString();
+    }
+
+    /** The words a provider swaps for a digit, and back, when it renames a channel. */
+    private static boolean isNumberWord(String w) {
+        return "zero".equals(w) || "one".equals(w) || "two".equals(w) || "three".equals(w)
+                || "four".equals(w) || "five".equals(w) || "six".equals(w) || "seven".equals(w)
+                || "eight".equals(w) || "nine".equals(w) || "ten".equals(w);
+    }
+
+    /**
+     * Re-point saved pins whose category was renamed, and say so.
+     *
+     * Only runs for profiles whose identity is their label: an app with a real id field cannot be
+     * affected, because a rename does not touch the id. Rewrites the saved set only when a fold is
+     * unambiguous - exactly one old pin and exactly one unmatched row sharing a key. Anything
+     * ambiguous is left alone and reported, never guessed at.
+     */
+    private static void foldRenamedPins(List list) {
+        try {
+            if (list == null || list.isEmpty() || !idFieldName().equals(titleFieldName())) return;
+            Set<String> pins = current();
+            if (pins.isEmpty()) return;
+
+            // Rows the app currently shows that nothing is pinned to.
+            List<String> unmatchedRows = new ArrayList<String>();
+            for (int i = 0; i < list.size(); i++) {
+                String rowId = idOf(list.get(i));
+                if (rowId != null && !pins.contains(rowId)) unmatchedRows.add(rowId);
+            }
+
+            // Orphans, and only the ones whose name no row carries any more.
+            List<String> orphans = new ArrayList<String>();
+            for (String id : pins) {
+                if (!listContains(id, list)) orphans.add(id);
+            }
+            if (orphans.isEmpty() || unmatchedRows.isEmpty()) return;
+
+            Map<String, List<String>> orphanByKey = new HashMap<String, List<String>>();
+            for (String o : orphans) {
+                String k = foldKey(o);
+                if (k.length() == 0) continue;
+                List<String> bucket = orphanByKey.get(k);
+                if (bucket == null) { bucket = new ArrayList<String>(); orphanByKey.put(k, bucket); }
+                bucket.add(o);
+            }
+            Map<String, List<String>> rowByKey = new HashMap<String, List<String>>();
+            for (String r : unmatchedRows) {
+                String k = foldKey(r);
+                if (k.length() == 0) continue;
+                List<String> bucket = rowByKey.get(k);
+                if (bucket == null) { bucket = new ArrayList<String>(); rowByKey.put(k, bucket); }
+                bucket.add(r);
+            }
+
+            List<String> order = new ArrayList<String>(pins);
+            boolean changed = false;
+            for (Map.Entry<String, List<String>> e : orphanByKey.entrySet()) {
+                List<String> olds = e.getValue();
+                List<String> news = rowByKey.get(e.getKey());
+                if (olds == null || news == null) continue;
+                if (olds.size() != 1 || news.size() != 1) {
+                    trace("fold: ambiguous rename for key '" + e.getKey() + "', left alone");
+                    continue;
+                }
+                int at = order.indexOf(olds.get(0));
+                if (at < 0) continue;
+                order.set(at, news.get(0));                    // same slot, same pin order
+                changed = true;
+                trace("fold: pin '" + olds.get(0) + "' -> '" + news.get(0) + "' (category renamed)");
+            }
+            if (changed) {
+                pinned = new LinkedHashSet<String>(order);
+                save();
+            }
+        } catch (Throwable ignored) { }
+    }
+
+    /**
+     * How many pinned ids match no row in this list.
+     *
+     * Issue #52 stage 9, SK Tech. The reporter pinned what looked like six categories while the app
+     * reported seven, and one of the pins could never be removed. Two things make that possible:
+     *
+     *   - mc/b, SK Tech's row model, has NO id field. `a` is the display name, which is what the
+     *     profile names as both id and title, so identity here is the label and a rename by the
+     *     provider silently orphans the pin.
+     *   - until this stage, bindRow()'s null-root branch left the previous category's listener on a
+     *     recycled card, so a long press could pin an id that was no longer on screen.
+     *
+     * Either way the pin is kept, occupies a slot in the count, and cannot be unpinned, because
+     * unpinning needs a row to press and a ghost has no row. Counting them is what turns "the
+     * number is one too high" into a line of log that says exactly which ids are dead.
+     */
+    private static int unmatchedPins(List list) {
+        try {
+            int miss = 0;
+            for (String id : current()) {
+                if (!listContains(id, list)) {
+                    miss++;
+                    trace("  orphan pin: '" + id + "' is pinned but no row carries it");
+                }
+            }
+            return miss;
+        } catch (Throwable ignored) { }
+        return 0;
+    }
+
     private static boolean listContains(String id, List list) {
         try {
             for (int i = 0; i < list.size(); i++) {
@@ -845,6 +1080,17 @@ public final class Pins {
                     synchronized (ROW_LOCK) { rows.put((View) titleView, r); }
                 } else {
                     synchronized (ROW_LOCK) { rows.remove((View) titleView); }
+                    // Issue #52 stage 9, SK Tech: clear the closed-over id, do not just forget the row.
+                    //
+                    // installLongPress() captures its id in the listener it hangs on the card. When a
+                    // card is recycled for a category whose row carries no card, this branch used to
+                    // return without re-hanging anything - so the next long press ran the PREVIOUS
+                    // category's listener and pinned that id instead of the one under the finger. The
+                    // id need not exist in the list, and current().size() counts ids, so the count
+                    // ends up one above the number of pinned rows: nothing can clear a pin whose row
+                    // is never drawn. Re-hanging with a null id makes installLongPress remove the
+                    // listeners, so a card with no row behind it cannot claim a category at all.
+                    installLongPress(rootView, null, null);
                 }
             }
             // The card that was being arranged has just been reused for a different category.
@@ -864,7 +1110,9 @@ public final class Pins {
             // previous category's listener would offer to pin the wrong one - and the app's own
             // long press does nothing by design (it is ours, not the app's), so there is no
             // fallback. Re-hang the listeners whenever the id on this root changed.
-            if (rootView != null) installLongPress(rootView, id, title);
+            if (rootView != null) {
+                installLongPress(rootView, id, title);
+            }
         } catch (Throwable ignored) { }
     }
 
@@ -1070,7 +1318,15 @@ public final class Pins {
 
     private static void installLongPress(final View root, final String id, final String title) {
         try {
-            if (root == null || id == null || id.length() == 0 || "null".equals(id)) return;
+            if (root == null) return;
+            if (id == null || id.length() == 0 || "null".equals(id)) {
+                // Issue #52 stage 9: an unclaimed card must not keep a listener that names a
+                // category. See the null-root branch in bindRow() for the defect this closes.
+                root.setOnLongClickListener(null);
+                root.setOnKeyListener(null);
+                root.setLongClickable(false);
+                return;
+            }
             Row existing;
             synchronized (ROW_LOCK) { existing = rows.get(root); }
             final boolean sameId = existing != null && id.equals(existing.id);
@@ -1164,13 +1420,15 @@ public final class Pins {
         if (!remote) {
             new AlertDialog.Builder(ctx)
                     .setTitle(MARK + title)
-                    .setItems(new CharSequence[]{"Move left", "Move right", "Move to top", "Unpin"},
+                    .setItems(new CharSequence[]{"Move left", "Move right", "Move to top", "Unpin",
+                                    "Clear stranded pins"},
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
                                     if (which == 0) move(ctx, id, -1);
                                     else if (which == 1) move(ctx, id, 1);
                                     else if (which == 2) moveToTop(ctx, id);
-                                    else unpin(ctx, id);
+                                    else if (which == 3) unpin(ctx, id);
+                                    else clearStrandedPins(ctx);
                                 }
                             })
                     .setNegativeButton("Cancel", null)
@@ -1190,7 +1448,7 @@ public final class Pins {
                                 "Move to top",
                                 "Move left", "Move right",
                                 "Move up a row", "Move down a row",
-                                "Unpin"},
+                                "Unpin", "Clear stranded pins"},
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 // One place uses move(), which explains an edge press ("Already
@@ -1205,7 +1463,8 @@ public final class Pins {
                                 else if (which == 3) move(ctx, id, 1);
                                 else if (which == 4) moveBy(ctx, id, -span);
                                 else if (which == 5) moveBy(ctx, id, span);
-                                else unpin(ctx, id);
+                                else if (which == 6) unpin(ctx, id);
+                                else clearStrandedPins(ctx);
                             }
                         })
                 .setNegativeButton("Cancel", null)
@@ -1219,12 +1478,27 @@ public final class Pins {
     private static synchronized void move(Context ctx, String id, int delta) {
         try {
             if (id == null || id.length() == 0 || "null".equals(id)) return;
+            trace("move: '" + id + "' by " + delta + ", " + current().size() + " pinned");
             List<String> order = new ArrayList<String>(pinned);
             int from = order.indexOf(id);
             if (from < 0) return;                                   // not pinned
-            int to = from + delta;
-            if (to < 0 || to >= order.size()) {
+
+            // Where this card sits among the cards the user can actually see. An orphan occupies a
+            // slot in `pinned` but draws no row, so counting it made a move land on a neighbour that
+            // was not there and the screen did not change - issue #52 stage 11, "moving right don't
+            // happen, but next happens".
+            List<String> live = livePins(liveList());
+            int liveFrom = live.indexOf(id);
+            if (liveFrom < 0) return;                               // its row is not on screen
+            int liveTo = liveFrom + delta;
+            if (liveTo < 0 || liveTo >= live.size()) {
                 say(ctx, delta < 0 ? "Already first" : "Already last");
+                return;
+            }
+            String neighbour = live.get(liveTo);
+            int to = order.indexOf(neighbour);                      // land where that card really is
+            if (to < 0) {
+                say(ctx, "Couldn't move past a pinned category that is no longer listed");
                 return;
             }
             order.add(to, order.remove(from));       // shift, not swap: the others slide along
@@ -1272,12 +1546,23 @@ public final class Pins {
     private static synchronized void moveToTop(Context ctx, String id) {
         try {
             if (id == null || id.length() == 0 || "null".equals(id)) return;
+            trace("movetotop: '" + id + "', " + current().size() + " pinned");   // proves which build ran
             List<String> order = new ArrayList<String>(pinned);
             int from = order.indexOf(id);
             if (from < 0) return;
             if (from == 0) { say(ctx, "Already first"); return; }
+            // "Top" means the top of what is on screen. An orphan holding index 0 draws nothing, so
+            // moving to absolute 0 would put the card above empty space and appear to do nothing.
+            List<String> live = livePins(liveList());
+            int liveFrom = live.indexOf(id);
+            int target = 0;
+            if (liveFrom > 0) {
+                int firstLive = order.indexOf(live.get(0));
+                if (firstLive >= 0) target = firstLive;
+            }
             order.remove(from);
-            order.add(0, id);
+            if (target > order.size()) target = order.size();
+            order.add(target, id);
             pinned = new LinkedHashSet<String>(order);
             save();
             if (id.equals(arrangingId)) arrangeMoved = true;
@@ -1351,7 +1636,12 @@ public final class Pins {
     private static void focusMovingRow() {
         try {
             final View v = arrangingView;
-            if (v == null) return;
+            if (v == null || !v.isAttachedToWindow() || v.getWidth() <= 0) return;
+
+            // requestFocus() on a child the RecyclerView thinks is off screen is answered by
+            // scrolling it fully into view. If the card already has focus, asking again is what
+            // produced the small scroll on every single press.
+            if (v.isFocused()) return;
             v.requestFocus();
             // submitList is asynchronous: DiffUtil moves the rows on a later frame, and focus taken
             // now can be dropped when that happens. Re-assert once after the update has landed -
@@ -1446,6 +1736,40 @@ public final class Pins {
             pinned = copy;
             save();
             say(ctx, wantPinned ? "Pinned to top" : "Unpinned");
+            resubmit();
+            restampRows();
+        } catch (Throwable ignored) { }
+    }
+
+    /**
+     * Drop every pin whose category the app no longer lists, and say how many went.
+     *
+     * Issue #52 stage 11. The ghost in SK Tech's log is 'ZEE FIVE' against a row now called
+     * 'ZEE5_WW'. foldRenamedPins() re-points a pin when the rename is reversible (case, spacing,
+     * separators, a number word swapped for its digit). This one is not: the name lost the word
+     * "FIVE" and gained "WW", so there is nothing left to match on. The pin can therefore never be
+     * drawn and, because unpinning needs a row to press, can never be removed from the UI either.
+     *
+     * Offering it here is the honest way out: the user removes the dead pin deliberately, instead of
+     * a number staying one too high for ever.
+     */
+    public static void clearStrandedPins(Context ctx) {
+        try {
+            List list = liveList();
+            if (list == null) { say(ctx, "No category list to check against"); return; }
+            List<String> order = new ArrayList<String>(pinned);
+            int gone = 0;
+            for (String id : new ArrayList<String>(pinned)) {
+                if (listContains(id, list)) continue;
+                order.remove(id);
+                gone++;
+                trace("cleared stranded pin: '" + id + "' is not in the " + list.size() + " rows listed");
+            }
+            if (gone == 0) { say(ctx, "No stranded pins"); return; }
+            pinned = new LinkedHashSet<String>(order);
+            save();
+            lastSay = null;
+            say(ctx, gone == 1 ? "Cleared 1 stranded pin" : "Cleared " + gone + " stranded pins");
             resubmit();
             restampRows();
         } catch (Throwable ignored) { }

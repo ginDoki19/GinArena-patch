@@ -24,6 +24,28 @@ public class View {
     public ViewParent getParent() { throw new RuntimeException(); }
     /** top edge in px, relative to the parent; 0 before layout */
     public int getTop() { throw new RuntimeException(); }
+    /** true when this view is attached to a window and can take focus */
+    public boolean isAttachedToWindow() { throw new RuntimeException(); }
+    /** direction: negative = up/left, positive = down/right. True when there is somewhere to go. */
+    public boolean canScrollVertically(int direction) { throw new RuntimeException(); }
+    /**
+     * NOT STUBBED ON PURPOSE.
+     *
+     * computeVerticalScrollOffset() is PROTECTED on the real android.view.View. Declaring it public
+     * here made the extension compile and then fail on a device with:
+     *
+     *   IllegalAccessError: Method 'int android.view.View.computeVerticalScrollOffset()'
+     *   is inaccessible to class 'app.template.extension.playfy.Pins'
+     *
+     * Stages 12-14 called it from inside catch(Throwable) and were silent no-ops for four rounds.
+     * A stub that is more permissive than the framework is worse than no stub at all.
+     */
+    /** scroll the viewport by a delta, in px */
+    public void scrollBy(int x, int y) { throw new RuntimeException(); }
+    /** PUBLIC on the real View - how far this view's content has been scrolled vertically */
+    public int getScrollY() { throw new RuntimeException(); }
+    /** run a runnable after a delay, on this view's handler */
+    public boolean postDelayed(Runnable action, long delayMillis) { throw new RuntimeException(); }
     public interface OnLongClickListener {
         boolean onLongClick(View v);
     }
