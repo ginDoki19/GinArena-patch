@@ -1,3 +1,13 @@
+## [2.13.0-dev.1](https://github.com/ginDoki19/GinArena-patch/compare/v2.12.1...v2.13.0-dev.1) (2026-11-20)
+
+### 🐛 Bug Fixes
+
+* **build:** declare buildPlayfyExtensionMpe for sourcesJar ([060f4d5](https://github.com/ginDoki19/GinArena-patch/commit/060f4d57663a37e9291eb0a23ba748440bbcf2e5))
+
+### ✨ New Features
+
+* pin and arrange favourite categories across the TV apps ([1be7f71](https://github.com/ginDoki19/GinArena-patch/commit/1be7f71e2aa36aa5fb031ac8392b8f2f1257ead4))
+
 ## [2.12.1](https://github.com/ginDoki19/GinArena-patch/compare/v2.12.0...v2.12.1) (2026-11-18)
 
 ### 🐛 Bug Fixes
