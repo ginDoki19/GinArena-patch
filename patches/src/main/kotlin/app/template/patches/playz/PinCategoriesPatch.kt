@@ -2,6 +2,7 @@ package app.template.patches.playz
 
 import app.morphe.patcher.Fingerprint
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
+import app.template.patches.shared.addInstructionsAfterSuperInit
 import app.morphe.patcher.extensions.InstructionExtensions.instructions
 import app.morphe.patcher.patch.bytecodePatch
 import app.template.patches.shared.Constants.COMPATIBILITY_PLAYZ_TV
@@ -179,8 +180,7 @@ val pinCategoriesPatch = bytecodePatch(
         )
 
         // ---- 2. register the adapter when it is built --------------------------------------
-        PlayZAdapterInitFingerprint.method.addInstructions(
-            0,
+        PlayZAdapterInitFingerprint.method.addInstructionsAfterSuperInit(
             "invoke-static {p0}, L$PINS;->seeAdapter(Ljava/lang/Object;)V",
         )
 

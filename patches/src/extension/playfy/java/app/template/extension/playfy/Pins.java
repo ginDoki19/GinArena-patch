@@ -2,6 +2,7 @@ package app.template.extension.playfy;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.util.Log;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -105,6 +106,20 @@ public final class Pins {
      */
     private static volatile App app = new App("kd.i", "a", "b", null, "a", "c");
 
+    /**
+     * Diagnostic trace, for issue #52 stage 3.
+     *
+     * The device logs that came back for stage 2 contained zero Pins lines: this class was silent,
+     * so a reorder that failed to redraw looked exactly like a reorder that never ran. Every
+     * decision resubmit() makes is now written to logcat under the tag "GinArenaPins", so one
+     * capture answers "which branch did it take and why".
+     *
+     * Logging only. No behaviour depends on it, and a failure to log is swallowed.
+     */
+    private static void trace(String what) {
+        try { Log.i("GinArenaPins", what); } catch (Throwable ignored) { }
+    }
+
     private static final class App {
         final String model, id, title, adapterList, rowCard, rowTitle;
         /**
@@ -128,6 +143,14 @@ public final class Pins {
          */
         final String holderStep;
         /**
+         * Is `adapterList` a field that must be READ and never written?
+         *
+         * PlayZ keeps its rows in a final ArrayList that the app mutates in place. Naming the field
+         * is how resubmit() finds the list without a weak reference; writing that field would be
+         * both impossible (final) and the wrong mechanism (the setter is the app's own path).
+         */
+        final boolean finalList;
+        /**
          * Does the setter above redraw the list on its own?
          *
          * PlayZ's `g(List)` writes the field and stops, so a redraw has to be asked for. CRICFy's
@@ -143,6 +166,14 @@ public final class Pins {
             this(model, id, title, adapterList, rowCard, rowTitle, null, null, false);
         }
         App(String model, String id, String title, String adapterList,
+            String rowCard, String rowTitle, String setter, String holderStep, boolean setterRedraws,
+            boolean finalList) {
+            this.model = model; this.id = id; this.title = title;
+            this.adapterList = adapterList; this.rowCard = rowCard; this.rowTitle = rowTitle;
+            this.setter = setter; this.holderStep = holderStep;
+            this.setterRedraws = setterRedraws; this.finalList = finalList;
+        }
+        App(String model, String id, String title, String adapterList,
             String rowCard, String rowTitle, String setter) {
             this(model, id, title, adapterList, rowCard, rowTitle, setter, null, false);
         }
@@ -152,10 +183,8 @@ public final class Pins {
         }
         App(String model, String id, String title, String adapterList,
             String rowCard, String rowTitle, String setter, String holderStep, boolean setterRedraws) {
-            this.model = model; this.id = id; this.title = title;
-            this.adapterList = adapterList; this.rowCard = rowCard; this.rowTitle = rowTitle;
-            this.setter = setter; this.holderStep = holderStep;
-            this.setterRedraws = setterRedraws;
+            this(model, id, title, adapterList, rowCard, rowTitle, setter, holderStep,
+                setterRedraws, false);
         }
     }
 
@@ -185,9 +214,16 @@ public final class Pins {
             app = new App("mc.b", "a", "a", "f", "u", "v");
         } else if (which == PROFILE_PLAYZ) {
             // qc.b: `a` is the JSON "name" with the "psp_" prefix stripped, `b` is the logo URL.
-            // The category adapter keeps its list in a final ArrayList that it mutates in place,
-            // so the reorder goes through its own setter, g(List), rather than through a field.
-            app = new App("qc.b", "a", "a", null, "u", "v", "g");
+            //
+            // The category adapter keeps its list in field `e` - a final ArrayList that it mutates
+            // in place - and `g(List)` copies into it rather than adopting its argument. So:
+            //   - `e` is named here as the adapterList, READ-ONLY: it is where the rows come from,
+            //     and reading it is what stops the reorder depending on a remembered list that the
+            //     GC can collect out from under a long-lived activity. That was issue #52 stage 6:
+            //     "sometimes works sometimes not", 8 of 15 resubmits bailing out with no list.
+            //   - `finalList` says the field must never be WRITTEN. `e` is final and the app mutates
+            //     it in place; resubmit() goes through `g(List)`, which is the app's own path.
+            app = new App("qc.b", "a", "a", "e", "u", "v", "g", null, false, true);
         } else if (which == PROFILE_CRICZ) {
             // pc.b has one string that is both the label and the only stable value: a.
             app = new App("pc.b", "a", "a", "g", "u", "v");
@@ -304,6 +340,78 @@ public final class Pins {
     /** the adapter + the app's own list, so a toggle can re-submit */
     private static volatile WeakReference<Object> lastAdapter = new WeakReference<Object>(null);
     private static volatile WeakReference<List> lastList = new WeakReference<List>(null);
+
+    /**
+     * What each adapter's list looks like with NOTHING pinned, keyed by the adapter itself.
+     *
+     * Issue #52 stage 5. The sort was "stable within two groups, original relative order kept",
+     * and the original order was taken to be the order the list arrived in. That is wrong the
+     * moment the list the app hands back is one WE already sorted:
+     *
+     *   - unpin a category that was pinned first  -> it keeps the front seat, because the group
+     *     it rejoins is still in our sorted order, so "last pinned position" is where it lands.
+     *   - reopen the screen                       -> the pinned rows fall back to wherever the
+     *     decrypted list happens to put them, because there is no app-side original to go back to.
+     *
+     * With a baseline captured from the app BEFORE any sorting, both become the same simple
+     * statement: pinned first in pin order, then the rest in the order the APP put them.
+     *
+     * Keyed by adapter identity, in a WeakHashMap, so a destroyed category screen takes its
+     * baseline with it and a new adapter never inherits another screen's order.
+     */
+    private static final Map<Object, IdentityHashMap<Object, Integer>> BASE_ORDER =
+        java.util.Collections.synchronizedMap(new WeakHashMap<Object, IdentityHashMap<Object, Integer>>());
+
+    /** How many rows the app's own order has been recorded for; 0 means "never seen". */
+    private static int baseSize(Object adapter) {
+        try {
+            IdentityHashMap<Object, Integer> base = adapter == null ? null : BASE_ORDER.get(adapter);
+            return base == null ? 0 : base.size();
+        } catch (Throwable ignored) { }
+        return 0;
+    }
+
+    /** Where an item sits in the app's unsorted order for that adapter; -1 when unknown. */
+    private static int baseRank(Object adapter, Object item) {
+        if (adapter == null || item == null) return -1;
+        IdentityHashMap<Object, Integer> base = BASE_ORDER.get(adapter);
+        if (base == null) return -1;
+        Integer r = base.get(item);
+        return r == null ? -1 : r.intValue();
+    }
+
+    /**
+     * Record the app's own order for this adapter, once per list it produces.
+     *
+     * Called from onSubmit, BEFORE sorting. A list that arrives with an object already known is
+     * our own output coming back (an adapter setter that copies and re-enters, or a second pass),
+     * and re-recording it would overwrite the real order with a sorted one - the exact bug this
+     * baseline exists to fix. Those lists are ignored.
+     */
+    private static void rememberBaseOrder(Object adapter, List list) {
+        try {
+            if (adapter == null || list == null) return;
+            IdentityHashMap<Object, Integer> base = BASE_ORDER.get(adapter);
+            if (base == null) {
+                base = new IdentityHashMap<Object, Integer>();
+                BASE_ORDER.put(adapter, base);
+            }
+            boolean recapture = base.isEmpty();
+            if (!recapture) {
+                for (int i = 0; i < list.size(); i++) {
+                    Object item = list.get(i);
+                    if (item != null && base.containsKey(item)) return;   // our own output; keep the old order
+                }
+            }
+            base.clear();
+            for (int i = 0; i < list.size(); i++) {
+                Object item = list.get(i);
+                if (item != null && !base.containsKey(item)) {
+                    base.put(item, Integer.valueOf(i));
+                }
+            }
+        } catch (Throwable ignored) { }
+    }
     private static volatile SharedPreferences prefs;
 
     private Pins() {}
@@ -407,13 +515,60 @@ public final class Pins {
             String ar = arrangingId;
             if (ar != null && !listContains(ar, list)) endArrange(null, false);
 
-            if (current().isEmpty()) return list;           // nothing pinned -> stock order
+            // The app's own order, recorded before we touch the list. Everything unpinned is
+            // ordered by this, so it does not matter whether this list is the app's or ours.
+            rememberBaseOrder(adapter, list);
 
-            List sorted = sortedCopy(list);
-            if (sorted == null) return list;
+            if (current().isEmpty()) {
+                trace("onSubmit: nothing pinned -> stock order, " + list.size() + " items");
+                return list;                                // nothing pinned -> stock order
+            }
+
+            List sorted = sortedCopy(list, adapter);
+            if (sorted == null) {
+                trace("onSubmit: sortedCopy failed -> stock order kept");
+                return list;
+            }
+            trace("onSubmit: " + list.size() + " items, pinned=" + current().size()
+                    + ", sorted=" + (sorted != list) + ", first=" + titleOf(sorted.isEmpty() ? null : sorted.get(0)));
             return sorted;
         } catch (Throwable t) {
             return list;
+        }
+    }
+
+    /**
+     * Hook 0c: sort a freshly built adapter before its first row is drawn.
+     *
+     * Issue #52 stage 5, CricZ. On a cold open the rows appear in the app's order and only move
+     * after a refresh. The app builds the adapter with the decrypted list already inside it, draws
+     * from that, and does not route the first pass through the list write this patch hooks - so
+     * nothing sorted it before the first bind. Priming at the end of the adapter's constructor puts
+     * the pinned order in place before the RecyclerView asks for a single row.
+     *
+     * Non-destructive: the sorted order is written to the adapter's own field, and the list the app
+     * passed in is left alone. Apps whose list field is final are not primed at all (the profile
+     * names no field for them) - PlayZ already re-submits on entering the screen, which is why it
+     * does not show this.
+     */
+    public static void primeAdapter(Object adapter) {
+        try {
+            if (adapter == null) return;
+            if (app.finalList) { trace("prime: adapter is reordered through its own setter, not primed"); return; }
+            List list = adapterList(adapter);
+            if (list == null || list.isEmpty()) { trace("prime: adapter exposes no list"); return; }
+            rememberBaseOrder(adapter, list);
+            if (current().isEmpty()) { trace("prime: nothing pinned, " + list.size() + " items"); return; }
+            List sorted = sortedCopy(list, adapter);
+            if (sorted == null || sorted == list) {
+                trace("prime: already in order, " + list.size() + " items, base=" + baseSize(adapter));
+                return;
+            }
+            boolean wrote = writeListField(adapter, app.adapterList, sorted);
+            trace("prime: sorted before first draw, " + list.size() + " items, wrote=" + wrote
+                    + ", base=" + baseSize(adapter) + ", first=" + titleOf(sorted.get(0)));
+        } catch (Throwable t) {
+            trace("prime threw: " + t);
         }
     }
 
@@ -483,17 +638,40 @@ public final class Pins {
      * pass over data that has not changed.
      */
     private static List sortedCopy(List list) {
+        return sortedCopy(list, null);
+    }
+
+    /**
+     * The sort, with the app's own order as the tie-breaker for unpinned rows.
+     *
+     * Pinned rows first, in pin order. Unpinned rows follow in the order the APP produced, which is
+     * read from the per-adapter baseline rather than from the list being sorted - the list being
+     * sorted is often one we already sorted, and "the order it arrived in" then means "our last
+     * answer", which is how an unpinned row ended up parked at the end of the pinned group.
+     */
+    private static List sortedCopy(final List list, final Object adapter) {
         try {
             final IdentityHashMap<Object, Integer> ranks = pinRanks(list);
+            final boolean anyPinned = !ranks.isEmpty() && hasPinnedRank(ranks);
+            if (!anyPinned && BASE_ORDER.get(adapter) == null) return list;   // nothing to do at all
             ArrayList<Object> copy = new ArrayList<Object>(list);
             Collections.sort(copy, new Comparator<Object>() {
                 public int compare(Object a, Object b) {
                     int ra = rankOf(ranks, a);               // 0,1,2... = pin order; -1 = not pinned
                     int rb = rankOf(ranks, b);
-                    if (ra == rb) return 0;                  // stable: keep the app's order
-                    if (ra < 0) return 1;                     // only b is pinned -> b first
-                    if (rb < 0) return -1;                    // only a is pinned -> a first
-                    return ra < rb ? -1 : 1;                  // both pinned -> whoever was pinned first
+                    if (ra != rb) {
+                        if (ra < 0) return 1;                 // only b is pinned -> b first
+                        if (rb < 0) return -1;                // only a is pinned -> a first
+                        return ra < rb ? -1 : 1;              // both pinned -> whoever was pinned first
+                    }
+                    if (ra >= 0) return 0;                    // both pinned with equal rank: stable
+                    // Both unpinned: the app's own order decides, not the order they arrive in.
+                    int ba = baseRank(adapter, a);
+                    int bb = baseRank(adapter, b);
+                    if (ba == bb) return 0;                   // one (or both) unknown: keep as-is
+                    if (ba < 0) return 1;
+                    if (bb < 0) return -1;
+                    return ba < bb ? -1 : 1;
                 }
             });
             for (int i = 0; i < copy.size(); i++) {
@@ -526,6 +704,14 @@ public final class Pins {
         return out;
     }
 
+    /** Is anything in this rank table actually pinned (rank >= 0)? */
+    private static boolean hasPinnedRank(IdentityHashMap<Object, Integer> ranks) {
+        for (Integer r : ranks.values()) {
+            if (r != null && r.intValue() >= 0) return true;
+        }
+        return false;
+    }
+
     private static int rankOf(IdentityHashMap<Object, Integer> ranks, Object item) {
         if (item == null) return -1;
         Integer r = ranks.get(item);
@@ -550,6 +736,15 @@ public final class Pins {
         } catch (Throwable t) {
             return null;
         }
+    }
+
+    /** The row title of an item, for trace lines only. Never used for logic. */
+    private static String titleOf(Object item) {
+        try {
+            Object raw = field(item, app.title);
+            return raw == null ? "null" : String.valueOf(raw);
+        } catch (Throwable ignored) { }
+        return "?";
     }
 
     /** cached "a" field per class; a null value means "this class has no such field" */
@@ -1313,32 +1508,91 @@ public final class Pins {
     private static void resubmit() {
         try {
             Object adapter = lastAdapter.get();
-            List list = lastList.get();
-            if (adapter == null || list == null) return;
-            List sorted = sortedCopy(list);
-            if (sorted == null) return;
+            if (adapter == null) { trace("resubmit: no adapter registered -> nothing redrawn"); return; }
+
+            // The list to re-sort must come from the ADAPTER, not from a remembered reference.
+            //
+            // Issue #52 stage 3, CricZ: after leaving the Category screen and coming back, the
+            // adapter is alive and remembered but lastList is dead - it was a WeakReference to the
+            // list that the previous activity inflated. resubmit() then bailed out with
+            // "no list registered", so pinning did nothing until the app itself rebuilt and
+            // re-submitted the list. The adapter's own field is the authoritative copy of what the
+            // rows are currently drawn from, and it cannot go stale while the adapter lives.
+            List list = adapterList(adapter);
+            if (list == null) {
+                list = lastList.get();
+                if (list == null) {
+                    trace("resubmit: no list on the adapter and none registered -> nothing redrawn");
+                    return;
+                }
+                trace("resubmit: using the remembered list (adapter exposes none)");
+            }
+
+            // PlayZ shape: a final list on the adapter cannot be re-ordered by writing a field, and
+            // the adapter's own setter is the ONLY path the app redraws through. Prefer it before
+            // sorting, so there is exactly one list to sort and the app and this code never hold two
+            // different orders.
+            Method setter = findNamed(adapter.getClass(), app.setter);
+            if (setter != null) {
+                List sorted = sortedCopy(list, adapter);
+                if (sorted == null) { trace("resubmit: sortedCopy failed -> nothing redrawn"); return; }
+                trace("resubmit: via setter '" + app.setter + "', items=" + list.size()
+                        + ", moved=" + (sorted != list) + ", base=" + baseSize(adapter));
+                setter.setAccessible(true);
+                setter.invoke(adapter, sorted);
+                if (!app.setterRedraws) trace("resubmit: redraw -> " + notifyRedraw(adapter));
+                return;
+            }
+
+            List sorted = sortedCopy(list, adapter);
+            if (sorted == null) { trace("resubmit: sortedCopy failed -> nothing redrawn"); return; }
 
             Method submit = findSubmit(adapter.getClass());
             if (submit != null) {
+                trace("resubmit: via submitList, moved=" + (sorted != list));
                 submit.setAccessible(true);
                 submit.invoke(adapter, sorted);
                 return;
             }
-            // A setter of its own, for an adapter whose list field is final and mutated in place.
-            Method setter = findNamed(adapter.getClass(), app.setter);
-            if (setter != null) {
-                setter.setAccessible(true);
-                setter.invoke(adapter, sorted);
-                if (!app.setterRedraws) notifyRedraw(adapter);   // PlayZ's g(List) does not redraw
+
+            // No submitList and no setter: write the adapter's own list field, then ask it to redraw.
+            final String listField = app.adapterList;
+            if (listField == null || listField.length() == 0) {
+                trace("resubmit: no submitList, no setter, no adapterList field -> cannot redraw");
                 return;
             }
+            if (app.finalList) {
+                // The field is read-only by contract: this adapter is reordered through its own
+                // setter, which did not exist on this build. Nothing safe left to do.
+                trace("resubmit: field '" + listField + "' is final and no setter was found");
+                return;
+            }
+            if (!writeListField(adapter, listField, sorted)) {
+                trace("resubmit: adapter field '" + listField + "' not writable -> cannot redraw");
+                return;
+            }
+            trace("resubmit: via field '" + listField + "', moved=" + (sorted != list)
+                    + ", base=" + baseSize(adapter) + ", redraw -> " + notifyRedraw(adapter));
+        } catch (Throwable t) {
+            trace("resubmit threw: " + t);
+        }
+    }
 
-            // No submitList: write the adapter's own list field, then ask it to redraw.
-            final String listField = app.adapterList;
-            if (listField == null || listField.length() == 0) return;
-            if (!writeListField(adapter, listField, sorted)) return;
-            notifyRedraw(adapter);
+    /**
+     * The list the adapter is currently drawing from, read off the adapter itself.
+     *
+     * `app.adapterList` names the field for the apps whose adapter holds its items in a plain
+     * field. Adapters with a submitList or a setter keep their items somewhere this profile does
+     * not name, and for those this returns null and the caller falls back to the remembered list.
+     */
+    private static List adapterList(Object adapter) {
+        try {
+            final String name = app.adapterList;
+            if (name == null || name.length() == 0) return null;
+            Object raw = field(adapter, name);
+            return raw instanceof List ? (List) raw : null;
         } catch (Throwable ignored) { }
+        return null;
     }
 
     /**
@@ -1384,12 +1638,12 @@ public final class Pins {
      * If neither works the method returns quietly. The pin state is already saved, so the next
      * bind or the next launch shows the truth.
      */
-    private static void notifyRedraw(Object adapter) {
+    private static String notifyRedraw(Object adapter) {
         try {
             Method m = adapter.getClass().getMethod("notifyDataSetChanged");
             m.setAccessible(true);
             m.invoke(adapter);
-            return;
+            return "ok (notifyDataSetChanged)";
         } catch (Throwable ignored) { }
         try {
             Object notifier = null;
@@ -1433,10 +1687,15 @@ public final class Pins {
                 }
                 k = k.getSuperclass();
             }
-            if (notifier == null || redraw == null) return;
+            if (notifier == null || redraw == null) {
+                return "FAILED: no Observable notifier with b() found on " + adapter.getClass().getName();
+            }
             redraw.setAccessible(true);
             redraw.invoke(notifier);
-        } catch (Throwable ignored) { }
+            return "ok (notifier " + notifier.getClass().getName() + ".b())";
+        } catch (Throwable t) {
+            return "FAILED: " + t;
+        }
     }
 
     /** A named `(List)` method on the adapter, public or not, anywhere up the hierarchy. */

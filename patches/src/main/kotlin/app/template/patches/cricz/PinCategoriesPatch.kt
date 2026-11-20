@@ -2,6 +2,7 @@ package app.template.patches.cricz
 
 import app.morphe.patcher.Fingerprint
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
+import app.template.patches.shared.addInstructionsAfterSuperInit
 import app.morphe.patcher.extensions.InstructionExtensions.instructions
 import app.morphe.patcher.patch.BytecodePatchContext
 import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod
@@ -207,9 +208,26 @@ val pinCategoriesPatch = bytecodePatch(
         )
 
         // ---- 2. register the adapter, from the category constructor only -------------------
-        CricZCategoryAdapterInitFingerprint.method.addInstructions(
-            0,
+        CricZCategoryAdapterInitFingerprint.method.addInstructionsAfterSuperInit(
             "invoke-static {p0}, L$PINS;->seeAdapter(Ljava/lang/Object;)V",
+        )
+        // The app builds this adapter with the decrypted list already inside and draws from it
+        // before anything writes the field back, so a cold open showed the app's order until a
+        // refresh. Sorting at the end of the constructor means the first row drawn is already in
+        // pin order. Only apps that name a writable list field are primed; PlayZ's is final and its
+        // screen re-submits on entry.
+        // BEFORE the final return-void, not after it. Appending at the end put the call after
+        // `return-void`, which is legal dex and therefore passes every static check while never
+        // executing - the first build of this did exactly that.
+        val adapterCtor = CricZCategoryAdapterInitFingerprint.method
+        val ctorInsns = adapterCtor.instructions.toList()
+        val lastReturn = ctorInsns.indexOfLast { i -> i.opcode == Opcode.RETURN_VOID }
+        check(lastReturn >= 0) {
+            "The category adapter constructor has no return-void; refusing to guess where to prime."
+        }
+        adapterCtor.addInstructions(
+            lastReturn,
+            "invoke-static {p0}, L$PINS;->primeAdapter(Ljava/lang/Object;)V",
         )
 
         // ---- 3 to 6. the list writes are hooked by sortCategoryWrites() below --------------

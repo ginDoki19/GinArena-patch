@@ -21,7 +21,7 @@ github.com/ginDoki19/GinArena-patch
 The table below reflects the last published release and is refreshed automatically by the release workflow.
 
 <!-- PATCHES_START -->
-> **[v2.13.0-dev.1](https://github.com/ginDoki19/GinArena-patch/releases/tag/v2.13.0-dev.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;42 patches total&nbsp;&nbsp;•&nbsp;&nbsp;**[⬇️ Download patches-2.13.0-dev.1.mpp](https://github.com/ginDoki19/GinArena-patch/releases/download/v2.13.0-dev.1/patches-2.13.0-dev.1.mpp)**
+> **[v2.12.1](https://github.com/ginDoki19/GinArena-patch/releases/tag/v2.12.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;36 patches total&nbsp;&nbsp;•&nbsp;&nbsp;**[⬇️ Download patches-2.12.1.mpp](https://github.com/ginDoki19/GinArena-patch/releases/download/v2.12.1/patches-2.12.1.mpp)**
 <details>
 <summary>📦 1DM&nbsp;&nbsp;•&nbsp;&nbsp;5 patches</summary>
 <br>
@@ -81,7 +81,7 @@ The table below reflects the last published release and is refreshed automatical
 </details>
 
 <details>
-<summary>📦 CRICFy TV&nbsp;&nbsp;•&nbsp;&nbsp;5 patches</summary>
+<summary>📦 CRICFy TV&nbsp;&nbsp;•&nbsp;&nbsp;4 patches</summary>
 <br>
 
 **🎯 Supported versions:**
@@ -95,7 +95,6 @@ The table below reflects the last published release and is refreshed automatical
 | [Fix search keyboard focus](#fix-search-keyboard-focus) | Opens search on Android TV and helps keep the keyboard connected during category searches on TV and phones. Clears TV search on navigation or close. |  |
 | [Hide playback controls at stream open](#hide-playback-controls-at-stream-open) | Keeps playback controls hidden when a stream opens or the player switches between embedded and fullscreen. The controls remain available. |  |
 | [Improve Android TV playback controls](#improve-android-tv-playback-controls) | On Android TV, prefers the seekbar when controls open and helps retain focus when live-source tabs auto-focus. Seeking depends on the stream. |  |
-| [Pin favourite categories to the top](#pin-favourite-categories-to-the-top) | Long-press a category to pin it to the top of the Category list. Long-press a pinned category to reorder it. On Android TV the menu offers Arrange to move several in one go, Move to top, Move left and Move right one place, and Move up and Move down a whole row. On a phone it offers Move left, Move right, Move to top and Unpin, one place at a time. The order you choose is the order you get, and it survives a restart. Nothing moves until you pin something. |  |
 | [Remove ads, proxy & restrictions](#remove-ads-proxy--restrictions) | Stops background bandwidth sharing, removes ads, and hides the player app logo on 7.5. | • Hide promo marquee ticker<br>• Bypass update & force-update screen<br>• Block promotional push notifications<br>• Bypass clone, work-profile & sniffer checks<br>• Strip unused ad native libraries |
 
 </details>
@@ -118,7 +117,7 @@ The table below reflects the last published release and is refreshed automatical
 </details>
 
 <details>
-<summary>📦 CrexiFy TV&nbsp;&nbsp;•&nbsp;&nbsp;4 patches</summary>
+<summary>📦 CrexiFy TV&nbsp;&nbsp;•&nbsp;&nbsp;3 patches</summary>
 <br>
 
 **🎯 Supported versions:**
@@ -131,13 +130,12 @@ The table below reflects the last published release and is refreshed automatical
 |----------|----------------|-----------|
 | [Hide playback controls at stream open](#hide-playback-controls-at-stream-open) | Keeps playback controls hidden when a stream opens or the player switches between embedded and fullscreen. The controls remain available. |  |
 | [Improve Android TV playback controls](#improve-android-tv-playback-controls) | Helps the Android TV remote reveal native playback controls and focus the seekbar when available. Live streams may not be seekable. |  |
-| [Pin favourite categories to the top](#pin-favourite-categories-to-the-top) | Long-press a category to pin it to the top of the Category list. Long-press a pinned category to reorder it. On Android TV the menu offers Arrange to move several in one go, Move to top, Move left and Move right one place, and Move up and Move down a whole row. On a phone it offers Move left, Move right, Move to top and Unpin, one place at a time. The order you choose is the order you get, and it survives a restart. Nothing moves until you pin something. |  |
 | [Remove configured startup and banner ads](#remove-configured-startup-and-banner-ads) | Suppresses configured startup/banner ads, the Telegram prompt and message ticker. |  |
 
 </details>
 
 <details>
-<summary>📦 CricZ TV&nbsp;&nbsp;•&nbsp;&nbsp;4 patches</summary>
+<summary>📦 CricZ TV&nbsp;&nbsp;•&nbsp;&nbsp;3 patches</summary>
 <br>
 
 **🎯 Supported versions:**
@@ -150,13 +148,12 @@ The table below reflects the last published release and is refreshed automatical
 |----------|----------------|-----------|
 | [Hide playback controls at stream open](#hide-playback-controls-at-stream-open) | Keeps playback controls hidden when a stream opens or the player switches between embedded and fullscreen. The controls remain available. |  |
 | [Improve Android TV playback controls](#improve-android-tv-playback-controls) | Helps the Android TV remote reveal native playback controls and focus the seekbar when available. Live streams may not be seekable. |  |
-| [Pin favourite categories to the top](#pin-favourite-categories-to-the-top) | Long-press a category to pin it to the top of the Category list. Long-press a pinned category to reorder it. On Android TV the menu offers Arrange to move several in one go, Move to top, Move left and Move right one place, and Move up and Move down a whole row. On a phone it offers Move left, Move right, Move to top and Unpin, one place at a time. The order you choose is the order you get, and it survives a restart. Nothing moves until you pin something. |  |
 | [Remove ads, telemetry & restrictions](#remove-ads-telemetry--restrictions) | Removes ads, promo popups, and tracking, and keeps channels working after patching. | • Hide promo announcement bar<br>• Remove push notifications<br>• Bypass update & force-update screen<br>• Bypass root & sniffer checks<br>• Strip native & telemetry bloat |
 
 </details>
 
 <details>
-<summary>📦 Playfy TV&nbsp;&nbsp;•&nbsp;&nbsp;4 patches</summary>
+<summary>📦 Playfy TV&nbsp;&nbsp;•&nbsp;&nbsp;3 patches</summary>
 <br>
 
 **🎯 Supported versions:**
@@ -169,13 +166,12 @@ The table below reflects the last published release and is refreshed automatical
 |----------|----------------|-----------|
 | [Hide playback controls at stream open](#hide-playback-controls-at-stream-open) | Keeps playback controls hidden when a stream opens or the player switches between embedded and fullscreen. The controls remain available. |  |
 | [Improve Android TV playback controls](#improve-android-tv-playback-controls) | On Android TV, prefers the seekbar over play/pause when controls open. Seeking depends on the stream. |  |
-| [Pin favourite categories to the top](#pin-favourite-categories-to-the-top) | Long-press a category to pin it to the top of the Category list. Long-press a pinned category to reorder it. On Android TV the menu offers Arrange to move several in one go, Move to top, Move left and Move right one place, and Move up and Move down a whole row. On a phone it offers Move left, Move right, Move to top and Unpin, one place at a time. The order you choose is the order you get, and it survives a restart. Nothing moves until you pin something. |  |
 | [Remove ads, telemetry & restrictions](#remove-ads-telemetry--restrictions) | Removes ads and tracking, and hides the player app logo. | • Remove push notifications<br>• Bypass update & force-update screen<br>• Bypass sniffer-app check<br>• Strip native & telemetry bloat |
 
 </details>
 
 <details>
-<summary>📦 PlayZ TV&nbsp;&nbsp;•&nbsp;&nbsp;4 patches</summary>
+<summary>📦 PlayZ TV&nbsp;&nbsp;•&nbsp;&nbsp;3 patches</summary>
 <br>
 
 **🎯 Supported versions:**
@@ -188,13 +184,12 @@ The table below reflects the last published release and is refreshed automatical
 |----------|----------------|-----------|
 | [Hide playback controls at stream open](#hide-playback-controls-at-stream-open) | Keeps playback controls hidden when a stream opens or the player switches between embedded and fullscreen. The controls remain available. |  |
 | [Improve Android TV playback controls](#improve-android-tv-playback-controls) | Helps the Android TV remote reveal native playback controls and focus the seekbar when available. Live streams may not be seekable. |  |
-| [Pin favourite categories to the top](#pin-favourite-categories-to-the-top) | Long-press a category to pin it to the top of the Category list. Long-press a pinned category to reorder it. On Android TV the menu offers Arrange to move several in one go, Move to top, Move left and Move right one place, and Move up and Move down a whole row. On a phone it offers Move left, Move right, Move to top and Unpin, one place at a time. The order you choose is the order you get, and it survives a restart. Nothing moves until you pin something. |  |
 | [Remove ads, popups & restrictions](#remove-ads-popups--restrictions) | Removes ads and promo popups, and keeps channels working after patching. |  |
 
 </details>
 
 <details>
-<summary>📦 SK Tech TV&nbsp;&nbsp;•&nbsp;&nbsp;4 patches</summary>
+<summary>📦 SK Tech TV&nbsp;&nbsp;•&nbsp;&nbsp;3 patches</summary>
 <br>
 
 **🎯 Supported versions:**
@@ -207,7 +202,6 @@ The table below reflects the last published release and is refreshed automatical
 |----------|----------------|-----------|
 | [Hide playback controls at stream open](#hide-playback-controls-at-stream-open) | Keeps playback controls hidden when a stream opens or the player switches between embedded and fullscreen. The controls remain available. |  |
 | [Improve Android TV playback controls](#improve-android-tv-playback-controls) | Helps the Android TV remote reveal native playback controls and focus the seekbar when available. Live streams may not be seekable. |  |
-| [Pin favourite categories to the top](#pin-favourite-categories-to-the-top) | Long-press a category to pin it to the top of the Category list. Long-press a pinned category to reorder it. On Android TV the menu offers Arrange to move several in one go, Move to top, Move left and Move right one place, and Move up and Move down a whole row. On a phone it offers Move left, Move right, Move to top and Unpin, one place at a time. The order you choose is the order you get, and it survives a restart. Nothing moves until you pin something. |  |
 | [Remove ads, telemetry & restrictions](#remove-ads-telemetry--restrictions) | Removes ads, tracking, and forced updates, and keeps channels working after patching. | • Remove push notifications<br>• Bypass update & force-update screen<br>• Bypass root & sniffer checks<br>• Strip native & telemetry bloat<br>• Disable WebActivity (potential ad surface) |
 
 </details>
@@ -256,7 +250,7 @@ The table below reflects the last published release and is refreshed automatical
 
 ### Pin favourite categories to the top
 
-*Off by default* for Playfy TV, PlayZ TV, CricZ TV, CRICFy TV, CrexiFy TV, and SK Tech TV - tick it when
+*Off by default* for CricZ TV, PlayZ TV - tick it when
 you patch. It rewrites the Category list adapter, so anyone who never pins anything should get vanilla
 order and does not need it.
 
