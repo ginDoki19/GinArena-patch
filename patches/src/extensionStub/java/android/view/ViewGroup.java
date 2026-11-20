@@ -1,5 +1,13 @@
 package android.view;
-public abstract class ViewGroup extends View {
+
+/**
+ * Lab stub: the parts of a ViewGroup the grid measurement reads.
+ *
+ * The extension measures a row by looking at the card's parent: how many children it holds, what
+ * each child's top is, and how wide the parent is. All of that is public framework API, so unlike
+ * the field-name reflection this replaced, none of it can be obfuscated away.
+ */
+public abstract class ViewGroup extends View implements ViewParent {
     public int getChildCount() { throw new RuntimeException(); }
     public View getChildAt(int index) { throw new RuntimeException(); }
 }
