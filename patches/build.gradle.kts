@@ -231,7 +231,7 @@ tasks {
     }
 
     matching { it.name == "sourcesJar" }.configureEach {
-        dependsOn(buildMxPlayerExtensionMpe, buildOnedmExtensionMpe)
+        dependsOn(buildMxPlayerExtensionMpe, buildOnedmExtensionMpe, buildPlayfyExtensionMpe)
     }
 
     register<JavaExec>("generatePatchesList") {
