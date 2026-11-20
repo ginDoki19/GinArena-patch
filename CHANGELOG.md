@@ -1,3 +1,9 @@
+## [2.13.0-dev.2](https://github.com/ginDoki19/GinArena-patch/compare/v2.13.0-dev.1...v2.13.0-dev.2) (2026-11-20)
+
+### 🐛 Bug Fixes
+
+* **cricz,playz:** pin rows reorder without a refresh ([c9f5dbf](https://github.com/ginDoki19/GinArena-patch/commit/c9f5dbfb0b875e038294a0254a551840836307f7))
+
 ## [2.13.0-dev.1](https://github.com/ginDoki19/GinArena-patch/compare/v2.12.1...v2.13.0-dev.1) (2026-11-20)
 
 ### 🐛 Bug Fixes
