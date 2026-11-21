@@ -21,7 +21,7 @@ github.com/ginDoki19/GinArena-patch
 The table below reflects the last published release and is refreshed automatically by the release workflow.
 
 <!-- PATCHES_START -->
-> **[v2.13.0-dev.3](https://github.com/ginDoki19/GinArena-patch/releases/tag/v2.13.0-dev.3)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;40 patches total&nbsp;&nbsp;•&nbsp;&nbsp;**[⬇️ Download patches-2.13.0-dev.3.mpp](https://github.com/ginDoki19/GinArena-patch/releases/download/v2.13.0-dev.3/patches-2.13.0-dev.3.mpp)**
+> **[v2.13.0-dev.4](https://github.com/ginDoki19/GinArena-patch/releases/tag/v2.13.0-dev.4)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;41 patches total&nbsp;&nbsp;•&nbsp;&nbsp;**[⬇️ Download patches-2.13.0-dev.4.mpp](https://github.com/ginDoki19/GinArena-patch/releases/download/v2.13.0-dev.4/patches-2.13.0-dev.4.mpp)**
 <details>
 <summary>📦 1DM&nbsp;&nbsp;•&nbsp;&nbsp;5 patches</summary>
 <br>
@@ -155,7 +155,7 @@ The table below reflects the last published release and is refreshed automatical
 </details>
 
 <details>
-<summary>📦 Playfy TV&nbsp;&nbsp;•&nbsp;&nbsp;3 patches</summary>
+<summary>📦 Playfy TV&nbsp;&nbsp;•&nbsp;&nbsp;4 patches</summary>
 <br>
 
 **🎯 Supported versions:**
@@ -168,6 +168,7 @@ The table below reflects the last published release and is refreshed automatical
 |----------|----------------|-----------|
 | [Hide playback controls at stream open](#hide-playback-controls-at-stream-open) | Keeps playback controls hidden when a stream opens or the player switches between embedded and fullscreen. The controls remain available. |  |
 | [Improve Android TV playback controls](#improve-android-tv-playback-controls) | On Android TV, prefers the seekbar over play/pause when controls open. Seeking depends on the stream. |  |
+| [Pin favourite categories to the top](#pin-favourite-categories-to-the-top) | Long-press a category to pin it to the top of the Category list. Long-press a pinned category to reorder it. On Android TV the menu offers Arrange to move several in one go, Move to top, Move left and Move right one place, and Move up and Move down a whole row. On a phone it offers Move left, Move right, Move to top and Unpin, one place at a time. The order you choose is the order you get, and it survives a restart. Nothing moves until you pin something. |  |
 | [Remove ads, telemetry & restrictions](#remove-ads-telemetry--restrictions) | Removes ads and tracking, and hides the player app logo. | • Remove push notifications<br>• Bypass update & force-update screen<br>• Bypass sniffer-app check<br>• Strip native & telemetry bloat |
 
 </details>

@@ -1,3 +1,9 @@
+## [2.13.0-dev.4](https://github.com/ginDoki19/GinArena-patch/compare/v2.13.0-dev.3...v2.13.0-dev.4) (2026-11-21)
+
+### 🐛 Bug Fixes
+
+* **playfy:** add category pinning with AsyncListDiffer viewport anchor ([b5f1f4d](https://github.com/ginDoki19/GinArena-patch/commit/b5f1f4d45e8e2cd41472fefcfa88491f6194e96f))
+
 ## [2.13.0-dev.3](https://github.com/ginDoki19/GinArena-patch/compare/v2.13.0-dev.2...v2.13.0-dev.3) (2026-11-20)
 
 ### 🐛 Bug Fixes
