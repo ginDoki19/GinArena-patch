@@ -1,3 +1,9 @@
+## [2.13.0-dev.5](https://github.com/ginDoki19/GinArena-patch/compare/v2.13.0-dev.4...v2.13.0-dev.5) (2026-11-21)
+
+### 🐛 Bug Fixes
+
+* **cricfy:** add category pinning with viewport anchor and grid layout fix ([351d409](https://github.com/ginDoki19/GinArena-patch/commit/351d40968364182c2b63089a140fe66db9c5a314))
+
 ## [2.13.0-dev.4](https://github.com/ginDoki19/GinArena-patch/compare/v2.13.0-dev.3...v2.13.0-dev.4) (2026-11-21)
 
 ### 🐛 Bug Fixes

@@ -21,7 +21,7 @@ github.com/ginDoki19/GinArena-patch
 The table below reflects the last published release and is refreshed automatically by the release workflow.
 
 <!-- PATCHES_START -->
-> **[v2.13.0-dev.4](https://github.com/ginDoki19/GinArena-patch/releases/tag/v2.13.0-dev.4)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;41 patches total&nbsp;&nbsp;•&nbsp;&nbsp;**[⬇️ Download patches-2.13.0-dev.4.mpp](https://github.com/ginDoki19/GinArena-patch/releases/download/v2.13.0-dev.4/patches-2.13.0-dev.4.mpp)**
+> **[v2.13.0-dev.5](https://github.com/ginDoki19/GinArena-patch/releases/tag/v2.13.0-dev.5)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;42 patches total&nbsp;&nbsp;•&nbsp;&nbsp;**[⬇️ Download patches-2.13.0-dev.5.mpp](https://github.com/ginDoki19/GinArena-patch/releases/download/v2.13.0-dev.5/patches-2.13.0-dev.5.mpp)**
 <details>
 <summary>📦 1DM&nbsp;&nbsp;•&nbsp;&nbsp;5 patches</summary>
 <br>
@@ -81,7 +81,7 @@ The table below reflects the last published release and is refreshed automatical
 </details>
 
 <details>
-<summary>📦 CRICFy TV&nbsp;&nbsp;•&nbsp;&nbsp;4 patches</summary>
+<summary>📦 CRICFy TV&nbsp;&nbsp;•&nbsp;&nbsp;5 patches</summary>
 <br>
 
 **🎯 Supported versions:**
@@ -95,6 +95,7 @@ The table below reflects the last published release and is refreshed automatical
 | [Fix search keyboard focus](#fix-search-keyboard-focus) | Opens search on Android TV and helps keep the keyboard connected during category searches on TV and phones. Clears TV search on navigation or close. |  |
 | [Hide playback controls at stream open](#hide-playback-controls-at-stream-open) | Keeps playback controls hidden when a stream opens or the player switches between embedded and fullscreen. The controls remain available. |  |
 | [Improve Android TV playback controls](#improve-android-tv-playback-controls) | On Android TV, prefers the seekbar when controls open and helps retain focus when live-source tabs auto-focus. Seeking depends on the stream. |  |
+| [Pin favourite categories to the top](#pin-favourite-categories-to-the-top) | Long-press a category to pin it to the top of the Category list. Long-press a pinned category to reorder it. On Android TV the menu offers Arrange to move several in one go, Move to top, Move left and Move right one place, and Move up and Move down a whole row. On a phone it offers Move left, Move right, Move to top and Unpin, one place at a time. The order you choose is the order you get, and it survives a restart. Nothing moves until you pin something. |  |
 | [Remove ads, proxy & restrictions](#remove-ads-proxy--restrictions) | Stops background bandwidth sharing, removes ads, and hides the player app logo on 7.5. | • Hide promo marquee ticker<br>• Bypass update & force-update screen<br>• Block promotional push notifications<br>• Bypass clone, work-profile & sniffer checks<br>• Strip unused ad native libraries |
 
 </details>
