@@ -38,7 +38,7 @@
 The bundle summary below is refreshed automatically by the release workflow.
 
 <!-- PATCHES_START -->
-> **[v2.13.0-dev.7](https://github.com/ginDoki19/GinArena-patch/releases/tag/v2.13.0-dev.7)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;42 patches total&nbsp;&nbsp;•&nbsp;&nbsp;**[⬇️ Download patches-2.13.0-dev.7.mpp](https://github.com/ginDoki19/GinArena-patch/releases/download/v2.13.0-dev.7/patches-2.13.0-dev.7.mpp)**
+> **[v2.13.0](https://github.com/ginDoki19/GinArena-patch/releases/tag/v2.13.0)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;42 patches total&nbsp;&nbsp;•&nbsp;&nbsp;**[⬇️ Download patches-2.13.0.mpp](https://github.com/ginDoki19/GinArena-patch/releases/download/v2.13.0/patches-2.13.0.mpp)**
 <details>
 <summary>📦 1DM&nbsp;&nbsp;•&nbsp;&nbsp;5 patches</summary>
 <br>

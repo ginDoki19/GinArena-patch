@@ -1,3 +1,22 @@
+## [2.13.0](https://github.com/ginDoki19/GinArena-patch/compare/v2.12.1...v2.13.0) (2026-11-21)
+
+### 🐛 Bug Fixes
+
+* **build:** declare buildPlayfyExtensionMpe for sourcesJar ([060f4d5](https://github.com/ginDoki19/GinArena-patch/commit/060f4d57663a37e9291eb0a23ba748440bbcf2e5))
+* **cricfy:** add category pinning with viewport anchor and grid layout fix ([351d409](https://github.com/ginDoki19/GinArena-patch/commit/351d40968364182c2b63089a140fe66db9c5a314))
+* **cricz,playz:** pin rows reorder without a refresh ([c9f5dbf](https://github.com/ginDoki19/GinArena-patch/commit/c9f5dbfb0b875e038294a0254a551840836307f7))
+* **playfy:** add category pinning with AsyncListDiffer viewport anchor ([b5f1f4d](https://github.com/ginDoki19/GinArena-patch/commit/b5f1f4d45e8e2cd41472fefcfa88491f6194e96f))
+* **playfy:** preserve Android TV focus across notifyDataSetChanged reorders ([5369974](https://github.com/ginDoki19/GinArena-patch/commit/5369974d8ff4adacacb05fa0d7867f773e84e8a2))
+* **sktech,crexify:** pin rows reorder without a refresh ([2617f5d](https://github.com/ginDoki19/GinArena-patch/commit/2617f5da12cde82e346328ef94d314e104281ed6))
+
+### ✨ New Features
+
+* pin and arrange favourite categories across the TV apps ([1be7f71](https://github.com/ginDoki19/GinArena-patch/commit/1be7f71e2aa36aa5fb031ac8392b8f2f1257ead4))
+
+### 🚀 Updated App Support
+
+* **adguard:** support v4.16.0 alongside v4.15.2 ([d93bd2d](https://github.com/ginDoki19/GinArena-patch/commit/d93bd2d73d34a2f01938a2ff20bdf02ba1bbca49))
+
 ## [2.13.0-dev.7](https://github.com/ginDoki19/GinArena-patch/compare/v2.13.0-dev.6...v2.13.0-dev.7) (2026-11-21)
 
 ### 🐛 Bug Fixes
