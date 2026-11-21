@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-11-18T08:56:21",
-  "description": "## [2.12.1](https://github.com/ginDoki19/GinArena-patch/compare/v2.12.0...v2.12.1) (2026-11-18)\n\n### 🐛 Bug Fixes\n\n* **wps,cricfy:** support WPS 26.11.1 only, harden MicroG patching, fix the CricFy strip ([da8e130](https://github.com/ginDoki19/GinArena-patch/commit/da8e1307d94cc36a090613e4b24c969de5b50ce6)), closes [#56](https://github.com/ginDoki19/GinArena-patch/issues/56)",
-  "download_url": "https://github.com/ginDoki19/GinArena-patch/releases/download/v2.12.1/patches-2.12.1.mpp",
+  "created_at": "2026-11-21T05:13:41",
+  "description": "## [2.13.0-dev.7](https://github.com/ginDoki19/GinArena-patch/compare/v2.13.0-dev.6...v2.13.0-dev.7) (2026-11-21)\n\n### 🐛 Bug Fixes\n\n* **playfy:** preserve Android TV focus across notifyDataSetChanged reorders ([5369974](https://github.com/ginDoki19/GinArena-patch/commit/5369974d8ff4adacacb05fa0d7867f773e84e8a2))",
+  "download_url": "https://github.com/ginDoki19/GinArena-patch/releases/download/v2.13.0-dev.7/patches-2.13.0-dev.7.mpp",
   "signature_download_url": "",
-  "version": "2.12.1"
+  "version": "2.13.0-dev.7"
 }
