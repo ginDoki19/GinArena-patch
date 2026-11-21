@@ -1,3 +1,9 @@
+## [2.13.0-dev.6](https://github.com/ginDoki19/GinArena-patch/compare/v2.13.0-dev.5...v2.13.0-dev.6) (2026-11-21)
+
+### 🚀 Updated App Support
+
+* **adguard:** support v4.16.0 alongside v4.15.2 ([d93bd2d](https://github.com/ginDoki19/GinArena-patch/commit/d93bd2d73d34a2f01938a2ff20bdf02ba1bbca49))
+
 ## [2.13.0-dev.5](https://github.com/ginDoki19/GinArena-patch/compare/v2.13.0-dev.4...v2.13.0-dev.5) (2026-11-21)
 
 ### 🐛 Bug Fixes

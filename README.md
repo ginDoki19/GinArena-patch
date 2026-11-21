@@ -38,7 +38,7 @@
 The bundle summary below is refreshed automatically by the release workflow.
 
 <!-- PATCHES_START -->
-> **[v2.13.0-dev.5](https://github.com/ginDoki19/GinArena-patch/releases/tag/v2.13.0-dev.5)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;42 patches total&nbsp;&nbsp;•&nbsp;&nbsp;**[⬇️ Download patches-2.13.0-dev.5.mpp](https://github.com/ginDoki19/GinArena-patch/releases/download/v2.13.0-dev.5/patches-2.13.0-dev.5.mpp)**
+> **[v2.13.0-dev.6](https://github.com/ginDoki19/GinArena-patch/releases/tag/v2.13.0-dev.6)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;42 patches total&nbsp;&nbsp;•&nbsp;&nbsp;**[⬇️ Download patches-2.13.0-dev.6.mpp](https://github.com/ginDoki19/GinArena-patch/releases/download/v2.13.0-dev.6/patches-2.13.0-dev.6.mpp)**
 <details>
 <summary>📦 1DM&nbsp;&nbsp;•&nbsp;&nbsp;5 patches</summary>
 <br>
@@ -235,9 +235,9 @@ The bundle summary below is refreshed automatically by the release workflow.
 
 **🎯 Supported versions:**
 
-| 4.15.2 |
-| :---: |
-| Universal APK (arm64-v8a, armeabi-v7a, x86, x86_64), Android 9+ |
+| 4.15.2 | 4.16.0 |
+| :---: | :---: |
+| Universal APK (arm64-v8a, armeabi-v7a, x86, x86_64), Android 9+ | Universal APK (arm64-v8a, armeabi-v7a, x86, x86_64), Android 9+ |
 
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
