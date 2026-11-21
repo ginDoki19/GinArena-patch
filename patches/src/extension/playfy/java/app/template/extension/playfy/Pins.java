@@ -112,26 +112,54 @@ public final class Pins {
         new App("kd.i", "a", "b", null, "a", "c", "i", null, true);
 
     /**
-     * Playfy AsyncListDiffer viewport anchor config (opt-in via enablePlayfyDifferAnchor()).
-     * All 6 names are verified against Playfy's bytecode at patch time by PinCategoriesPatch.kt.
+     * AsyncListDiffer viewport anchor config (opt-in via enablePlayfyDifferAnchor() or
+     * enableCricfyDifferAnchor()). All names are verified against app bytecode at patch time.
      * Left null on every other app so their submit path stays untouched.
      */
     private static volatile String differField;
     private static volatile String differRawListField;
     private static volatile String differListField;
+    private static volatile String differGenField;
     private static volatile String differSubmitName;
     private static volatile String lmPosField;
     private static volatile String lmOffField;
     private static volatile String lmStateField;
+    private static volatile String lmSpanField;
+    private static volatile String decorInsetsField;
+    private static volatile String rvMarkDirtyMethod;
+    private static volatile String lmMeasureCacheField;
+    private static volatile boolean differCallbackHooked;
 
     public static void enablePlayfyDifferAnchor() {
         differField = "A";
         differRawListField = "e";
         differListField = "f";
+        differGenField = null;
         differSubmitName = "b";
         lmPosField = "x";
         lmOffField = "y";
         lmStateField = "z";
+        lmSpanField = null;
+        decorInsetsField = null;
+        rvMarkDirtyMethod = null;
+        lmMeasureCacheField = null;
+        differCallbackHooked = false;
+    }
+
+    public static void enableCricfyDifferAnchor() {
+        differField = "d";
+        differRawListField = "e";
+        differListField = "f";
+        differGenField = "g";
+        differSubmitName = "b";
+        lmPosField = "x";
+        lmOffField = "y";
+        lmStateField = "z";
+        lmSpanField = "F";
+        decorInsetsField = "b";
+        rvMarkDirtyMethod = "Q";
+        lmMeasureCacheField = "h";
+        differCallbackHooked = true;
     }
 
     /**
@@ -238,6 +266,8 @@ public final class Pins {
      * the patch says which set to use with one integer.
      */
     public static void useProfile(int which) {
+        phoneColumns = PHONE_COLUMNS;
+        tvColumns = TV_COLUMNS;
         if (which == PROFILE_SKTECH) {
             app = new App("mc.b", "a", "a", "f", "u", "v");
         } else if (which == PROFILE_PLAYZ) {
@@ -272,6 +302,8 @@ public final class Pins {
             //     not a submit at all. `t` hands the list to the differ, which redraws by itself.
             //   - there is no notifyDataSetChanged.
             app = new App("gt", "a", "b", null, "a", "c", "t", "u", true);
+            phoneColumns = 2;
+            tvColumns = 4;
         } else if (which == PROFILE_CREXIFY) {
             // xr: a is the category name (the app strips a "psp_" prefix), b the logo; the row
             // draws a on a TextView, and the card is sr.u.
@@ -338,6 +370,8 @@ public final class Pins {
      */
     private static final int TV_COLUMNS = 8;
     private static final int PHONE_COLUMNS = 4;
+    private static volatile int phoneColumns = PHONE_COLUMNS;
+    private static volatile int tvColumns = TV_COLUMNS;
 
     /**
      * ids of the pinned categories, in the order they were pinned.
@@ -1324,13 +1358,28 @@ public final class Pins {
      */
     private static int ruleColumns(Context ctx) {
         try {
-            if (looksLikeTv(ctx)) return TV_COLUMNS;
+            if (looksLikeTv(ctx)) return tvColumns;
             if (ctx != null) {
                 Configuration c = ctx.getResources().getConfiguration();
-                if (c != null && c.orientation == Configuration.ORIENTATION_LANDSCAPE) return TV_COLUMNS;
+                if (c != null && c.orientation == Configuration.ORIENTATION_LANDSCAPE) return tvColumns;
             }
         } catch (Throwable ignored) { }
-        return PHONE_COLUMNS;
+        return phoneColumns;
+    }
+
+    private static int layoutSpan(View row, Context ctx) {
+        if (lmSpanField != null && row != null) {
+            try {
+                Object p = row.getParent();
+                if (p instanceof ViewGroup) {
+                    Object mgr = callNoArg(p, "getLayoutManager");
+                    int s = intField(mgr, lmSpanField, 0);
+                    if (s > 0) return s;
+                }
+            } catch (Throwable ignored) { }
+        }
+        int measured = measuredColumns(row);
+        return measured > 1 ? measured : ruleColumns(ctx);
     }
 
     /** Remember how this gesture arrived. Called from the key and touch paths, never from a guess. */
@@ -1461,8 +1510,7 @@ public final class Pins {
 
         // Up/down move a whole row. Measuring beats guessing, but a guess that is labelled is
         // better than a silent one: see measuredColumns() for what went wrong the other way.
-        final int measured = measuredColumns(findRow(id));
-        final int span = measured > 1 ? measured : ruleColumns(ctx);
+        final int span = layoutSpan(findRow(id), ctx);
 
         new AlertDialog.Builder(ctx)
                 .setTitle(MARK + title)
@@ -1692,8 +1740,7 @@ public final class Pins {
             // top is twelve presses of LEFT. The width is measured from the card itself, with the
             // app's own 8/4 rule as the fallback - never a silent one-place step.
             if (keyCode == KeyEvent.KEYCODE_DPAD_UP || keyCode == KeyEvent.KEYCODE_DPAD_DOWN) {
-                final int rowStep = (v != null && measuredColumns(v) > 1)
-                        ? measuredColumns(v) : ruleColumns(c);
+                final int rowStep = layoutSpan(v, c);
                 moveBy(c, id, keyCode == KeyEvent.KEYCODE_DPAD_UP ? -rowStep : rowStep);
                 return true;
             }
@@ -2089,15 +2136,119 @@ public final class Pins {
         return findNamed(c, "submitList");
     }
 
-    // ------------------------------------------------------------ Playfy differ anchor
+    // ------------------------------------------------------------ differ viewport anchor
+
+    private static final Object ADAPTER_RECYCLER_LOCK = new Object();
+    private static final WeakHashMap<Object, WeakReference<ViewGroup>> ADAPTER_RECYCLER =
+            new WeakHashMap<Object, WeakReference<ViewGroup>>();
+    private static final WeakHashMap<Object, WeakReference<ViewGroup>> DIFFER_RECYCLER =
+            new WeakHashMap<Object, WeakReference<ViewGroup>>();
+
+    private static final class PendingAnchor {
+        final WeakReference<ViewGroup> rvRef;
+        final WeakReference<Object> lmRef;
+        final int pos, off, preY, expectedGen;
+        PendingAnchor(ViewGroup rv, Object lm, int pos, int off, int preY, int expectedGen) {
+            this.rvRef = new WeakReference<ViewGroup>(rv);
+            this.lmRef = new WeakReference<Object>(lm);
+            this.pos = pos;
+            this.off = off;
+            this.preY = preY;
+            this.expectedGen = expectedGen;
+        }
+    }
+
+    private static final Object PENDING_LOCK = new Object();
+    private static final IdentityHashMap<Object, PendingAnchor> PENDING_ANCHORS =
+            new IdentityHashMap<Object, PendingAnchor>();
+
+    public static void seeAdapterRecycler(Object rv, Object adapter) {
+        if (!(rv instanceof ViewGroup) || adapter == null) return;
+        ViewGroup vg = (ViewGroup) rv;
+        Object d = differField != null ? field(adapter, differField) : null;
+        synchronized (ADAPTER_RECYCLER_LOCK) {
+            WeakReference<ViewGroup> ref = new WeakReference<ViewGroup>(vg);
+            ADAPTER_RECYCLER.put(adapter, ref);
+            if (d != null) DIFFER_RECYCLER.put(d, ref);
+        }
+        if (lmMeasureCacheField != null) {
+            Object mgr = callNoArg(vg, "getLayoutManager");
+            if (mgr != null) setBooleanField(mgr, lmMeasureCacheField, false);
+        }
+    }
+
+    private static ViewGroup findRecyclerForDiffer(Object differ) {
+        if (differ == null) return null;
+        synchronized (ADAPTER_RECYCLER_LOCK) {
+            WeakReference<ViewGroup> ref = DIFFER_RECYCLER.get(differ);
+            if (ref != null) {
+                ViewGroup rv = ref.get();
+                if (rv != null && rv.isAttachedToWindow()) return rv;
+            }
+        }
+        return null;
+    }
+
+    private static void invalidateDecorAndCache(ViewGroup g, Object mgr) {
+        if (g == null) return;
+        if (lmMeasureCacheField != null) {
+            Object lm = mgr != null ? mgr : callNoArg(g, "getLayoutManager");
+            if (lm != null) setBooleanField(lm, lmMeasureCacheField, false);
+        }
+        if (rvMarkDirtyMethod != null) {
+            callVoidNoArg(g, rvMarkDirtyMethod);
+        }
+    }
+
+    public static void onDifferCommitted(Object differ) {
+        if (differ == null) return;
+        PendingAnchor pa;
+        synchronized (PENDING_LOCK) {
+            pa = PENDING_ANCHORS.remove(differ);
+        }
+        if (pa == null) {
+            if (rvMarkDirtyMethod != null || lmMeasureCacheField != null) {
+                ViewGroup g = findRecyclerForDiffer(differ);
+                if (g != null && g.isAttachedToWindow()) {
+                    invalidateDecorAndCache(g, null);
+                    callVoidNoArg(g, "requestLayout");
+                }
+            }
+            return;
+        }
+        try {
+            if (differGenField != null && pa.expectedGen >= 0) {
+                int gen = intField(differ, differGenField, -1);
+                if (gen != pa.expectedGen) return;
+            }
+            applyAnchor(pa.rvRef.get(), pa.lmRef.get(), pa.pos, pa.off, pa.preY);
+        } catch (Throwable t) {
+            trace("onDifferCommitted threw: " + t);
+        }
+    }
+
+    private static void applyAnchor(ViewGroup g, Object mgr, int pos, int off, int preY) {
+        try {
+            if (g == null || mgr == null || !g.isAttachedToWindow()) return;
+            if (lmStateField != null) setFieldValue(mgr, lmStateField, null);
+            setIntField(mgr, lmPosField, pos);
+            setIntField(mgr, lmOffField, off);
+            invalidateDecorAndCache(g, mgr);
+            callVoidNoArg(g, "requestLayout");
+            trace("differ commit anchor: pos=" + pos + ", off=" + off + ", preY=" + preY);
+        } catch (Throwable t) {
+            trace("differ commit anchor threw: " + t);
+        }
+    }
 
     public static void submitWithAnchor(Object adapter, List list) {
         if (adapter == null) return;
         try {
             if (differField != null && differSubmitName != null) {
                 Object differ = field(adapter, differField);
-                Method sub = differ == null ? null : findMethod2(
-                        differ.getClass(), differSubmitName, List.class, Runnable.class);
+                Method sub = differ == null ? null : (differCallbackHooked
+                        ? findSubmit2(differ.getClass(), differSubmitName)
+                        : findMethod2(differ.getClass(), differSubmitName, List.class, Runnable.class));
                 if (sub != null) {
                     lastAdapter = new WeakReference<Object>(adapter);
                     if (list != null && !list.isEmpty()) lastList = new WeakReference<List>(list);
@@ -2105,17 +2256,19 @@ public final class Pins {
                     Object rawCurrent = differRawListField != null
                             ? field(differ, differRawListField) : null;
                     final boolean sameRef = (list == rawCurrent);
-                    Runnable onCommitted = null;
+                    int anchorPos = -1;
+                    int anchorOff = 0;
+                    int preYVal = 0;
+                    ViewGroup rv = null;
+                    Object lm = null;
                     if (list != null && !list.isEmpty() && !sameRef) {
-                        final ViewGroup rv = findRecyclerForAdapter(adapter);
+                        rv = findRecyclerForAdapter(adapter);
                         if (rv != null && rv.getChildCount() > 0) {
-                            final Object lm = callNoArg(rv, "getLayoutManager");
+                            lm = callNoArg(rv, "getLayoutManager");
                             if (lm != null && hasField(lm.getClass(), lmPosField)
                                     && hasField(lm.getClass(), lmOffField)) {
-                                final int preY = intCallNoArg(rv, "computeVerticalScrollOffset", 0);
-                                int anchorPos = -1;
-                                int anchorOff = 0;
-                                if (preY <= 0) {
+                                preYVal = intCallNoArg(rv, "computeVerticalScrollOffset", 0);
+                                if (preYVal <= 0) {
                                     anchorPos = 0;
                                     anchorOff = 0;
                                 } else {
@@ -2124,46 +2277,65 @@ public final class Pins {
                                     Row topRow = topView != null ? findRowByRoot(topView) : null;
                                     int oldPos = topRow != null ? indexOfId(oldList, topRow.id) : -1;
                                     if (oldPos >= 0 && oldPos < list.size()) {
-                                        int span = measuredColumns(topView);
+                                        int span = lmSpanField != null ? intField(lm, lmSpanField, 0) : 0;
+                                        if (span <= 0) span = measuredColumns(topView);
                                         if (span <= 1) span = ruleColumns(rv.getContext());
                                         if (span < 1) span = 1;
                                         if (oldPos < span) {
                                             anchorPos = 0;
-                                            anchorOff = -preY;
+                                            anchorOff = -preYVal;
                                         } else {
                                             anchorPos = oldPos - (oldPos % span);
                                             int padTop = intCallNoArg(rv, "getPaddingTop", 0);
-                                            anchorOff = topView.getTop() - padTop;
+                                            int decorTop = rectTopField(
+                                                    callNoArg(topView, "getLayoutParams"), decorInsetsField);
+                                            anchorOff = topView.getTop() - decorTop - padTop;
                                         }
                                     }
-                                }
-                                if (anchorPos >= 0) {
-                                    final int fPos = anchorPos;
-                                    final int fOff = anchorOff;
-                                    final WeakReference<ViewGroup> rvRef = new WeakReference<ViewGroup>(rv);
-                                    final WeakReference<Object> lmRef = new WeakReference<Object>(lm);
-                                    onCommitted = new Runnable() {
-                                        public void run() {
-                                            try {
-                                                ViewGroup g = rvRef.get();
-                                                Object mgr = lmRef.get();
-                                                if (g == null || mgr == null || !g.isAttachedToWindow()) return;
-                                                if (lmStateField != null) setFieldValue(mgr, lmStateField, null);
-                                                setIntField(mgr, lmPosField, fPos);
-                                                setIntField(mgr, lmOffField, fOff);
-                                                callVoidNoArg(g, "requestLayout");
-                                                trace("differ commit anchor: pos=" + fPos + ", off=" + fOff
-                                                        + ", preY=" + preY);
-                                            } catch (Throwable t) {
-                                                trace("differ commit anchor threw: " + t);
-                                            }
-                                        }
-                                    };
                                 }
                             }
                         }
                     }
+
                     sub.setAccessible(true);
+                    if (differCallbackHooked) {
+                        if (anchorPos >= 0) {
+                            int preGen = differGenField != null
+                                    ? intField(differ, differGenField, -1) : -1;
+                            int expGen = preGen >= 0 ? preGen + 1 : -1;
+                            synchronized (PENDING_LOCK) {
+                                PENDING_ANCHORS.put(differ,
+                                        new PendingAnchor(rv, lm, anchorPos, anchorOff, preYVal, expGen));
+                            }
+                        } else {
+                            synchronized (PENDING_LOCK) {
+                                PENDING_ANCHORS.remove(differ);
+                            }
+                        }
+                        try {
+                            sub.invoke(differ, list, null);
+                        } catch (Throwable invokeErr) {
+                            synchronized (PENDING_LOCK) {
+                                PENDING_ANCHORS.remove(differ);
+                            }
+                            throw invokeErr;
+                        }
+                        return;
+                    }
+
+                    Runnable onCommitted = null;
+                    if (anchorPos >= 0) {
+                        final int fPos = anchorPos;
+                        final int fOff = anchorOff;
+                        final int fPreY = preYVal;
+                        final WeakReference<ViewGroup> rvRef = new WeakReference<ViewGroup>(rv);
+                        final WeakReference<Object> lmRef = new WeakReference<Object>(lm);
+                        onCommitted = new Runnable() {
+                            public void run() {
+                                applyAnchor(rvRef.get(), lmRef.get(), fPos, fOff, fPreY);
+                            }
+                        };
+                    }
                     sub.invoke(differ, list, onCommitted);
                     return;
                 }
@@ -2183,10 +2355,18 @@ public final class Pins {
     private static ViewGroup findRecyclerForAdapter(Object adapter) {
         if (adapter == null) return null;
         try {
+            synchronized (ADAPTER_RECYCLER_LOCK) {
+                WeakReference<ViewGroup> ref = ADAPTER_RECYCLER.get(adapter);
+                if (ref != null) {
+                    ViewGroup rv = ref.get();
+                    if (rv != null && rv.isAttachedToWindow()) return rv;
+                }
+            }
             List<Row> snap;
             synchronized (ROW_LOCK) {
                 snap = new ArrayList<Row>(rows.values());
             }
+            ViewGroup fallback = null;
             for (int i = 0; i < snap.size(); i++) {
                 Row r = snap.get(i);
                 if (r == null || r.root == null || !r.root.isAttachedToWindow()) continue;
@@ -2195,7 +2375,11 @@ public final class Pins {
                 ViewGroup vg = (ViewGroup) p;
                 Object rvAd = callNoArg(vg, "getAdapter");
                 if (rvAd == adapter) return vg;
+                if (fallback == null && rvAd != null && adapter == lastAdapter.get()) {
+                    fallback = vg;
+                }
             }
+            return fallback;
         } catch (Throwable ignored) { }
         return null;
     }
@@ -2266,6 +2450,45 @@ public final class Pins {
         return null;
     }
 
+    private static Method findSubmit2(Class<?> c, String name) {
+        if (name == null || name.length() == 0) return null;
+        while (c != null) {
+            for (Method m : c.getDeclaredMethods()) {
+                if (!name.equals(m.getName())) continue;
+                Class<?>[] ps = m.getParameterTypes();
+                if (ps.length == 2 && List.class.isAssignableFrom(ps[0])) return m;
+            }
+            c = c.getSuperclass();
+        }
+        return null;
+    }
+
+    private static int rectTopField(Object target, String name) {
+        if (target == null || name == null || name.length() == 0) return 0;
+        try {
+            Object v = field(target, name);
+            if (v != null) return intField(v, "top", 0);
+        } catch (Throwable ignored) { }
+        return 0;
+    }
+
+    private static int intField(Object target, String name, int fallback) {
+        if (target == null || name == null || name.length() == 0) return fallback;
+        try {
+            Class<?> c = target.getClass();
+            while (c != null) {
+                try {
+                    Field f = c.getDeclaredField(name);
+                    f.setAccessible(true);
+                    return f.getInt(target);
+                } catch (NoSuchFieldException e) {
+                    c = c.getSuperclass();
+                }
+            }
+        } catch (Throwable ignored) { }
+        return fallback;
+    }
+
     private static boolean hasField(Class<?> c, String name) {
         if (name == null || name.length() == 0) return false;
         while (c != null) {
@@ -2302,6 +2525,23 @@ public final class Pins {
                     Field f = c.getDeclaredField(name);
                     f.setAccessible(true);
                     f.set(target, val);
+                    return;
+                } catch (NoSuchFieldException e) {
+                    c = c.getSuperclass();
+                }
+            }
+        } catch (Throwable ignored) { }
+    }
+
+    private static void setBooleanField(Object target, String name, boolean val) {
+        if (target == null || name == null || name.length() == 0) return;
+        try {
+            Class<?> c = target.getClass();
+            while (c != null) {
+                try {
+                    Field f = c.getDeclaredField(name);
+                    f.setAccessible(true);
+                    f.setBoolean(target, val);
                     return;
                 } catch (NoSuchFieldException e) {
                     c = c.getSuperclass();
