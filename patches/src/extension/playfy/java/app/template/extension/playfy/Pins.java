@@ -393,6 +393,12 @@ public final class Pins {
     private static volatile View arrangingView;
     /** did anything actually move during this arrange session? decides whether finishing speaks */
     private static volatile boolean arrangeMoved;
+    /** generation counter for pending post-layout focus restoration on non-DiffUtil adapters */
+    private static volatile int pendingFocusGen;
+    /** RecyclerView whose descendantFocusability is held during notifyDataSetChanged */
+    private static volatile WeakReference<ViewGroup> savedFocusRv = new WeakReference<ViewGroup>(null);
+    private static volatile int savedFocusDescendant;
+    private static volatile boolean savedFocusFocusable;
     /** last toast text, so a held-left edge press does not queue the same message six times */
     private static volatile String lastSay;
     /**
@@ -1169,6 +1175,9 @@ public final class Pins {
             // fallback. Re-hang the listeners whenever the id on this root changed.
             if (rootView != null) {
                 installLongPress(rootView, id, title);
+                if (id.equals(arrangingId)) {
+                    arrangingView = rootView;
+                }
             }
         } catch (Throwable ignored) { }
     }
@@ -1575,11 +1584,18 @@ public final class Pins {
             order.add(to, order.remove(from));       // shift, not swap: the others slide along
             pinned = new LinkedHashSet<String>(order);
             save();
-            if (id.equals(arrangingId)) arrangeMoved = true;
+            final boolean isArranging = id.equals(arrangingId);
+            if (isArranging) arrangeMoved = true;
             lastSay = null;                                          // a real move earned new feedback
+            final boolean postLayoutFocus = (differField == null) && (isArranging || remoteInput(ctx));
+            final ViewGroup capturedRv = postLayoutFocus ? captureRecyclerFocus(id, isArranging) : null;
             resubmit();
             restampRows();
-            focusMovingRow();
+            if (postLayoutFocus) {
+                schedulePostLayoutFocus(capturedRv, id, isArranging, true);
+            } else {
+                focusMovingRow();
+            }
         } catch (Throwable ignored) { }
     }
 
@@ -1595,6 +1611,8 @@ public final class Pins {
             if (id == null || places == 0) return;
             final int dir = places > 0 ? 1 : -1;
             final int count = Math.abs(places);
+            boolean moved = false;
+            final boolean isArranging = id.equals(arrangingId);
             for (int i = 0; i < count; i++) {
                 List<String> order = new ArrayList<String>(pinned);
                 int from = order.indexOf(id);
@@ -1603,13 +1621,21 @@ public final class Pins {
                 if (to < 0 || to >= order.size()) break;            // the end: stop, say nothing
                 order.add(to, order.remove(from));
                 pinned = new LinkedHashSet<String>(order);
-                if (id.equals(arrangingId)) arrangeMoved = true;
+                moved = true;
+                if (isArranging) arrangeMoved = true;
             }
+            if (!moved) return;
             save();
             lastSay = null;
+            final boolean postLayoutFocus = (differField == null) && (isArranging || remoteInput(ctx));
+            final ViewGroup capturedRv = postLayoutFocus ? captureRecyclerFocus(id, isArranging) : null;
             resubmit();
             restampRows();
-            focusMovingRow();
+            if (postLayoutFocus) {
+                schedulePostLayoutFocus(capturedRv, id, isArranging, true);
+            } else {
+                focusMovingRow();
+            }
         } catch (Throwable ignored) { }
     }
 
@@ -1636,11 +1662,18 @@ public final class Pins {
             order.add(target, id);
             pinned = new LinkedHashSet<String>(order);
             save();
-            if (id.equals(arrangingId)) arrangeMoved = true;
+            final boolean isArranging = id.equals(arrangingId);
+            if (isArranging) arrangeMoved = true;
             lastSay = null;
+            final boolean postLayoutFocus = (differField == null) && (isArranging || remoteInput(ctx));
+            final ViewGroup capturedRv = postLayoutFocus ? captureRecyclerFocus(id, isArranging) : null;
             resubmit();
             restampRows();
-            focusMovingRow();
+            if (postLayoutFocus) {
+                schedulePostLayoutFocus(capturedRv, id, isArranging, true);
+            } else {
+                focusMovingRow();
+            }
         } catch (Throwable ignored) { }
     }
 
@@ -1679,34 +1712,300 @@ public final class Pins {
     static void endArrange(Context ctx, boolean keep) {
         try {
             final boolean moved = arrangeMoved;
+            final String prevId = arrangingId;
+            final View prevView = arrangingView;
             arrangingId = null;
             arrangingView = null;
             arrangeMoved = false;
             lastSay = null;
+            ViewGroup pendingRv = savedFocusRv.get();
+            if (pendingRv != null && pendingRv.isAttachedToWindow() && pendingRv.isLayoutRequested()) {
+                // A notifyDataSetChanged() layout pass from the last move is still pending: stop
+                // forwarding arrange keys right away, but keep holding focus on the RecyclerView
+                // until onLayoutChange fires so detaching children mid-layout cannot steal focus.
+                pendingRv.setOnKeyListener(null);
+                schedulePostLayoutFocus(pendingRv, prevId, false, true);
+            } else {
+                pendingFocusGen++;
+                restoreRecyclerFocusAndHandoff(prevView != null ? prevView : findRow(prevId));
+            }
             restampRows();
             if (keep && moved) say(ctx, "Position saved");   // silence beats a claim that is not true
         } catch (Throwable ignored) { }
     }
 
-    /** The view we know for a category id, if it is on screen. */
+    /** The attached card view we know for a category id, if it is on screen. */
     private static View findRow(String id) {
+        if (id == null) return null;
         try {
+            View attachedFallback = null;
             synchronized (ROW_LOCK) {
                 for (Map.Entry<View, Row> e : rows.entrySet()) {
                     Row r = e.getValue();
-                    if (r != null && id.equals(r.id)) {
-                        return r.root != null ? r.root : e.getKey();   // the focusable card, not the title
-                    }
+                    if (r == null || !id.equals(r.id)) continue;
+                    View cand = r.root != null ? r.root : e.getKey();
+                    if (cand == null || !cand.isAttachedToWindow() || cand.getParent() == null) continue;
+                    // Verify the card itself has not already been rebound to a different category.
+                    Row rootRow = rows.get(cand);
+                    if (rootRow != null && !id.equals(rootRow.id)) continue;
+                    if (cand.getWidth() > 0) return cand;
+                    if (attachedFallback == null) attachedFallback = cand;
                 }
+            }
+            return attachedFallback;
+        } catch (Throwable ignored) { }
+        return null;
+    }
+
+    private static boolean isRecyclerView(ViewGroup vg) {
+        if (vg == null) return false;
+        String name = vg.getClass().getName();
+        if (name.endsWith("RecyclerView")) return true;
+        try {
+            vg.getClass().getMethod("getLayoutManager");
+            return true;
+        } catch (Throwable ignored) { }
+        return false;
+    }
+
+    private static ViewGroup findRecyclerView(View v) {
+        View cur = v;
+        try {
+            while (cur != null) {
+                Object p = cur.getParent();
+                if (!(p instanceof ViewGroup)) break;
+                ViewGroup vg = (ViewGroup) p;
+                if (isRecyclerView(vg)) return vg;
+                cur = vg;
             }
         } catch (Throwable ignored) { }
         return null;
     }
 
+    private static ViewGroup resolveRecycler(String id) {
+        ViewGroup rv = findRecyclerView(arrangingView);
+        if (rv != null && rv.isAttachedToWindow()) return rv;
+        rv = findRecyclerView(findRow(id));
+        if (rv != null && rv.isAttachedToWindow()) return rv;
+        return findRecyclerForAdapter(lastAdapter.get());
+    }
+
+    /**
+     * Hold focus on the RecyclerView across a notifyDataSetChanged() layout pass so detaching
+     * children mid-layout cannot bounce Android TV focus up to the parent TabLayout.
+     */
+    private static ViewGroup captureRecyclerFocus(String id, boolean forwardKeys) {
+        try {
+            ViewGroup rv = resolveRecycler(id);
+            if (rv == null || !rv.isAttachedToWindow()) return null;
+            ViewGroup prev = savedFocusRv.get();
+            if (prev != rv) {
+                if (prev != null) restoreRecyclerFocusAndHandoff(null);
+                savedFocusRv = new WeakReference<ViewGroup>(rv);
+                savedFocusDescendant = rv.getDescendantFocusability();
+                savedFocusFocusable = rv.isFocusable();
+            }
+            rv.setDescendantFocusability(ViewGroup.FOCUS_BEFORE_DESCENDANTS);
+            rv.setFocusable(true);
+            rv.requestFocus();
+            if (forwardKeys) {
+                rv.setOnKeyListener(new View.OnKeyListener() {
+                    public boolean onKey(View v, int keyCode, KeyEvent event) {
+                        try { noteKeyInput(); } catch (Throwable ignored) { }
+                        return onArrangeKey(v, keyCode, event);
+                    }
+                });
+            }
+            return rv;
+        } catch (Throwable ignored) { }
+        return null;
+    }
+
+    /**
+     * Restore descendantFocusability + clear temp key listener FIRST, transfer focus to `target`
+     * (or first focusable child), and ONLY THEN restore `rv.setFocusable(savedFocusFocusable)`.
+     * Calling `rv.setFocusable(false)` while `rv.isFocused()` is true triggers AOSP `clearFocus()`,
+     * which bounces focus up to the parent TabLayout before `target.requestFocus()` runs.
+     */
+    private static void restoreRecyclerFocusAndHandoff(View target) {
+        try {
+            ViewGroup rv = savedFocusRv.get();
+            savedFocusRv = new WeakReference<ViewGroup>(null);
+            if (rv == null) {
+                if (target != null && target.isAttachedToWindow() && !target.isFocused()) {
+                    target.requestFocus();
+                }
+                return;
+            }
+            rv.setOnKeyListener(null);
+            rv.setDescendantFocusability(savedFocusDescendant);
+            boolean handedOff = false;
+            if (target != null && target.isAttachedToWindow()) {
+                handedOff = target.isFocused() || target.requestFocus();
+            }
+            if (!handedOff) {
+                int n = rv.getChildCount();
+                for (int i = 0; i < n; i++) {
+                    View c = rv.getChildAt(i);
+                    if (c != null && c.isAttachedToWindow() && (c.isFocused() || c.requestFocus())) {
+                        break;
+                    }
+                }
+            }
+            rv.setFocusable(savedFocusFocusable);
+        } catch (Throwable ignored) { }
+    }
+
+    private static void scrollTargetIntoView(ViewGroup rv, String targetId) {
+        try {
+            if (rv == null || targetId == null) return;
+            List live = liveList();
+            if (live == null) return;
+            int targetIdx = indexOfId(live, targetId);
+            if (targetIdx < 0) return;
+
+            int firstVisIdx = -1;
+            int sampleH = 0;
+            View sampleView = null;
+            int minTop = Integer.MAX_VALUE;
+            int maxTop = Integer.MIN_VALUE;
+            int minRow = Integer.MAX_VALUE;
+            int maxRow = Integer.MIN_VALUE;
+            int span = 0;
+
+            int n = rv.getChildCount();
+            for (int i = 0; i < n; i++) {
+                View c = rv.getChildAt(i);
+                if (c == null) continue;
+                if (sampleH <= 0 && c.getHeight() > 0) {
+                    sampleH = c.getHeight();
+                    sampleView = c;
+                    span = layoutSpan(sampleView, rv.getContext());
+                    if (span < 1) span = 1;
+                }
+                Row r;
+                synchronized (ROW_LOCK) { r = rows.get(c); }
+                if (r != null && r.id != null) {
+                    int idx = indexOfId(live, r.id);
+                    if (idx >= 0) {
+                        if (firstVisIdx < 0 || idx < firstVisIdx) firstVisIdx = idx;
+                        if (span > 0) {
+                            int row = idx / span;
+                            int top = c.getTop();
+                            if (row < minRow) { minRow = row; minTop = top; }
+                            if (row > maxRow) { maxRow = row; maxTop = top; }
+                        }
+                    }
+                }
+            }
+            if (sampleH <= 0) sampleH = 160;
+            if (span < 1) span = ruleColumns(rv.getContext());
+            int rowPitch = sampleH;
+            if (maxRow > minRow && maxTop > minTop) {
+                int measuredPitch = (maxTop - minTop) / (maxRow - minRow);
+                if (measuredPitch > 0) rowPitch = measuredPitch;
+            }
+            if (firstVisIdx >= 0) {
+                int dir = targetIdx < firstVisIdx ? -1 : 1;
+                int rowDelta = (targetIdx / span) - (firstVisIdx / span);
+                int initialDy = rowDelta != 0 ? rowDelta * rowPitch : dir * rowPitch;
+                if (initialDy != 0 && rv.canScrollVertically(dir)) {
+                    rv.scrollBy(0, initialDy);
+                }
+                for (int step = 0; step < 16 && findRow(targetId) == null; step++) {
+                    if (!rv.canScrollVertically(dir)) break;
+                    rv.scrollBy(0, dir * rowPitch);
+                }
+            }
+        } catch (Throwable ignored) { }
+    }
+
+    private static void schedulePostLayoutFocus(final ViewGroup rv, final String targetId,
+                                                final boolean isArranging, final boolean scrollIfNeeded) {
+        final int gen = ++pendingFocusGen;
+        if (rv == null || !rv.isAttachedToWindow()) {
+            restoreRecyclerFocusAndHandoff(null);
+            if (isArranging) focusMovingRow();
+            return;
+        }
+        final boolean[] done = new boolean[1];
+        final int[] retries = new int[1];
+        final View.OnLayoutChangeListener[] holder = new View.OnLayoutChangeListener[1];
+        final Runnable finish = new Runnable() {
+            public void run() {
+                if (done[0]) return;
+                done[0] = true;
+                try {
+                    if (holder[0] != null) rv.removeOnLayoutChangeListener(holder[0]);
+                } catch (Throwable ignored) { }
+                try {
+                    if (gen != pendingFocusGen) return;
+                    if (isArranging && targetId != null && !targetId.equals(arrangingId)) {
+                        restoreRecyclerFocusAndHandoff(null);
+                        return;
+                    }
+                    View target = targetId != null ? findRow(targetId) : null;
+                    if (target == null && targetId != null && scrollIfNeeded) {
+                        scrollTargetIntoView(rv, targetId);
+                        target = findRow(targetId);
+                    }
+                    if (target != null && target.isAttachedToWindow()) {
+                        if (isArranging) arrangingView = target;
+                        int top = target.getTop();
+                        int h = target.getHeight();
+                        int rvH = rv.getHeight();
+                        if (top < 0 && rv.canScrollVertically(-1)) {
+                            rv.scrollBy(0, top);
+                        } else if (rvH > 0 && h > 0 && top + h > rvH && rv.canScrollVertically(1)) {
+                            rv.scrollBy(0, (top + h) - rvH);
+                        }
+                        restoreRecyclerFocusAndHandoff(target);
+                        final View fTarget = target;
+                        target.post(new Runnable() {
+                            public void run() {
+                                try {
+                                    if (gen != pendingFocusGen) return;
+                                    if (isArranging && !targetId.equals(arrangingId)) return;
+                                    if (fTarget.isAttachedToWindow() && !fTarget.isFocused()) {
+                                        fTarget.requestFocus();
+                                    }
+                                } catch (Throwable ignored) { }
+                            }
+                        });
+                    } else {
+                        restoreRecyclerFocusAndHandoff(null);
+                    }
+                } catch (Throwable ignored) {
+                    restoreRecyclerFocusAndHandoff(null);
+                }
+            }
+        };
+        holder[0] = new View.OnLayoutChangeListener() {
+            public void onLayoutChange(View v, int left, int top, int right, int bottom,
+                                       int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                finish.run();
+            }
+        };
+        rv.addOnLayoutChangeListener(holder[0]);
+        final Runnable fallback = new Runnable() {
+            public void run() {
+                if (done[0] || gen != pendingFocusGen) return;
+                // Do not pre-empt Choreographer vsync: wait while layout is still pending (up to 3x48ms).
+                if (rv.isAttachedToWindow() && rv.isLayoutRequested() && retries[0] < 3) {
+                    retries[0]++;
+                    rv.postDelayed(this, 48L);
+                    return;
+                }
+                finish.run();
+            }
+        };
+        rv.postDelayed(fallback, 48L);
+    }
+
     /** After a reorder the list moves underneath us; put focus back on the card being arranged. */
     private static void focusMovingRow() {
         try {
-            final View v = arrangingView;
+            final View v = arrangingView != null ? arrangingView : findRow(arrangingId);
             if (v == null || !v.isAttachedToWindow() || v.getWidth() <= 0) return;
 
             // requestFocus() on a child the RecyclerView thinks is off screen is answered by
@@ -1740,7 +2039,17 @@ public final class Pins {
             // top is twelve presses of LEFT. The width is measured from the card itself, with the
             // app's own 8/4 rule as the fallback - never a silent one-place step.
             if (keyCode == KeyEvent.KEYCODE_DPAD_UP || keyCode == KeyEvent.KEYCODE_DPAD_DOWN) {
-                final int rowStep = layoutSpan(v, c);
+                View sampleCard = v;
+                if (v instanceof ViewGroup && isRecyclerView((ViewGroup) v)) {
+                    ViewGroup rvg = (ViewGroup) v;
+                    sampleCard = arrangingView != null && arrangingView.isAttachedToWindow()
+                            ? arrangingView
+                            : findRow(id);
+                    if (sampleCard == null && rvg.getChildCount() > 0) {
+                        sampleCard = rvg.getChildAt(0);
+                    }
+                }
+                final int rowStep = layoutSpan(sampleCard, c);
                 moveBy(c, id, keyCode == KeyEvent.KEYCODE_DPAD_UP ? -rowStep : rowStep);
                 return true;
             }
@@ -1806,8 +2115,13 @@ public final class Pins {
             pinned = copy;
             save();
             say(ctx, wantPinned ? "Pinned to top" : "Unpinned");
+            final boolean postLayoutFocus = (differField == null) && remoteInput(ctx);
+            final ViewGroup capturedRv = postLayoutFocus ? captureRecyclerFocus(id, false) : null;
             resubmit();
             restampRows();
+            if (postLayoutFocus) {
+                schedulePostLayoutFocus(capturedRv, id, false, wantPinned);
+            }
         } catch (Throwable ignored) { }
     }
 
@@ -1840,8 +2154,13 @@ public final class Pins {
             save();
             lastSay = null;
             say(ctx, gone == 1 ? "Cleared 1 stranded pin" : "Cleared " + gone + " stranded pins");
+            final boolean postLayoutFocus = (differField == null) && remoteInput(ctx);
+            final ViewGroup capturedRv = postLayoutFocus ? captureRecyclerFocus(arrangingId, false) : null;
             resubmit();
             restampRows();
+            if (postLayoutFocus) {
+                schedulePostLayoutFocus(capturedRv, arrangingId, arrangingId != null, false);
+            }
         } catch (Throwable ignored) { }
     }
 
@@ -2375,7 +2694,8 @@ public final class Pins {
                 ViewGroup vg = (ViewGroup) p;
                 Object rvAd = callNoArg(vg, "getAdapter");
                 if (rvAd == adapter) return vg;
-                if (fallback == null && rvAd != null && adapter == lastAdapter.get()) {
+                if (fallback == null && adapter == lastAdapter.get()
+                        && (rvAd != null || vg.getClass().getName().endsWith("RecyclerView"))) {
                     fallback = vg;
                 }
             }

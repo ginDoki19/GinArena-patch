@@ -20,6 +20,11 @@ public class View {
     public void setOnTouchListener(OnTouchListener l) {}
     public boolean requestFocus() { throw new RuntimeException(); }
     public boolean isFocused() { throw new RuntimeException(); }
+    public boolean isFocusable() { throw new RuntimeException(); }
+    public void setFocusable(boolean focusable) {}
+    public void addOnLayoutChangeListener(OnLayoutChangeListener listener) {}
+    public void removeOnLayoutChangeListener(OnLayoutChangeListener listener) {}
+    public boolean isLayoutRequested() { throw new RuntimeException(); }
     /** the view's parent (the grid a card sits in); null before it is attached */
     public ViewParent getParent() { throw new RuntimeException(); }
     /** top edge in px, relative to the parent; 0 before layout */
@@ -54,5 +59,9 @@ public class View {
     }
     public interface OnTouchListener {
         boolean onTouch(View v, MotionEvent event);
+    }
+    public interface OnLayoutChangeListener {
+        void onLayoutChange(View v, int left, int top, int right, int bottom,
+                            int oldLeft, int oldTop, int oldRight, int oldBottom);
     }
 }

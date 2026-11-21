@@ -8,6 +8,9 @@ package android.view;
  * the field-name reflection this replaced, none of it can be obfuscated away.
  */
 public abstract class ViewGroup extends View implements ViewParent {
+    public static final int FOCUS_BEFORE_DESCENDANTS = 0x20000;
+    public int getDescendantFocusability() { throw new RuntimeException(); }
+    public void setDescendantFocusability(int focusability) {}
     public int getChildCount() { throw new RuntimeException(); }
     public View getChildAt(int index) { throw new RuntimeException(); }
     /**
