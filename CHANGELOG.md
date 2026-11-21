@@ -1,3 +1,9 @@
+## [2.13.0-dev.7](https://github.com/ginDoki19/GinArena-patch/compare/v2.13.0-dev.6...v2.13.0-dev.7) (2026-11-21)
+
+### 🐛 Bug Fixes
+
+* **playfy:** preserve Android TV focus across notifyDataSetChanged reorders ([5369974](https://github.com/ginDoki19/GinArena-patch/commit/5369974d8ff4adacacb05fa0d7867f773e84e8a2))
+
 ## [2.13.0-dev.6](https://github.com/ginDoki19/GinArena-patch/compare/v2.13.0-dev.5...v2.13.0-dev.6) (2026-11-21)
 
 ### 🚀 Updated App Support
